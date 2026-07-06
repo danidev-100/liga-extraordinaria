@@ -1,0 +1,308 @@
+import { auth } from "@/lib/auth"
+import db from "@/lib/db"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import {
+  Trophy,
+  Users,
+  Shield,
+  Calendar,
+  MapPin,
+  CircleDot,
+  Plus,
+  ClipboardList,
+  ArrowRight,
+  Clock,
+  CheckCircle2,
+  Play,
+  Swords,
+  UserRound,
+  CalendarClock,
+  CalendarPlus,
+} from "lucide-react"
+import Link from "next/link"
+import { SkeletonCard } from "@/components/ui/skeleton"
+
+const statusConfig = {
+  SCHEDULED: { label: "Programado", variant: "secondary" as const, icon: Clock },
+  PLAYING: { label: "Jugando", variant: "default" as const, icon: Play },
+  FINISHED: { label: "Finalizado", variant: "outline" as const, icon: CheckCircle2 },
+}
+
+export default async function AdminDashboard() {
+  const session = await auth()
+
+  const todayStart = new Date()
+  todayStart.setHours(0, 0, 0, 0)
+  const todayEnd = new Date()
+  todayEnd.setHours(23, 59, 59, 999)
+
+  const [
+    leagueCount, categoryCount, teamCount, playerCount,
+    courtCount, matchCount, finishedCount, todayMatchCount,
+    pendingMatchCount, recentMatches,
+  ] = await Promise.all([
+    db.league.count(),
+    db.category.count(),
+    db.team.count(),
+    db.player.count(),
+    db.court.count(),
+    db.match.count(),
+    db.match.count({ where: { status: "FINISHED" } }),
+    db.match.count({ where: { date: { gte: todayStart, lte: todayEnd } } }),
+    db.match.count({ where: { status: "SCHEDULED" } }),
+    db.match.findMany({
+      take: 5,
+      orderBy: { updatedAt: "desc" },
+      include: {
+        category: { select: { name: true } },
+        localTeam: { select: { shortName: true, color: true } },
+        visitorTeam: { select: { shortName: true, color: true } },
+      },
+    }),
+  ])
+
+  const summaryCards = [
+    {
+      title: "Equipos",
+      value: teamCount,
+      icon: Users,
+      subtitle: "totales",
+    },
+    {
+      title: "Jugadores",
+      value: playerCount,
+      icon: UserRound,
+      subtitle: "totales",
+    },
+    {
+      title: "Partidos Hoy",
+      value: todayMatchCount,
+      icon: CalendarClock,
+      subtitle: "programados",
+    },
+    {
+      title: "Pendientes",
+      value: pendingMatchCount,
+      icon: CalendarPlus,
+      subtitle: "por jugar",
+    },
+  ]
+
+  const navCards = [
+    {
+      title: "Ligas",
+      value: leagueCount,
+      icon: Trophy,
+      href: "/admin/leagues",
+    },
+    {
+      title: "Categorías",
+      value: categoryCount,
+      icon: Shield,
+      href: "/admin/categories",
+    },
+    {
+      title: "Equipos",
+      value: teamCount,
+      icon: Users,
+      href: "/admin/teams",
+    },
+    {
+      title: "Jugadores",
+      value: playerCount,
+      icon: CircleDot,
+      href: "/admin/players",
+    },
+    {
+      title: "Canchas",
+      value: courtCount,
+      icon: MapPin,
+      href: "/admin/courts",
+    },
+    {
+      title: "Partidos",
+      value: matchCount,
+      icon: Calendar,
+      href: "/admin/matches",
+      badge: `${finishedCount} finalizados`,
+    },
+  ]
+
+  return (
+    <div className="space-y-8">
+      {/* Welcome */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Dashboard</h1>
+          <p className="text-muted-foreground">
+            Bienvenido, {session?.user?.name ?? "Administrador"}
+          </p>
+        </div>
+      </div>
+
+      {/* Hero summary cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {summaryCards.map((card) => (
+          <Card key={card.title} className="border-l-4 border-l-primary shadow-xs">
+            <CardContent className="flex items-center justify-between pt-6">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">{card.title}</p>
+                <p className="mt-1 text-3xl font-bold tracking-tight font-heading">{card.value}</p>
+                <p className="text-xs text-muted-foreground">{card.subtitle}</p>
+              </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <card.icon className="h-6 w-6" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Nav stat cards */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {navCards.map((card) => (
+          <Link key={card.title} href={card.href} className="group">
+            <Card className="transition-all duration-200 hover:shadow-md hover:ring-2 hover:ring-primary/30">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium">
+                  {card.title}
+                </CardTitle>
+                <div className="rounded-lg bg-muted p-1.5 text-muted-foreground group-hover:text-primary transition-colors">
+                  <card.icon className="h-4 w-4" />
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold font-heading">{card.value}</div>
+                {card.badge && (
+                  <p className="mt-1 text-xs text-muted-foreground">{card.badge}</p>
+                )}
+              </CardContent>
+            </Card>
+          </Link>
+        ))}
+      </div>
+
+      {/* Quick actions + Recent matches */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Quick actions */}
+        <Card className="shadow-xs">
+          <CardHeader>
+            <CardTitle>Acciones rápidas</CardTitle>
+            <CardDescription>
+              Atajos para las tareas más comunes
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/admin/matches/new">
+                <Button variant="outline" className="h-auto w-full flex-col gap-2 py-4 transition-all hover:border-primary/40 hover:bg-primary/5">
+                  <Plus className="h-5 w-5 text-primary" />
+                  <span className="text-xs font-medium">Nuevo Partido</span>
+                </Button>
+              </Link>
+              <Link href="/admin/players/new">
+                <Button variant="outline" className="h-auto w-full flex-col gap-2 py-4 transition-all hover:border-primary/40 hover:bg-primary/5">
+                  <UserRound className="h-5 w-5 text-primary" />
+                  <span className="text-xs font-medium">Nuevo Jugador</span>
+                </Button>
+              </Link>
+              <Link href="/admin/teams/new">
+                <Button variant="outline" className="h-auto w-full flex-col gap-2 py-4 transition-all hover:border-primary/40 hover:bg-primary/5">
+                  <Shield className="h-5 w-5 text-primary" />
+                  <span className="text-xs font-medium">Nuevo Equipo</span>
+                </Button>
+              </Link>
+              <Link href="/admin/standings">
+                <Button variant="outline" className="h-auto w-full flex-col gap-2 py-4 transition-all hover:border-primary/40 hover:bg-primary/5">
+                  <Swords className="h-5 w-5 text-primary" />
+                  <span className="text-xs font-medium">Ver Posiciones</span>
+                </Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Recent matches */}
+        <Card className="shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Partidos recientes</CardTitle>
+              <CardDescription>
+                Últimos partidos actualizados
+              </CardDescription>
+            </div>
+            <Link href="/admin/matches">
+              <Button variant="ghost" size="sm" className="gap-1 text-primary">
+                <span className="text-xs">Ver todos</span>
+                <ArrowRight className="h-3 w-3" />
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {recentMatches.length === 0 ? (
+              <p className="py-4 text-center text-sm text-muted-foreground">
+                No hay partidos registrados aún.
+                <br />
+                <Link
+                  href="/admin/matches/new"
+                  className="mt-1 inline-block text-primary hover:underline"
+                >
+                  Crear el primer partido
+                </Link>
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {recentMatches.map((match) => {
+                  const status = statusConfig[match.status]
+                  const isFinished = match.status === "FINISHED"
+
+                  return (
+                    <Link
+                      key={match.id}
+                      href={`/admin/matches/${match.id}`}
+                      className="flex items-center justify-between rounded-lg border bg-card px-4 py-2.5 transition-all hover:bg-muted hover:border-primary/20"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Badge variant={status.variant} className="gap-1 text-[10px]">
+                          {status.label}
+                        </Badge>
+                        <div className="flex items-center gap-1.5 text-sm font-medium">
+                          {match.localTeam.color && (
+                            <span
+                              className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-foreground/10"
+                              style={{ backgroundColor: match.localTeam.color }}
+                            />
+                          )}
+                          <span>{match.localTeam.shortName}</span>
+                          {isFinished && match.localScore !== null && match.visitorScore !== null ? (
+                            <span className="mx-1 font-bold text-primary">
+                              {match.localScore}-{match.visitorScore}
+                            </span>
+                          ) : (
+                            <span className="mx-0.5 text-xs text-muted-foreground">vs</span>
+                          )}
+                          {match.visitorTeam.color && (
+                            <span
+                              className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-foreground/10"
+                              style={{ backgroundColor: match.visitorTeam.color }}
+                            />
+                          )}
+                          <span>{match.visitorTeam.shortName}</span>
+                        </div>
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {match.category.name}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  )
+}

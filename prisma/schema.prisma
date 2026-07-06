@@ -1,0 +1,192 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum CardType {
+  YELLOW
+  RED
+}
+
+enum MatchStatus {
+  SCHEDULED
+  PLAYING
+  FINISHED
+}
+
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
+}
+
+model Admin {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  role         UserRole @default(ADMIN)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("admins")
+}
+
+model League {
+  id         String     @id @default(uuid()) @db.Uuid
+  name       String
+  season     String
+  startDate  DateTime   @map("start_date")
+  endDate    DateTime   @map("end_date")
+  isActive   Boolean    @default(false) @map("is_active")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  categories Category[]
+
+  @@map("leagues")
+}
+
+model Category {
+  id       String   @id @default(uuid()) @db.Uuid
+  name     String
+  minAge   Int      @map("min_age")
+  maxAge   Int      @map("max_age")
+  leagueId String   @map("league_id") @db.Uuid
+  league   League   @relation(fields: [leagueId], references: [id], onDelete: Restrict)
+  teams    Team[]
+  matches  Match[]
+  standings Standing[]
+
+  @@unique([name, leagueId])
+  @@map("categories")
+}
+
+model Team {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  shortName    String   @map("short_name")
+  logoUrl      String?  @map("logo_url")
+  color        String?
+  categoryId   String   @map("category_id") @db.Uuid
+  category     Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  players      Player[]
+  localMatches Match[]  @relation("LocalTeam")
+  visitorMatches Match[] @relation("VisitorTeam")
+  goals        Goal[]
+  cards        Card[]
+  standing     Standing?
+
+  @@unique([name, categoryId])
+  @@map("teams")
+}
+
+model Player {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  surname      String
+  dni          String   @unique
+  birthDate    DateTime @map("birth_date")
+  photoUrl     String?  @map("photo_url")
+  teamId       String   @map("team_id") @db.Uuid
+  team         Team     @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  jerseyNumber Int?     @map("jersey_number")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  goals        Goal[]
+  cards        Card[]
+
+  @@map("players")
+}
+
+model Court {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  address   String?
+  city      String
+  capacity  Int?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  matches   Match[]
+
+  @@map("courts")
+}
+
+model Match {
+  id            String      @id @default(uuid()) @db.Uuid
+  categoryId    String      @map("category_id") @db.Uuid
+  category      Category    @relation(fields: [categoryId], references: [id])
+  courtId       String      @map("court_id") @db.Uuid
+  court         Court       @relation(fields: [courtId], references: [id])
+  date          DateTime
+  time          String
+  localTeamId   String      @map("local_team_id") @db.Uuid
+  localTeam     Team        @relation("LocalTeam", fields: [localTeamId], references: [id])
+  visitorTeamId String      @map("visitor_team_id") @db.Uuid
+  visitorTeam   Team        @relation("VisitorTeam", fields: [visitorTeamId], references: [id])
+  localScore    Int?        @map("local_score")
+  visitorScore  Int?        @map("visitor_score")
+  status        MatchStatus @default(SCHEDULED)
+  round         Int
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+  goals         Goal[]
+  cards         Card[]
+
+  @@map("matches")
+}
+
+model Goal {
+  id        String  @id @default(uuid()) @db.Uuid
+  matchId   String  @map("match_id") @db.Uuid
+  match     Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  playerId  String  @map("player_id") @db.Uuid
+  player    Player  @relation(fields: [playerId], references: [id])
+  teamId    String  @map("team_id") @db.Uuid
+  team      Team    @relation(fields: [teamId], references: [id])
+  minute    Int
+  isOwnGoal Boolean @default(false) @map("is_own_goal")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("goals")
+}
+
+model Card {
+  id        String   @id @default(uuid()) @db.Uuid
+  matchId   String   @map("match_id") @db.Uuid
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  playerId  String   @map("player_id") @db.Uuid
+  player    Player   @relation(fields: [playerId], references: [id])
+  teamId    String   @map("team_id") @db.Uuid
+  team      Team     @relation(fields: [teamId], references: [id])
+  type      CardType
+  minute    Int
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("cards")
+}
+
+model Standing {
+  id         String   @id @default(uuid()) @db.Uuid
+  categoryId String   @map("category_id") @db.Uuid
+  category   Category @relation(fields: [categoryId], references: [id])
+  teamId     String   @map("team_id") @db.Uuid @unique
+  team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  pts        Int      @default(0)
+  pj         Int      @default(0)
+  pg         Int      @default(0)
+  pe         Int      @default(0)
+  pp         Int      @default(0)
+  gf         Int      @default(0)
+  gc         Int      @default(0)
+  dg         Int      @default(0)
+  ta         Int      @default(0)
+  tr         Int      @default(0)
+  position   Int      @default(0)
+
+  @@map("standings")
+}
