@@ -99,9 +99,9 @@ async function GoleadoresContent({ categoryId, leagueId }: { categoryId?: string
           playerId: g.playerId,
           playerName: player?.name ?? "",
           playerSurname: player?.surname ?? "",
-          teamName: player?.team.name ?? "",
-          teamShortName: player?.team.shortName ?? "",
-          teamColor: player?.team.color ?? null,
+          teamName: player?.team?.name ?? "",
+          teamShortName: player?.team?.shortName ?? "",
+          teamColor: player?.team?.color ?? null,
           totalGoals: g._count.id,
           position: idx + 1,
         }
