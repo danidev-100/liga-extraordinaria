@@ -8,6 +8,7 @@ import { Prisma } from "@prisma/client"
 export interface GoalsDistribution {
   teamShortName: string
   teamColor: string | null
+  teamLogoUrl: string | null
   goals: number
 }
 
@@ -48,6 +49,7 @@ export async function getGoalsDistribution(): Promise<GoalsDistribution[]> {
     return await db.$queryRaw<GoalsDistribution[]>`
       SELECT t.short_name AS "teamShortName",
              t.color AS "teamColor",
+             t.logo_url AS "teamLogoUrl",
              COUNT(g.id)::int AS goals
       FROM goals g
       JOIN matches m ON m.id = g.match_id AND m.status = 'FINISHED'
@@ -77,6 +79,7 @@ export async function getLeastConceded(): Promise<GoalsDistribution[]> {
       )
       SELECT t.short_name AS "teamShortName",
              t.color AS "teamColor",
+             t.logo_url AS "teamLogoUrl",
              SUM(c.goals)::int AS goals
       FROM conceded c
       JOIN teams t ON t.id = c.team_id

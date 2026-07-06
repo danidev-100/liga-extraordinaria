@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { DeleteButton } from "@/components/forms/delete-button"
 import { Edit } from "lucide-react"
 import { deletePlayer } from "@/actions/player"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export type PlayerRow = {
   id: string
@@ -19,6 +20,8 @@ export type PlayerRow = {
   isActive: boolean
   teamName: string
   teamShortName: string
+  teamLogoUrl: string | null
+  teamColor: string | null
   categoryName: string
 }
 
@@ -70,6 +73,12 @@ const columns: ColumnDef<PlayerRow>[] = [
   {
     accessorKey: "teamShortName",
     header: "Equipo",
+    cell: ({ row }) => (
+      <span className="flex items-center gap-2">
+        <TeamLogo logoUrl={row.original.teamLogoUrl} color={row.original.teamColor} name={row.original.teamName} size="md" />
+        {row.original.teamShortName}
+      </span>
+    ),
   },
   {
     id: "jerseyNumber",

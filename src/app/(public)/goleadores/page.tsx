@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export const metadata = {
   title: "Goleadores — Liga",
@@ -58,6 +59,7 @@ async function GoleadoresContent({ categoryId, leagueId }: { categoryId?: string
     teamName: string
     teamShortName: string
     teamColor: string | null
+    teamLogoUrl: string | null
     totalGoals: number
     position: number
   }
@@ -81,14 +83,14 @@ async function GoleadoresContent({ categoryId, leagueId }: { categoryId?: string
 
       const players: {
         id: string; name: string; surname: string;
-        team: { name: string; shortName: string; color: string | null } | null
+        team: { name: string; shortName: string; color: string | null; logoUrl: string | null } | null
       }[] = await db.player.findMany({
         where: { id: { in: playerIds } },
         select: {
           id: true,
           name: true,
           surname: true,
-          team: { select: { name: true, shortName: true, color: true } },
+          team: { select: { name: true, shortName: true, color: true, logoUrl: true } },
         },
       })
 
@@ -103,6 +105,7 @@ async function GoleadoresContent({ categoryId, leagueId }: { categoryId?: string
           teamName: player?.team?.name ?? "",
           teamShortName: player?.team?.shortName ?? "",
           teamColor: player?.team?.color ?? null,
+          teamLogoUrl: player?.team?.logoUrl ?? null,
           totalGoals: g._count.id,
           position: idx + 1,
         }
@@ -201,12 +204,7 @@ async function GoleadoresContent({ categoryId, leagueId }: { categoryId?: string
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {scorer.teamColor && (
-                          <span
-                            className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                            style={{ backgroundColor: scorer.teamColor }}
-                          />
-                        )}
+                        <TeamLogo logoUrl={scorer.teamLogoUrl} color={scorer.teamColor} name={scorer.teamName} size="md" />
                         <span className="text-sm text-muted-foreground">
                           {scorer.teamShortName}
                         </span>

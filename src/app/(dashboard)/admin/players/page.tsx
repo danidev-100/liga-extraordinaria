@@ -39,6 +39,8 @@ export default async function PlayersPage({
           select: {
             name: true,
             shortName: true,
+            logoUrl: true,
+            color: true,
             category: { select: { name: true, id: true } },
           },
         },
@@ -93,6 +95,8 @@ export default async function PlayersPage({
               isActive: p.isActive,
               teamName: p.team.name,
               teamShortName: p.team.shortName,
+              teamLogoUrl: p.team.logoUrl,
+              teamColor: p.team.color,
               categoryName: p.team.category.name,
             }))}
           />

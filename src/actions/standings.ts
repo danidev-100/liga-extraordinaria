@@ -19,7 +19,7 @@ export async function getStandingsByCategory(categoryId: string) {
   const standings = await db.standing.findMany({
     where: { categoryId },
     include: {
-      team: { select: { name: true, shortName: true } },
+      team: { select: { name: true, shortName: true, logoUrl: true, color: true } },
     },
     orderBy: { position: "asc" },
   })
@@ -34,7 +34,7 @@ export async function recalculateStandings(categoryId: string) {
   const [teams, matches, cards] = await Promise.all([
     db.team.findMany({
       where: { categoryId },
-      select: { id: true, name: true, shortName: true },
+      select: { id: true, name: true, shortName: true, logoUrl: true, color: true },
     }),
     db.match.findMany({
       where: { categoryId, status: "FINISHED" },

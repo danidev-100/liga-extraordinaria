@@ -15,6 +15,11 @@ export const teamSchema = z.object({
     .optional()
     .or(z.literal("")),
   categoryId: z.string().uuid("Debe seleccionar una categoría"),
+  logoUrl: z
+    .string()
+    .url("Debe ser una URL válida")
+    .optional()
+    .or(z.literal("")),
 })
 
 export type TeamFormData = z.input<typeof teamSchema>

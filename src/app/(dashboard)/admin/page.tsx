@@ -22,6 +22,7 @@ import {
   CalendarPlus,
 } from "lucide-react"
 import Link from "next/link"
+import { TeamLogo } from "@/components/ui/team-logo"
 import { SkeletonCard } from "@/components/ui/skeleton"
 import {
   getGoalsDistribution,
@@ -66,8 +67,8 @@ export default async function AdminDashboard() {
       orderBy: { updatedAt: "desc" },
       include: {
         category: { select: { name: true } },
-        localTeam: { select: { shortName: true, color: true } },
-        visitorTeam: { select: { shortName: true, color: true } },
+        localTeam: { select: { shortName: true, name: true, color: true, logoUrl: true } },
+        visitorTeam: { select: { shortName: true, name: true, color: true, logoUrl: true } },
       },
     }),
   ])
@@ -294,12 +295,7 @@ export default async function AdminDashboard() {
                           {status.label}
                         </Badge>
                         <div className="flex items-center gap-1.5 text-sm font-medium">
-                          {match.localTeam.color && (
-                            <span
-                              className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-foreground/10"
-                              style={{ backgroundColor: match.localTeam.color }}
-                            />
-                          )}
+                          <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
                           <span>{match.localTeam.shortName}</span>
                           {isFinished && match.localScore !== null && match.visitorScore !== null ? (
                             <span className="mx-1 font-bold text-primary">
@@ -308,12 +304,7 @@ export default async function AdminDashboard() {
                           ) : (
                             <span className="mx-0.5 text-xs text-muted-foreground">vs</span>
                           )}
-                          {match.visitorTeam.color && (
-                            <span
-                              className="inline-block h-2.5 w-2.5 rounded-full ring-1 ring-foreground/10"
-                              style={{ backgroundColor: match.visitorTeam.color }}
-                            />
-                          )}
+                          <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
                           <span>{match.visitorTeam.shortName}</span>
                         </div>
                       </div>

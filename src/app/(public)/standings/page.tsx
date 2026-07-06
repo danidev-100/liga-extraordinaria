@@ -34,7 +34,7 @@ async function StandingsContent({ categoryId, leagueId }: { categoryId?: string;
     dg: number
     ta: number
     tr: number
-    team: { id: string; name: string; shortName: string; color: string | null }
+    team: { id: string; name: string; shortName: string; color: string | null; logoUrl: string | null }
   }> = []
 
   let selectedCategory: (typeof categories)[0] | undefined
@@ -47,7 +47,7 @@ async function StandingsContent({ categoryId, leagueId }: { categoryId?: string;
     standings = await db.standing.findMany({
       where: { categoryId },
       include: {
-        team: { select: { id: true, name: true, shortName: true, color: true } },
+        team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       },
       orderBy: { position: "asc" },
     })
@@ -57,7 +57,7 @@ async function StandingsContent({ categoryId, leagueId }: { categoryId?: string;
     standings = await db.standing.findMany({
       where: { categoryId: categories[0].id },
       include: {
-        team: { select: { id: true, name: true, shortName: true, color: true } },
+        team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       },
       orderBy: { position: "asc" },
     })

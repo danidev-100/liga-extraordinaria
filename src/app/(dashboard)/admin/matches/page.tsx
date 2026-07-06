@@ -8,6 +8,7 @@ import { ClearFinishedButton } from "@/components/forms/clear-finished-button"
 import { deleteMatch } from "@/actions/matches"
 import { Badge } from "@/components/ui/badge"
 import { LeagueSelector } from "@/components/ui/league-selector"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 const statusConfig = {
   SCHEDULED: {
@@ -65,8 +66,8 @@ export default async function MatchesPage({
     include: {
       category: { select: { name: true } },
       court: { select: { name: true } },
-      localTeam: { select: { id: true, name: true, shortName: true } },
-      visitorTeam: { select: { id: true, name: true, shortName: true } },
+      localTeam: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true } },
+      visitorTeam: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true } },
     },
     orderBy: [{ date: "desc" }, { time: "desc" }],
   })
@@ -168,10 +169,12 @@ export default async function MatchesPage({
                     </div>
 
                     {/* Teams */}
-                    <p className="font-heading text-lg font-bold leading-tight">
-                      {match.localTeam.shortName}{" "}
-                      <span className="text-muted-foreground">vs</span>{" "}
-                      {match.visitorTeam.shortName}
+                    <p className="font-heading text-lg font-bold leading-tight flex items-center gap-2">
+                      <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
+                      <span>{match.localTeam.shortName}</span>
+                      <span className="text-muted-foreground">vs</span>
+                      <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
+                      <span>{match.visitorTeam.shortName}</span>
                     </p>
 
                     {/* Score for finished matches */}

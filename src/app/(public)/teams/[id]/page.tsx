@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/table"
 import { EmptyState } from "@/components/ui/empty-state"
 import { cn } from "@/lib/utils"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export const metadata = {
   title: "Equipo — Liga",
@@ -73,8 +74,8 @@ export default async function TeamDetailPage({ params }: PageProps) {
       OR: [{ localTeamId: id }, { visitorTeamId: id }],
     },
     include: {
-      localTeam: { select: { id: true, name: true, shortName: true, color: true } },
-      visitorTeam: { select: { id: true, name: true, shortName: true, color: true } },
+      localTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
+      visitorTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
     },
     orderBy: { date: "desc" },
     take: 20,
@@ -172,14 +173,7 @@ export default async function TeamDetailPage({ params }: PageProps) {
       {/* Team header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          {team.color && (
-            <span
-              className="inline-flex h-12 w-12 items-center justify-center rounded-xl ring-2 ring-black/10"
-              style={{ backgroundColor: team.color }}
-            >
-              <Trophy className="h-6 w-6 text-white drop-shadow-sm" />
-            </span>
-          )}
+          <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="lg" />
           <div>
             <h1 className="font-heading text-2xl font-bold tracking-tight md:text-3xl">
               {team.name}
@@ -334,12 +328,7 @@ export default async function TeamDetailPage({ params }: PageProps) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {opponent.color && (
-                            <span
-                              className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                              style={{ backgroundColor: opponent.color }}
-                            />
-                          )}
+                          <TeamLogo logoUrl={opponent.logoUrl} color={opponent.color} name={opponent.name} size="md" />
                           <span className="font-medium">{opponent.shortName}</span>
                           <span className="hidden text-xs text-muted-foreground sm:inline">
                             {opponent.name}

@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table"
 import { EmptyState } from "@/components/ui/empty-state"
 import { cn } from "@/lib/utils"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export const metadata = {
   title: "Jugador — Liga",
@@ -51,7 +52,7 @@ export default async function PlayerProfilePage({ params }: PageProps) {
   const player = await db.player.findUnique({
     where: { id },
     include: {
-      team: { select: { id: true, name: true, shortName: true, color: true } },
+      team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       goals: {
         where: { match: { status: "FINISHED" } },
         include: {
@@ -62,8 +63,8 @@ export default async function PlayerProfilePage({ params }: PageProps) {
               visitorTeamId: true,
               localScore: true,
               visitorScore: true,
-              localTeam: { select: { name: true, shortName: true, color: true } },
-              visitorTeam: { select: { name: true, shortName: true, color: true } },
+              localTeam: { select: { name: true, shortName: true, color: true, logoUrl: true } },
+              visitorTeam: { select: { name: true, shortName: true, color: true, logoUrl: true } },
             },
           },
         },
@@ -79,8 +80,8 @@ export default async function PlayerProfilePage({ params }: PageProps) {
               visitorTeamId: true,
               localScore: true,
               visitorScore: true,
-              localTeam: { select: { name: true, shortName: true, color: true } },
-              visitorTeam: { select: { name: true, shortName: true, color: true } },
+              localTeam: { select: { name: true, shortName: true, color: true, logoUrl: true } },
+              visitorTeam: { select: { name: true, shortName: true, color: true, logoUrl: true } },
             },
           },
         },
@@ -108,8 +109,8 @@ export default async function PlayerProfilePage({ params }: PageProps) {
   function resolveOpponent(
     matchLocalTeamId: string,
     matchVisitorTeamId: string,
-    localTeam: { name: string; shortName: string; color: string | null },
-    visitorTeam: { name: string; shortName: string; color: string | null },
+    localTeam: { name: string; shortName: string; color: string | null; logoUrl: string | null },
+    visitorTeam: { name: string; shortName: string; color: string | null; logoUrl: string | null },
   ) {
     return teamId === matchLocalTeamId ? visitorTeam : localTeam
   }
@@ -149,12 +150,7 @@ export default async function PlayerProfilePage({ params }: PageProps) {
                   href={`/teams/${player.team.id}`}
                   className="flex items-center gap-1.5 transition-colors hover:text-primary hover:underline"
                 >
-                  {player.team.color && (
-                    <span
-                      className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                      style={{ backgroundColor: player.team.color }}
-                    />
-                  )}
+                  <TeamLogo logoUrl={player.team.logoUrl} color={player.team.color} name={player.team.name} size="md" />
                   <span>{player.team.name}</span>
                 </Link>
               )}
@@ -284,12 +280,7 @@ export default async function PlayerProfilePage({ params }: PageProps) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {opponent.color && (
-                            <span
-                              className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                              style={{ backgroundColor: opponent.color }}
-                            />
-                          )}
+                          <TeamLogo logoUrl={opponent.logoUrl} color={opponent.color} name={opponent.name} size="md" />
                           <span className="font-medium">{opponent.shortName}</span>
                         </div>
                       </TableCell>
@@ -364,12 +355,7 @@ export default async function PlayerProfilePage({ params }: PageProps) {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          {opponent.color && (
-                            <span
-                              className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                              style={{ backgroundColor: opponent.color }}
-                            />
-                          )}
+                          <TeamLogo logoUrl={opponent.logoUrl} color={opponent.color} name={opponent.name} size="md" />
                           <span className="font-medium">{opponent.shortName}</span>
                         </div>
                       </TableCell>

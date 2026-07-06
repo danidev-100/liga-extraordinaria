@@ -51,6 +51,7 @@ export async function createTeam(data: TeamFormData) {
       name: parsed.name,
       shortName: parsed.shortName,
       color: parsed.color || null,
+      logoUrl: parsed.logoUrl || null,
       categoryId: parsed.categoryId,
     },
   })
@@ -68,6 +69,7 @@ export async function updateTeam(id: string, data: Partial<TeamFormData>) {
   if (parsed.name !== undefined) updateData.name = parsed.name
   if (parsed.shortName !== undefined) updateData.shortName = parsed.shortName
   if (parsed.color !== undefined) updateData.color = parsed.color || null
+  if (parsed.logoUrl !== undefined) updateData.logoUrl = parsed.logoUrl || null
   if (parsed.categoryId !== undefined) updateData.categoryId = parsed.categoryId
 
   const team = await db.team.update({

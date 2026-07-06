@@ -1,6 +1,7 @@
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, MapPin, Sparkles } from "lucide-react"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 interface TeamBrief {
   id: string
@@ -92,24 +93,14 @@ export function MatchHeader({
       <div className="flex items-center justify-between gap-4 px-6 py-8 sm:px-10">
         {/* Local team */}
         <div className="flex flex-1 flex-col items-center gap-3 text-center">
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-2xl shadow-md ring-2 ring-black/5 transition-transform sm:h-20 sm:w-20"
-            style={{ backgroundColor: localTeam.color || "var(--primary)" }}
-          >
-            <span className="text-2xl font-bold text-white sm:text-3xl">
-              {localTeam.shortName.charAt(0)}
-            </span>
-          </div>
+          <TeamLogo logoUrl={localTeam.logoUrl} color={localTeam.color} name={localTeam.name} size="xl" />
           <Link
             href={`/teams/${localTeam.id}`}
             className="font-heading text-lg font-semibold leading-tight transition-colors hover:text-primary sm:text-xl"
           >
             {localTeam.name}
           </Link>
-          <span
-            className="inline-block h-2 w-2 rounded-full ring-1 ring-black/10"
-            style={{ backgroundColor: localTeam.color || "var(--primary)" }}
-          />
+          <TeamLogo logoUrl={localTeam.logoUrl} color={localTeam.color} name={localTeam.name} size="md" />
         </div>
 
         {/* Score / VS */}
@@ -142,24 +133,14 @@ export function MatchHeader({
 
         {/* Visitor team */}
         <div className="flex flex-1 flex-col items-center gap-3 text-center">
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-2xl shadow-md ring-2 ring-black/5 transition-transform sm:h-20 sm:w-20"
-            style={{ backgroundColor: visitorTeam.color || "#64748b" }}
-          >
-            <span className="text-2xl font-bold text-white sm:text-3xl">
-              {visitorTeam.shortName.charAt(0)}
-            </span>
-          </div>
+          <TeamLogo logoUrl={visitorTeam.logoUrl} color={visitorTeam.color} name={visitorTeam.name} size="xl" />
           <Link
             href={`/teams/${visitorTeam.id}`}
             className="font-heading text-lg font-semibold leading-tight transition-colors hover:text-primary sm:text-xl"
           >
             {visitorTeam.name}
           </Link>
-          <span
-            className="inline-block h-2 w-2 rounded-full ring-1 ring-black/10"
-            style={{ backgroundColor: visitorTeam.color || "#64748b" }}
-          />
+          <TeamLogo logoUrl={visitorTeam.logoUrl} color={visitorTeam.color} name={visitorTeam.name} size="md" />
         </div>
       </div>
     </div>

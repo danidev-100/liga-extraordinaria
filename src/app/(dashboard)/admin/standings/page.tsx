@@ -23,6 +23,7 @@ import { Loader2, RefreshCw, Trophy } from "lucide-react"
 import { getAllCategories, getAllLeagues, getStandingsByCategory, recalculateStandings } from "@/actions/standings"
 import { toast } from "sonner"
 import { LeagueSelector } from "@/components/ui/league-selector"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 interface CategoryOption {
   id: string
@@ -49,7 +50,7 @@ interface StandingEntry {
   dg: number
   ta: number
   tr: number
-  team: { name: string; shortName: string }
+  team: { name: string; shortName: string; logoUrl: string | null; color: string | null }
 }
 
 export default function StandingsPage() {
@@ -223,7 +224,12 @@ export default function StandingsPage() {
                         <span className="text-muted-foreground text-xs">{row.position}</span>
                       )}
                     </TableCell>
-                    <TableCell className="font-medium">{row.team.shortName}</TableCell>
+                    <TableCell className="font-medium">
+                      <span className="flex items-center gap-2">
+                        <TeamLogo logoUrl={row.team.logoUrl} color={row.team.color} name={row.team.name} size="md" />
+                        {row.team.shortName}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-center font-bold text-primary">{row.pts}</TableCell>
                     <TableCell className="text-center text-muted-foreground">{row.pj}</TableCell>
                     <TableCell className="text-center">{row.pg}</TableCell>

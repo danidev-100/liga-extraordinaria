@@ -36,6 +36,7 @@ export default async function EditTeamPage({
               name: team.name,
               shortName: team.shortName,
               color: team.color,
+              logoUrl: team.logoUrl,
               categoryId: team.categoryId,
             }}
           />

@@ -1,9 +1,11 @@
+import { TeamLogo } from "@/components/ui/team-logo"
+
 interface TimelineGoal {
   id: string
   minute: number
   isOwnGoal: boolean
   player: { name: string; surname: string }
-  team: { id: string; name: string; shortName: string }
+  team: { id: string; name: string; shortName: string; color: string | null; logoUrl: string | null }
 }
 
 interface TimelineCard {
@@ -12,7 +14,7 @@ interface TimelineCard {
   type: "YELLOW" | "RED"
   isSecondYellow: boolean
   player: { name: string; surname: string }
-  team: { id: string; name: string; shortName: string }
+  team: { id: string; name: string; shortName: string; color: string | null; logoUrl: string | null }
 }
 
 interface MatchTimelineProps {
@@ -107,10 +109,7 @@ function GoalItem({
           )}
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span
-            className="inline-block h-1.5 w-1.5 rounded-full"
-            style={{ backgroundColor: teamColor }}
-          />
+          <TeamLogo logoUrl={goal.team.logoUrl} color={goal.team.color} name={goal.team.name} size="md" />
           <span className="font-medium" style={{ color: teamColor }}>
             {goal.team.shortName}
           </span>
@@ -173,10 +172,7 @@ function CardItem({
           )}
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span
-            className="inline-block h-1.5 w-1.5 rounded-full"
-            style={{ backgroundColor: teamColor }}
-          />
+          <TeamLogo logoUrl={card.team.logoUrl} color={card.team.color} name={card.team.name} size="md" />
           <span className="font-medium" style={{ color: teamColor }}>
             {card.team.shortName}
           </span>

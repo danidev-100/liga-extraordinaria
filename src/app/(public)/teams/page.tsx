@@ -3,6 +3,7 @@ import db from "@/lib/db"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Users } from "lucide-react"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export default async function TeamsPage() {
   const categories = await db.category.findMany({
@@ -16,6 +17,7 @@ export default async function TeamsPage() {
           name: true,
           shortName: true,
           color: true,
+          logoUrl: true,
           _count: { select: { players: true } },
         },
         orderBy: { name: "asc" },
@@ -59,12 +61,7 @@ export default async function TeamsPage() {
                 <Card className="h-full transition-all duration-200 hover:shadow-md hover:ring-2 hover:ring-primary/30">
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-3">
-                      {team.color && (
-                        <span
-                          className="inline-block h-4 w-4 rounded-full ring-1 ring-foreground/10"
-                          style={{ backgroundColor: team.color }}
-                        />
-                      )}
+                      <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="md" />
                       <div>
                         <CardTitle className="text-base font-semibold group-hover:text-primary transition-colors">
                           {team.name}

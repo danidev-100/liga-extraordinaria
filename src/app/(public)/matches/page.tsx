@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { MatchScheduleFilter } from "@/components/public/match-schedule-filter"
 import { LeagueSelector } from "@/components/ui/league-selector"
 import { cn } from "@/lib/utils"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export const metadata = {
   title: "Partidos — Liga",
@@ -45,19 +46,19 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
     include: {
       category: { select: { name: true } },
       court: { select: { name: true } },
-      localTeam: { select: { id: true, name: true, shortName: true, color: true } },
-      visitorTeam: { select: { id: true, name: true, shortName: true, color: true } },
+      localTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
+      visitorTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       goals: {
         include: {
           player: { select: { name: true, surname: true } },
-          team: { select: { id: true, name: true, shortName: true } },
+          team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
         },
         orderBy: { minute: "asc" },
       },
       cards: {
         include: {
           player: { select: { name: true, surname: true } },
-          team: { select: { id: true, name: true, shortName: true } },
+          team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
         },
         orderBy: { minute: "asc" },
       },
@@ -227,10 +228,7 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
                           <div className="flex items-center justify-between gap-3">
                             {/* Local team */}
                             <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
-                              <span
-                                className="inline-block h-3 w-3 rounded-full ring-2 ring-black/5 transition-transform group-hover:scale-110"
-                                style={{ backgroundColor: match.localTeam.color || "var(--primary)" }}
-                              />
+                              <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
                               <span className="text-sm font-semibold leading-tight">
                                 {match.localTeam.shortName}
                               </span>
@@ -259,10 +257,7 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
 
                             {/* Visitor team */}
                             <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
-                              <span
-                                className="inline-block h-3 w-3 rounded-full ring-2 ring-black/5 transition-transform group-hover:scale-110"
-                                style={{ backgroundColor: match.visitorTeam.color || "var(--primary)" }}
-                              />
+                              <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
                               <span className="text-sm font-semibold leading-tight">
                                 {match.visitorTeam.shortName}
                               </span>
@@ -297,10 +292,7 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
                         >
                           ⚽
                         </span>
-                        <span
-                          className="inline-block h-1.5 w-1.5 rounded-full"
-                          style={{ backgroundColor: isLocal ? (match.localTeam.color || "var(--primary)") : (match.visitorTeam.color || "#64748b") }}
-                        />
+                        <TeamLogo logoUrl={goal.team.logoUrl} color={goal.team.color} name={goal.team.name} size="sm" />
                         <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">
                           {goal.team.shortName}
                         </span>
@@ -347,10 +339,7 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
                                             }`}
                                           />
                                         )}
-                                        <span
-                                          className="inline-block h-1.5 w-1.5 rounded-full"
-                                          style={{ backgroundColor: isLocal ? (match.localTeam.color || "var(--primary)") : (match.visitorTeam.color || "#64748b") }}
-                                        />
+                                        <TeamLogo logoUrl={card.team.logoUrl} color={card.team.color} name={card.team.name} size="sm" />
                                         <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">
                                           {card.team.shortName}
                                         </span>

@@ -2,6 +2,8 @@ export interface TeamInfo {
   id: string
   name: string
   shortName: string
+  logoUrl?: string | null
+  color?: string | null
 }
 
 export interface MatchResultData {
@@ -20,6 +22,8 @@ export interface StandingRow {
   teamId: string
   teamName: string
   shortName: string
+  teamLogoUrl?: string | null
+  teamColor?: string | null
   pts: number
   pj: number
   pg: number
@@ -52,6 +56,8 @@ export function calculateStandings(
       teamId: team.id,
       teamName: team.name,
       shortName: team.shortName,
+      teamLogoUrl: team.logoUrl,
+      teamColor: team.color,
       pts: 0,
       pj: 0,
       pg: 0,

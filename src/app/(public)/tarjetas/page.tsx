@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export const metadata = {
   title: "Tarjetas — Liga",
@@ -57,6 +58,7 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
     teamName: string
     teamShortName: string
     teamColor: string | null
+    teamLogoUrl: string | null
     yellowCards: number
     redCards: number
     totalCards: number
@@ -93,14 +95,14 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
     if (allPlayerIds.size > 0) {
       const players: {
         id: string; name: string; surname: string;
-        team: { name: string; shortName: string; color: string | null } | null
+        team: { name: string; shortName: string; color: string | null; logoUrl: string | null } | null
       }[] = await db.player.findMany({
         where: { id: { in: Array.from(allPlayerIds) } },
         select: {
           id: true,
           name: true,
           surname: true,
-          team: { select: { name: true, shortName: true, color: true } },
+          team: { select: { name: true, shortName: true, color: true, logoUrl: true } },
         },
       })
 
@@ -118,6 +120,7 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
             teamName: player?.team?.name ?? "",
             teamShortName: player?.team?.shortName ?? "",
             teamColor: player?.team?.color ?? null,
+            teamLogoUrl: player?.team?.logoUrl ?? null,
             yellowCards: yellow,
             redCards: red,
             totalCards: yellow + red,
@@ -232,12 +235,7 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {player.teamColor && (
-                          <span
-                            className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                            style={{ backgroundColor: player.teamColor }}
-                          />
-                        )}
+                        <TeamLogo logoUrl={player.teamLogoUrl} color={player.teamColor} name={player.teamName} size="md" />
                         <span className="text-sm text-muted-foreground">
                           {player.teamShortName}
                         </span>

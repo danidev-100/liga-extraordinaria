@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react"
 import { MatchHeader } from "@/components/public/match-header"
 import { MatchTimeline } from "@/components/public/match-timeline"
 import { MatchStats } from "@/components/public/match-stats"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -53,14 +54,14 @@ export default async function MatchDetailPage({ params }: PageProps) {
       goals: {
         include: {
           player: { select: { name: true, surname: true } },
-          team: { select: { id: true, name: true, shortName: true } },
+          team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
         },
         orderBy: { minute: "asc" },
       },
       cards: {
         include: {
           player: { select: { name: true, surname: true } },
-          team: { select: { id: true, name: true, shortName: true } },
+          team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
         },
         orderBy: { minute: "asc" },
       },
@@ -122,20 +123,14 @@ export default async function MatchDetailPage({ params }: PageProps) {
               href={`/teams/${match.localTeam.id}`}
               className="flex items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted/50"
             >
-              <span
-                className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                style={{ backgroundColor: match.localTeam.color || "var(--primary)" }}
-              />
+              <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
               Ver ficha de {match.localTeam.name}
             </Link>
             <Link
               href={`/teams/${match.visitorTeam.id}`}
               className="flex items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted/50"
             >
-              <span
-                className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                style={{ backgroundColor: match.visitorTeam.color || "#64748b" }}
-              />
+              <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
               Ver ficha de {match.visitorTeam.name}
             </Link>
           </div>

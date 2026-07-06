@@ -6,6 +6,7 @@ import { MatchResultForm } from "@/components/forms/match-result-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle2, Clock, Play } from "lucide-react"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const, icon: Clock },
@@ -33,6 +34,8 @@ export default async function MatchDetailPage({
           id: true,
           name: true,
           shortName: true,
+          color: true,
+          logoUrl: true,
           players: {
             select: { id: true, name: true, surname: true },
             orderBy: { name: "asc" },
@@ -44,6 +47,8 @@ export default async function MatchDetailPage({
           id: true,
           name: true,
           shortName: true,
+          color: true,
+          logoUrl: true,
           players: {
             select: { id: true, name: true, surname: true },
             orderBy: { name: "asc" },
@@ -53,14 +58,14 @@ export default async function MatchDetailPage({
       goals: {
         include: {
           player: { select: { id: true, name: true, surname: true } },
-          team: { select: { id: true, name: true, shortName: true } },
+          team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
         },
         orderBy: { minute: "asc" },
       },
       cards: {
         include: {
           player: { select: { id: true, name: true, surname: true } },
-          team: { select: { id: true, name: true, shortName: true } },
+          team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
         },
         orderBy: { minute: "asc" },
       },
@@ -79,8 +84,12 @@ export default async function MatchDetailPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">
-          {match.localTeam.shortName} vs {match.visitorTeam.shortName}
+        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+          <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
+          <span>{match.localTeam.shortName}</span>
+          <span className="text-muted-foreground/50">vs</span>
+          <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
+          <span>{match.visitorTeam.shortName}</span>
         </h1>
         <p className="text-muted-foreground">
           {match.category.name} · Ronda {match.round}
@@ -136,6 +145,7 @@ export default async function MatchDetailPage({
               {match.goals.map((goal) => (
                 <div key={goal.id} className="flex items-center justify-between py-2">
                   <div className="flex items-center gap-2">
+                    <TeamLogo logoUrl={goal.team.logoUrl} color={goal.team.color} name={goal.team.name} size="sm" />
                     <span className="text-xs font-semibold text-muted-foreground">
                       {goal.team.shortName}
                     </span>
@@ -181,6 +191,7 @@ export default async function MatchDetailPage({
                         }`}
                       />
                     )}
+                    <TeamLogo logoUrl={card.team.logoUrl} color={card.team.color} name={card.team.name} size="sm" />
                     <span className="text-xs font-semibold text-muted-foreground">
                       {card.team.shortName}
                     </span>

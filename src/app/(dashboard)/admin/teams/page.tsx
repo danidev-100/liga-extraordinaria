@@ -9,6 +9,7 @@ import { deleteTeam } from "@/actions/team"
 import { Badge } from "@/components/ui/badge"
 import { CategoryFilter } from "@/components/ui/category-filter"
 import { LeagueSelector } from "@/components/ui/league-selector"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 export default async function TeamsPage({
   searchParams,
@@ -91,12 +92,7 @@ export default async function TeamsPage({
                   className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    {team.color && (
-                      <div
-                        className="h-4 w-4 rounded-full ring-1 ring-foreground/10 shrink-0"
-                        style={{ backgroundColor: team.color }}
-                      />
-                    )}
+                    <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="md" />
                     <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2 min-w-0">
                         <Link

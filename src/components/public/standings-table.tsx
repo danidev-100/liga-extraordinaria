@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
+import { TeamLogo } from "@/components/ui/team-logo"
 
 interface StandingEntry {
   id: string
@@ -25,7 +26,7 @@ interface StandingEntry {
   dg: number
   ta: number
   tr: number
-  team: { id: string; name: string; shortName: string; color: string | null }
+  team: { id: string; name: string; shortName: string; color: string | null; logoUrl: string | null }
 }
 
 interface StandingsTableProps {
@@ -99,12 +100,7 @@ export function StandingsTable({ standings, categoryName }: StandingsTableProps)
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      {row.team.color && (
-                        <span
-                          className="inline-block h-3 w-3 rounded-full ring-1 ring-black/10"
-                          style={{ backgroundColor: row.team.color }}
-                        />
-                      )}
+                      <TeamLogo logoUrl={row.team.logoUrl} color={row.team.color} name={row.team.name} size="md" />
                       <Link
                         href={`/teams/${row.team.id}`}
                         className="font-medium transition-colors hover:text-primary hover:underline"
