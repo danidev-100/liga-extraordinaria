@@ -78,7 +78,10 @@ async function GoleadoresContent({ categoryId, leagueId }: { categoryId?: string
     if (goalCounts.length > 0) {
       const playerIds = goalCounts.map((g) => g.playerId)
 
-      const players = await db.player.findMany({
+      const players: {
+        id: string; name: string; surname: string;
+        team: { name: string; shortName: string; color: string | null } | null
+      }[] = await db.player.findMany({
         where: { id: { in: playerIds } },
         select: {
           id: true,
