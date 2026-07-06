@@ -10,6 +10,7 @@ import {
   Hash,
   Calendar,
   Shirt,
+  AlertTriangle,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -97,6 +98,37 @@ export default async function TeamDetailPage({ params }: PageProps) {
   }
 
   const scorerMap = new Map(scorers.map((s) => [s.id, s]))
+
+  // 4. Fetch cards for this team grouped by player
+  const cardsByPlayer = await db.card.groupBy({
+    by: ["playerId"],
+    where: { teamId: id, match: { status: "FINISHED" } },
+    _count: { id: true },
+    _sum: { minute: true },
+  })
+  const yellowCounts = await db.card.groupBy({
+    by: ["playerId"],
+    where: { teamId: id, match: { status: "FINISHED" }, type: "YELLOW" },
+    _count: { id: true },
+  })
+  const redCounts = await db.card.groupBy({
+    by: ["playerId"],
+    where: { teamId: id, match: { status: "FINISHED" }, type: "RED" },
+    _count: { id: true },
+  })
+
+  const cardPlayerIds = [...new Set(cardsByPlayer.map((c) => c.playerId))]
+  let cardPlayers: { id: string; name: string; surname: string }[] = []
+  if (cardPlayerIds.length > 0) {
+    cardPlayers = await db.player.findMany({
+      where: { id: { in: cardPlayerIds } },
+      select: { id: true, name: true, surname: true },
+    })
+  }
+
+  const cardPlayerMap = new Map(cardPlayers.map((p) => [p.id, p]))
+  const yellowMap = new Map(yellowCounts.map((c) => [c.playerId, c._count.id]))
+  const redMap = new Map(redCounts.map((c) => [c.playerId, c._count.id]))
 
   // Compute standing with zeroes fallback
   const s = team.standing
@@ -379,6 +411,91 @@ export default async function TeamDetailPage({ params }: PageProps) {
                     </TableRow>
                   )
                 })}
+              </TableBody>
+            </Table>
+          </div>
+        )}
+      </section>
+
+      {/* Cards */}
+      <section>
+        <div className="mb-4 flex items-center gap-2">
+          <AlertTriangle className="h-5 w-5 text-primary" />
+          <h2 className="font-heading text-xl font-semibold tracking-tight">Tarjetas</h2>
+          <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">
+            {cardsByPlayer.length}
+          </span>
+        </div>
+
+        {cardsByPlayer.length === 0 ? (
+          <EmptyState
+            icon={AlertTriangle}
+            title="Sin tarjetas"
+            description="Este equipo no ha recibido tarjetas en partidos finalizados."
+          />
+        ) : (
+          <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-12 text-center">#</TableHead>
+                  <TableHead>Jugador</TableHead>
+                  <TableHead className="w-24 text-center">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="inline-block h-3 w-2 rounded-sm bg-yellow-400" />
+                      Amarillas
+                    </span>
+                  </TableHead>
+                  <TableHead className="w-24 text-center">
+                    <span className="inline-flex items-center gap-1.5">
+                      <span className="inline-block h-3 w-2 rounded-sm bg-red-500" />
+                      Rojas
+                    </span>
+                  </TableHead>
+                  <TableHead className="w-24 text-center">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {cardsByPlayer
+                  .sort((a, b) => (b._count.id ?? 0) - (a._count.id ?? 0))
+                  .map((entry, idx) => {
+                    const player = cardPlayerMap.get(entry.playerId)
+                    const yellows = yellowMap.get(entry.playerId) ?? 0
+                    const reds = redMap.get(entry.playerId) ?? 0
+                    return (
+                      <TableRow
+                        key={entry.playerId}
+                        className="transition-colors hover:bg-muted/40"
+                      >
+                        <TableCell className="text-center text-sm text-muted-foreground">
+                          {idx + 1}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          <Link
+                            href={`/players/${entry.playerId}`}
+                            className="transition-colors hover:text-primary hover:underline"
+                          >
+                            {player?.name ?? "Desconocido"} {player?.surname ?? ""}
+                          </Link>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="inline-flex items-center justify-center gap-1 rounded-full bg-yellow-100 px-3 py-1 text-sm font-bold text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
+                            <span className="inline-block h-2 w-1.5 rounded-sm bg-yellow-400" />
+                            {yellows}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <span className="inline-flex items-center justify-center gap-1 rounded-full bg-red-100 px-3 py-1 text-sm font-bold text-red-700 dark:bg-red-900/30 dark:text-red-400">
+                            <span className="inline-block h-2 w-1.5 rounded-sm bg-red-500" />
+                            {reds}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-center font-semibold tabular-nums">
+                          {yellows + reds}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
               </TableBody>
             </Table>
           </div>
