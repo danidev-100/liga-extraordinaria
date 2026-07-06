@@ -25,7 +25,7 @@ import Link from "next/link"
 import { SkeletonCard } from "@/components/ui/skeleton"
 import {
   getGoalsDistribution,
-  getMatchStatus,
+  getLeastConceded,
   getCardsBreakdown,
   getFormTrend,
   getTopScorers,
@@ -74,14 +74,14 @@ export default async function AdminDashboard() {
 
   const [
     goalsData,
-    statusData,
+    concededData,
     cardsData,
     formTrendData,
     topScorersData,
     categories,
   ] = await Promise.all([
     getGoalsDistribution(),
-    getMatchStatus(),
+    getLeastConceded(),
     getCardsBreakdown(),
     getFormTrend(),
     getTopScorers(),
@@ -332,7 +332,7 @@ export default async function AdminDashboard() {
       {/* Analytics Charts */}
       <ChartSection
         goalsData={goalsData}
-        statusData={statusData}
+        concededData={concededData}
         cardsData={cardsData}
         formTrendData={formTrendData}
         topScorersData={topScorersData}

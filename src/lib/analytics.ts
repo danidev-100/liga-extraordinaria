@@ -62,18 +62,28 @@ export async function getGoalsDistribution(): Promise<GoalsDistribution[]> {
 }
 
 /**
- * Count of matches per status (SCHEDULED, PLAYING, FINISHED).
+ * Teams with fewest goals conceded (best defense).
+ * Uses match scores: sum of opponent's score in each finished match.
  */
-export async function getMatchStatus(): Promise<MatchStatusRow[]> {
+export async function getLeastConceded(): Promise<GoalsDistribution[]> {
   try {
-    const result = await db.match.groupBy({
-      by: ["status"],
-      _count: { id: true },
-    })
-    return result.map((r) => ({
-      status: r.status,
-      count: r._count.id,
-    }))
+    return await db.$queryRaw<GoalsDistribution[]>`
+      WITH conceded AS (
+        SELECT local_team_id AS team_id, visitor_score::int AS goals
+        FROM matches WHERE status = 'FINISHED'
+        UNION ALL
+        SELECT visitor_team_id AS team_id, local_score::int AS goals
+        FROM matches WHERE status = 'FINISHED'
+      )
+      SELECT t.short_name AS "teamShortName",
+             t.color AS "teamColor",
+             SUM(c.goals)::int AS goals
+      FROM conceded c
+      JOIN teams t ON t.id = c.team_id
+      GROUP BY t.id, t.short_name, t.color
+      ORDER BY goals ASC
+      LIMIT 10
+    `
   } catch {
     return []
   }

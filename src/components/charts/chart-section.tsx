@@ -6,7 +6,6 @@ import { ErrorBoundary } from "@/components/ui/error-boundary"
 import { ChartSkeleton, ChartErrorFallback } from "@/components/charts"
 import type {
   GoalsDistribution,
-  MatchStatusRow,
   CardsBreakdown,
   FormTrendRow,
   TopScorerRow,
@@ -17,10 +16,10 @@ const GoalsPieChart = dynamic(
     import("@/components/charts/goals-pie-chart").then((m) => m.GoalsPieChart),
   { ssr: false },
 )
-const MatchStatusChart = dynamic(
+const LeastConcededChart = dynamic(
   () =>
-    import("@/components/charts/match-status-chart").then(
-      (m) => m.MatchStatusChart,
+    import("@/components/charts/least-conceded-chart").then(
+      (m) => m.LeastConcededChart,
     ),
   { ssr: false },
 )
@@ -41,7 +40,7 @@ const TopScorers = dynamic(
 
 interface ChartSectionProps {
   goalsData: GoalsDistribution[]
-  statusData: MatchStatusRow[]
+  concededData: GoalsDistribution[]
   cardsData: CardsBreakdown[]
   formTrendData: FormTrendRow[]
   topScorersData: TopScorerRow[]
@@ -58,7 +57,7 @@ interface ChartSectionProps {
  */
 export function ChartSection({
   goalsData,
-  statusData,
+  concededData,
   cardsData,
   formTrendData,
   topScorersData,
@@ -76,9 +75,9 @@ export function ChartSection({
         </Suspense>
         <Suspense fallback={<ChartSkeleton />}>
           <ErrorBoundary
-            fallback={<ChartErrorFallback title="Estado de Partidos" />}
+            fallback={<ChartErrorFallback title="Valla Menos Vencida" />}
           >
-            <MatchStatusChart data={statusData} />
+            <LeastConcededChart data={concededData} />
           </ErrorBoundary>
         </Suspense>
         <Suspense fallback={<ChartSkeleton />}>

@@ -1,5 +1,5 @@
 export { GoalsPieChart } from "./goals-pie-chart"
-export { MatchStatusChart } from "./match-status-chart"
+export { LeastConcededChart } from "./least-conceded-chart"
 export { CardsBarChart } from "./cards-bar-chart"
 export { FormTrendChart } from "./form-trend-chart"
 export { TopScorers } from "./top-scorers"
