@@ -73,7 +73,7 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
           type: "YELLOW",
         },
         _count: { id: true },
-      }),
+      }) as Promise<{ playerId: string; teamId: string; _count: { id: number } }[]>,
       db.card.groupBy({
         by: ["playerId", "teamId"],
         where: {
@@ -81,7 +81,7 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
           type: "RED",
         },
         _count: { id: true },
-      }),
+      }) as Promise<{ playerId: string; teamId: string; _count: { id: number } }[]>,
     ])
 
     // Merge yellow and red counts per player
@@ -90,7 +90,10 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
     const allPlayerIds = new Set([...yellowMap.keys(), ...redMap.keys()])
 
     if (allPlayerIds.size > 0) {
-      const players = await db.player.findMany({
+      const players: {
+        id: string; name: string; surname: string;
+        team: { name: string; shortName: string; color: string | null } | null
+      }[] = await db.player.findMany({
         where: { id: { in: Array.from(allPlayerIds) } },
         select: {
           id: true,
