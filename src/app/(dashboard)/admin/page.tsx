@@ -23,6 +23,15 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { SkeletonCard } from "@/components/ui/skeleton"
+import {
+  getGoalsDistribution,
+  getMatchStatus,
+  getCardsBreakdown,
+  getFormTrend,
+  getTopScorers,
+} from "@/lib/analytics"
+import { getCategories } from "@/actions/analytics"
+import { ChartSection } from "@/components/charts/chart-section"
 
 const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const, icon: Clock },
@@ -61,6 +70,22 @@ export default async function AdminDashboard() {
         visitorTeam: { select: { shortName: true, color: true } },
       },
     }),
+  ])
+
+  const [
+    goalsData,
+    statusData,
+    cardsData,
+    formTrendData,
+    topScorersData,
+    categories,
+  ] = await Promise.all([
+    getGoalsDistribution(),
+    getMatchStatus(),
+    getCardsBreakdown(),
+    getFormTrend(),
+    getTopScorers(),
+    getCategories(),
   ])
 
   const summaryCards = [
@@ -303,6 +328,16 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Analytics Charts */}
+      <ChartSection
+        goalsData={goalsData}
+        statusData={statusData}
+        cardsData={cardsData}
+        formTrendData={formTrendData}
+        topScorersData={topScorersData}
+        categories={categories}
+      />
     </div>
   )
 }
