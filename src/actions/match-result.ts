@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { finishMatchSchema, type FinishMatchFormData } from "@/lib/validations/match-result"
 import { calculateStandings, type TeamInfo, type MatchResultData, type CardData } from "@/lib/standings"
+import type { Prisma } from "@prisma/client"
 
 async function ensureAuth() {
   const session = await auth()
@@ -22,7 +23,7 @@ async function ensureAuth() {
 function processCards(
   cards: ({ playerId: string; teamId: string; minute: number; type: "YELLOW" | "RED" })[] | undefined,
   matchId: string,
-): { matchId: string; playerId: string; teamId: string; type: "YELLOW" | "RED"; minute: number }[] {
+): { matchId: string; playerId: string; teamId: string; type: "YELLOW" | "RED"; minute: number; isSecondYellow: boolean }[] {
   const safeCards = cards ?? []
   // Collect yellows per player with their original index + minute
   const yellowEntries: Map<string, { idx: number; minute: number }[]> = new Map()
@@ -44,13 +45,17 @@ function processCards(
     }
   }
 
-  return safeCards.map((c, idx) => ({
-    matchId,
-    playerId: c.playerId,
-    teamId: c.teamId,
-    type: c.type === "YELLOW" && convertIndexes.has(idx) ? "RED" : c.type,
-    minute: c.minute,
-  }))
+  return safeCards.map((c, idx) => {
+    const isSecondYellow = c.type === "YELLOW" && convertIndexes.has(idx)
+    return {
+      matchId,
+      playerId: c.playerId,
+      teamId: c.teamId,
+      type: isSecondYellow ? "RED" : c.type,
+      minute: c.minute,
+      isSecondYellow,
+    }
+  })
 }
 
 export async function finishMatch(matchId: string, data: FinishMatchFormData) {
@@ -67,7 +72,7 @@ export async function finishMatch(matchId: string, data: FinishMatchFormData) {
   if (match.status === "FINISHED") throw new Error("El partido ya está finalizado")
 
   // Execute everything atomically
-  await db.$transaction(async (tx) => {
+  await db.$transaction(async (tx: Prisma.TransactionClient) => {
     // 1. Update match scores and status
     await tx.match.update({
       where: { id: matchId },
@@ -98,7 +103,16 @@ export async function finishMatch(matchId: string, data: FinishMatchFormData) {
     // 4. Create cards — auto-convert 2nd yellow to RED for same player
     if (parsed.cards.length > 0) {
       const cardData = processCards(parsed.cards, matchId)
-      await tx.card.createMany({ data: cardData })
+      await tx.card.createMany({
+        data: cardData.map((c) => ({
+          matchId: c.matchId,
+          playerId: c.playerId,
+          teamId: c.teamId,
+          type: c.type,
+          minute: c.minute,
+          isSecondYellow: c.isSecondYellow,
+        })),
+      })
     }
 
     // 5. Recalculate standings for the category
