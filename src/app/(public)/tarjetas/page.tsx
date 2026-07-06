@@ -65,24 +65,24 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
   let cardsData: CardEntry[] = []
 
   if (activeCategoryId) {
-    const [yellowCounts, redCounts] = await Promise.all([
-      db.card.groupBy({
-        by: ["playerId", "teamId"],
-        where: {
-          match: { categoryId: activeCategoryId, status: "FINISHED" },
-          type: "YELLOW",
-        },
-        _count: { id: true },
-      }) as Promise<{ playerId: string; teamId: string; _count: { id: number } }[]>,
-      db.card.groupBy({
-        by: ["playerId", "teamId"],
-        where: {
-          match: { categoryId: activeCategoryId, status: "FINISHED" },
-          type: "RED",
-        },
-        _count: { id: true },
-      }) as Promise<{ playerId: string; teamId: string; _count: { id: number } }[]>,
-    ])
+    const yellowRaw = await db.card.groupBy({
+      by: ["playerId", "teamId"],
+      where: {
+        match: { categoryId: activeCategoryId, status: "FINISHED" },
+        type: "YELLOW",
+      },
+      _count: { id: true },
+    })
+    const redRaw = await db.card.groupBy({
+      by: ["playerId", "teamId"],
+      where: {
+        match: { categoryId: activeCategoryId, status: "FINISHED" },
+        type: "RED",
+      },
+      _count: { id: true },
+    })
+    const yellowCounts: { playerId: string; teamId: string; _count: { id: number } }[] = yellowRaw as any
+    const redCounts: { playerId: string; teamId: string; _count: { id: number } }[] = redRaw as any
 
     // Merge yellow and red counts per player
     const yellowMap = new Map(yellowCounts.map((c) => [c.playerId, c._count.id]))
