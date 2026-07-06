@@ -253,9 +253,21 @@ export default async function TeamDetailPage({ params }: PageProps) {
                     <TableCell className="text-center font-mono text-sm font-bold text-muted-foreground">
                       {player.jerseyNumber ?? "—"}
                     </TableCell>
-                    <TableCell className="font-medium">{player.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <Link
+                        href={`/players/${player.id}`}
+                        className="hover:underline transition-colors"
+                      >
+                        {player.name}
+                      </Link>
+                    </TableCell>
                     <TableCell className="hidden text-muted-foreground sm:table-cell">
-                      {player.surname}
+                      <Link
+                        href={`/players/${player.id}`}
+                        className="hover:underline transition-colors"
+                      >
+                        {player.surname}
+                      </Link>
                     </TableCell>
                   </TableRow>
                 ))}

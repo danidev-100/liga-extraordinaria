@@ -99,7 +99,12 @@ export default async function TeamsPage({
                     )}
                     <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2 min-w-0">
-                        <p className="font-medium truncate">{team.name}</p>
+                        <Link
+                          href={`/teams/${team.id}`}
+                          className="font-medium truncate hover:underline transition-colors"
+                        >
+                          {team.name}
+                        </Link>
                         <Badge variant="outline" className="shrink-0">{team.shortName}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground truncate">

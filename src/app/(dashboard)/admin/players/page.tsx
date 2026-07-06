@@ -3,12 +3,10 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Edit } from "lucide-react"
-import { DeleteButton } from "@/components/forms/delete-button"
-import { deletePlayer } from "@/actions/player"
-import { Badge } from "@/components/ui/badge"
+import { Plus } from "lucide-react"
 import { CategoryFilter } from "@/components/ui/category-filter"
 import { LeagueSelector } from "@/components/ui/league-selector"
+import { PlayersTable } from "@/components/tables/players-table"
 
 export default async function PlayersPage({
   searchParams,
@@ -84,54 +82,20 @@ export default async function PlayersPage({
           </div>
         </CardHeader>
         <CardContent>
-          {players.length === 0 ? (
-            <p className="py-8 text-center text-muted-foreground">
-              {categoryId
-                ? "No hay jugadores en esta categoría."
-                : "No hay jugadores registrados."}
-            </p>
-          ) : (
-            <div className="divide-y">
-              {players.map((player) => (
-                <div
-                  key={player.id}
-                  className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
-                >
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <p className="font-medium truncate">
-                        {player.name} {player.surname}
-                      </p>
-                      <Badge
-                        variant={player.isActive ? "default" : "secondary"}
-                        className="shrink-0"
-                      >
-                        {player.isActive ? "Activo" : "Inactivo"}
-                      </Badge>
-                      {player.jerseyNumber && (
-                        <Badge variant="outline" className="shrink-0">#{player.jerseyNumber}</Badge>
-                      )}
-                    </div>
-                    <p className="text-sm text-muted-foreground truncate">
-                      DNI: {player.dni} · {player.team.shortName} —{" "}
-                      {player.team.category.name}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Link href={`/admin/players/${player.id}`}>
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </Link>
-                    <DeleteButton
-                      action={deletePlayer.bind(null, player.id)}
-                      confirmMessage="¿Eliminar este jugador?"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <PlayersTable
+            players={players.map((p) => ({
+              id: p.id,
+              name: p.name,
+              surname: p.surname,
+              dni: p.dni,
+              birthDate: p.birthDate.toISOString(),
+              jerseyNumber: p.jerseyNumber,
+              isActive: p.isActive,
+              teamName: p.team.name,
+              teamShortName: p.team.shortName,
+              categoryName: p.team.category.name,
+            }))}
+          />
         </CardContent>
       </Card>
     </div>
