@@ -1,9 +1,11 @@
 import { Suspense } from "react"
+import Link from "next/link"
 import db from "@/lib/db"
-import { Calendar, Sparkles } from "lucide-react"
+import { Calendar, Sparkles, List } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { MatchScheduleFilter } from "@/components/public/match-schedule-filter"
 import { LeagueSelector } from "@/components/ui/league-selector"
+import { cn } from "@/lib/utils"
 
 export const metadata = {
   title: "Partidos — Liga",
@@ -100,6 +102,35 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
         </div>
       </div>
 
+      {/* View toggle: List / Calendar */}
+      <div className="flex items-center gap-1 rounded-lg border bg-muted/30 p-0.5 w-fit">
+        <Link
+          href={
+            categoryId
+              ? `/matches?categoryId=${categoryId}${leagueId ? `&leagueId=${leagueId}` : ""}`
+              : `/matches${leagueId ? `?leagueId=${leagueId}` : ""}`
+          }
+          className={cn(
+            "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+            "bg-background text-foreground shadow-sm",
+          )}
+        >
+          <List className="h-4 w-4" />
+          Lista
+        </Link>
+        <Link
+          href={
+            categoryId
+              ? `/matches/calendar?categoryId=${categoryId}${leagueId ? `&leagueId=${leagueId}` : ""}`
+              : `/matches/calendar${leagueId ? `?leagueId=${leagueId}` : ""}`
+          }
+          className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <Calendar className="h-4 w-4" />
+          Calendario
+        </Link>
+      </div>
+
       {matches.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
           <Calendar className="mb-4 h-12 w-12 text-muted-foreground/40" />
@@ -146,9 +177,10 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
                     const isToday = matchDate.toDateString() === today.toDateString()
 
                     return (
-                      <div
+                      <Link
                         key={match.id}
-                        className="group relative overflow-hidden rounded-xl border bg-card shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30"
+                        href={`/matches/${match.id}`}
+                        className="group relative block overflow-hidden rounded-xl border bg-card shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                       >
                         {/* Top accent line for live matches */}
                         {isPlaying && (
@@ -341,7 +373,7 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
                             </div>
                           )}
                         </div>
-                      </div>
+                      </Link>
                     )
                   })}
                 </div>
