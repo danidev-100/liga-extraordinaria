@@ -264,7 +264,7 @@ export async function generateRoundRobin(data: {
   const { categoryId, startDate, baseTime } = data
 
   // Fetch teams
-  const teams = await db.team.findMany({
+  const teams: { id: string; name: string }[] = await db.team.findMany({
     where: { categoryId },
     select: { id: true, name: true },
     orderBy: { name: "asc" },
