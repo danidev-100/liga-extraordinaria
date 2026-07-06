@@ -5,7 +5,6 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { finishMatchSchema, type FinishMatchFormData } from "@/lib/validations/match-result"
 import { calculateStandings, type TeamInfo, type MatchResultData, type CardData } from "@/lib/standings"
-import type { Prisma } from "@prisma/client"
 
 async function ensureAuth() {
   const session = await auth()
@@ -72,7 +71,8 @@ export async function finishMatch(matchId: string, data: FinishMatchFormData) {
   if (match.status === "FINISHED") throw new Error("El partido ya está finalizado")
 
   // Execute everything atomically
-  await db.$transaction(async (tx: Prisma.TransactionClient) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await db.$transaction(async (tx: any) => {
     // 1. Update match scores and status
     await tx.match.update({
       where: { id: matchId },

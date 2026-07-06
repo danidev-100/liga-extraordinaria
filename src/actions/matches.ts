@@ -205,9 +205,10 @@ export async function updateMatch(id: string, data: MatchUpdateData) {
 export async function clearFinishedMatches() {
   await ensureAuth()
 
-  const deleted = await db.$transaction(async (tx) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const deleted = await db.$transaction(async (tx: any) => {
     // Delete goals and cards from finished matches first (cascade should handle it, but be explicit)
-    const finishedMatches = await tx.match.findMany({
+    const finishedMatches: { id: string }[] = await tx.match.findMany({
       where: { status: "FINISHED" },
       select: { id: true },
     })

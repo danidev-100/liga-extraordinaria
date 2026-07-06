@@ -59,7 +59,8 @@ export async function recalculateStandings(categoryId: string) {
   )
 
   // Delete old standings and create new ones atomically
-  await db.$transaction(async (tx) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  await db.$transaction(async (tx: any) => {
     await tx.standing.deleteMany({ where: { categoryId } })
 
     if (result.length > 0) {
