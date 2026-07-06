@@ -164,26 +164,41 @@ export default async function MatchDetailPage({
           </CardHeader>
           <CardContent>
             <div className="divide-y">
-              {match.cards.map((card) => (
+              {match.cards.map((card) => {
+                const isDoubleYellowRed = card.type === "RED" && card.isSecondYellow
+                return (
                 <div key={card.id} className="flex items-center justify-between py-2">
                   <div className="flex items-center gap-2">
-                    <div
-                      className={`h-3 w-2 rounded-sm ${
-                        card.type === "YELLOW" ? "bg-yellow-400" : "bg-red-500"
-                      }`}
-                    />
+                    {isDoubleYellowRed ? (
+                      <div className="flex items-center gap-0.5">
+                        <div className="h-3 w-2 rounded-sm bg-yellow-400" />
+                        <div className="h-3 w-2 rounded-sm bg-red-500 -ml-0.5" />
+                      </div>
+                    ) : (
+                      <div
+                        className={`h-3 w-2 rounded-sm ${
+                          card.type === "YELLOW" ? "bg-yellow-400" : "bg-red-500"
+                        }`}
+                      />
+                    )}
                     <span className="text-xs font-semibold text-muted-foreground">
                       {card.team.shortName}
                     </span>
                     <span className="font-medium">
                       {card.player.name} {card.player.surname}
                     </span>
+                    {isDoubleYellowRed && (
+                      <span className="rounded bg-amber-100 px-1 py-0.5 text-[10px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                        2A
+                      </span>
+                    )}
                   </div>
                   <span className="text-sm text-muted-foreground">
                     {card.minute}&apos;
                   </span>
                 </div>
-              ))}
+                )
+              })}
             </div>
           </CardContent>
         </Card>

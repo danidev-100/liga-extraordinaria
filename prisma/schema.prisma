@@ -156,16 +156,17 @@ model Goal {
 }
 
 model Card {
-  id        String   @id @default(uuid()) @db.Uuid
-  matchId   String   @map("match_id") @db.Uuid
-  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  playerId  String   @map("player_id") @db.Uuid
-  player    Player   @relation(fields: [playerId], references: [id])
-  teamId    String   @map("team_id") @db.Uuid
-  team      Team     @relation(fields: [teamId], references: [id])
-  type      CardType
-  minute    Int
-  createdAt DateTime @default(now()) @map("created_at")
+  id             String   @id @default(uuid()) @db.Uuid
+  matchId        String   @map("match_id") @db.Uuid
+  match          Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  playerId       String   @map("player_id") @db.Uuid
+  player         Player   @relation(fields: [playerId], references: [id])
+  teamId         String   @map("team_id") @db.Uuid
+  team           Team     @relation(fields: [teamId], references: [id])
+  type           CardType
+  minute         Int
+  isSecondYellow Boolean  @default(false) @map("is_second_yellow")
+  createdAt      DateTime @default(now()) @map("created_at")
 
   @@map("cards")
 }

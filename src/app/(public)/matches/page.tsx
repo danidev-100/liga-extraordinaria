@@ -295,18 +295,26 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
                                   </p>
                                   {match.cards.map((card) => {
                                     const isLocal = card.teamId === match.localTeam.id
+                                    const isDoubleYellowRed = card.type === "RED" && card.isSecondYellow
                                     return (
                                       <div
                                         key={card.id}
                                         className="flex items-center gap-1.5 text-xs"
                                       >
-                                        <span
-                                          className={`inline-block h-2.5 w-1.5 rounded-sm ${
-                                            card.type === "YELLOW"
-                                              ? "bg-yellow-400"
-                                              : "bg-red-500"
-                                          }`}
-                                        />
+                                        {isDoubleYellowRed ? (
+                                          <>
+                                            <span className="inline-block h-2.5 w-1.5 rounded-sm bg-yellow-400" />
+                                            <span className="inline-block h-2.5 w-1.5 rounded-sm bg-red-500 -ml-0.5" />
+                                          </>
+                                        ) : (
+                                          <span
+                                            className={`inline-block h-2.5 w-1.5 rounded-sm ${
+                                              card.type === "YELLOW"
+                                                ? "bg-yellow-400"
+                                                : "bg-red-500"
+                                            }`}
+                                          />
+                                        )}
                                         <span
                                           className="inline-block h-1.5 w-1.5 rounded-full"
                                           style={{ backgroundColor: isLocal ? (match.localTeam.color || "var(--primary)") : (match.visitorTeam.color || "#64748b") }}
@@ -317,6 +325,11 @@ async function MatchesContent({ categoryId, leagueId }: { categoryId?: string; l
                                         <span className="font-medium">
                                           {card.player.name} {card.player.surname}
                                         </span>
+                                        {isDoubleYellowRed && (
+                                          <span className="rounded bg-amber-100 px-1 py-0.5 text-[9px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                                            2A
+                                          </span>
+                                        )}
                                         <span className="text-muted-foreground">
                                           {card.minute}&apos;
                                         </span>
