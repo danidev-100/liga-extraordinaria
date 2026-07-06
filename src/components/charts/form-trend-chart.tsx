@@ -14,6 +14,13 @@ import {
 import { TrendingDown } from "lucide-react"
 import { ChartCard } from "@/components/charts/chart-card"
 import { EmptyState } from "@/components/ui/empty-state"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { getFormTrendAction } from "@/actions/analytics"
 import type { FormTrendRow } from "@/lib/analytics"
 
@@ -62,18 +69,22 @@ export function FormTrendChart({ data: initialData, categories }: FormTrendChart
   )
 
   const categorySelect = (
-    <select
-      onChange={(e) => handleCategoryChange(e.target.value)}
-      className="h-8 rounded-lg border border-input bg-transparent px-2 text-xs outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+    <Select
+      onValueChange={(value) => handleCategoryChange(value as string)}
       disabled={loading}
     >
-      <option value="">Todas las categorías</option>
-      {categories.map((cat) => (
-        <option key={cat.id} value={cat.id}>
-          {cat.name}
-        </option>
-      ))}
-    </select>
+      <SelectTrigger className="h-8 w-44 text-xs">
+        <SelectValue placeholder="Todas las categorías" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="">Todas las categorías</SelectItem>
+        {categories.map((cat) => (
+          <SelectItem key={cat.id} value={cat.id}>
+            {cat.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 
   if (data.length === 0 && !loading) {
