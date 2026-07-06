@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Suspense } from "react"
 import db from "@/lib/db"
 import { ShieldAlert } from "lucide-react"
@@ -222,7 +223,12 @@ async function TarjetasContent({ categoryId, leagueId }: { categoryId?: string; 
                       </span>
                     </TableCell>
                     <TableCell className="font-medium">
-                      {player.playerName} {player.playerSurname}
+                      <Link
+                        href={`/players/${player.playerId}`}
+                        className="transition-colors hover:text-primary hover:underline"
+                      >
+                        {player.playerName} {player.playerSurname}
+                      </Link>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

@@ -1,3 +1,4 @@
+import Link from "next/link"
 import { Suspense } from "react"
 import db from "@/lib/db"
 import { Goal, Trophy } from "lucide-react"
@@ -191,7 +192,12 @@ async function GoleadoresContent({ categoryId, leagueId }: { categoryId?: string
                       </span>
                     </TableCell>
                     <TableCell className="font-medium">
-                      {scorer.playerName} {scorer.playerSurname}
+                      <Link
+                        href={`/players/${scorer.playerId}`}
+                        className="transition-colors hover:text-primary hover:underline"
+                      >
+                        {scorer.playerName} {scorer.playerSurname}
+                      </Link>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">

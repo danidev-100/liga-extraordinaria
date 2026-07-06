@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { Trophy } from "lucide-react"
 import {
   Table,
@@ -24,7 +25,7 @@ interface StandingEntry {
   dg: number
   ta: number
   tr: number
-  team: { name: string; shortName: string; color: string | null }
+  team: { id: string; name: string; shortName: string; color: string | null }
 }
 
 interface StandingsTableProps {
@@ -104,7 +105,12 @@ export function StandingsTable({ standings, categoryName }: StandingsTableProps)
                           style={{ backgroundColor: row.team.color }}
                         />
                       )}
-                      <span className="font-medium">{row.team.shortName}</span>
+                      <Link
+                        href={`/teams/${row.team.id}`}
+                        className="font-medium transition-colors hover:text-primary hover:underline"
+                      >
+                        {row.team.shortName}
+                      </Link>
                       <span className="hidden text-xs text-muted-foreground sm:inline">
                         {row.team.name}
                       </span>

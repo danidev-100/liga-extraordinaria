@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 
 const navLinks = [
   { href: "/matches", label: "Partidos" },
+  { href: "/teams", label: "Equipos" },
   { href: "/standings", label: "Posiciones" },
   { href: "/goleadores", label: "Goleadores" },
   { href: "/tarjetas", label: "Tarjetas" },
