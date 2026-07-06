@@ -22,6 +22,17 @@ export const metadata: Metadata = {
     template: "%s — Liga Extraordinaria",
   },
   description: "Gestión de ligas de fútbol, equipos, partidos y posiciones",
+  manifest: "/manifest.json",
+  icons: [{ rel: "icon", url: "/icon.svg", type: "image/svg+xml" }],
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Liga Extra",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+    "theme-color": "#16a34a",
+  },
 }
 
 export default function RootLayout({
@@ -40,6 +51,17 @@ export default function RootLayout({
           {children}
           <Toaster />
         </Providers>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js').catch(() => {});
+                });
+              }
+            `,
+          }}
+        />
       </body>
     </html>
   )

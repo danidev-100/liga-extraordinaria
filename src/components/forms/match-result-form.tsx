@@ -29,7 +29,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Loader2, Plus, X } from "lucide-react"
+import { Loader2, Plus, X, AlertTriangle, CheckCircle } from "lucide-react"
 import {
   finishMatchSchema,
   type FinishMatchFormData,
@@ -60,6 +60,7 @@ interface MatchResultFormProps {
 export function MatchResultForm({ match }: MatchResultFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   const form = useForm<FinishMatchFormData>({
     resolver: zodResolver(finishMatchSchema),
@@ -510,10 +511,54 @@ export function MatchResultForm({ match }: MatchResultFormProps) {
           </CardContent>
         </Card>
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Finalizar Partido
-        </Button>
+        {showConfirm ? (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-3">
+            <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+              <AlertTriangle className="h-4 w-4" />
+              ¿Confirmar resultado?
+            </div>
+            <div className="flex items-center justify-center gap-4 text-lg font-bold">
+              <span>{match.localTeam.shortName}</span>
+              <span className="text-primary">{localGoals} - {visitorGoals}</span>
+              <span>{match.visitorTeam.shortName}</span>
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              {goalFields.length} gol{goalFields.length !== 1 ? "es" : ""} · {cardFields.length} tarjeta{cardFields.length !== 1 ? "s" : ""}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                type="submit"
+                className="flex-1 gap-2"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                Confirmar
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => setShowConfirm(false)}
+                disabled={isSubmitting}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            className="w-full gap-2"
+            onClick={() => setShowConfirm(true)}
+          >
+            <CheckCircle className="h-4 w-4" />
+            Finalizar Partido
+          </Button>
+        )}
       </form>
     </Form>
   )
