@@ -66,7 +66,7 @@ export function MatchCalendarGrid({ weeks, currentMonth }: MatchCalendarGridProp
           week.days.map((day, dayIdx) => (
             <div
               key={`${week.label}-${dayIdx}`}
-              className={`min-h-[100px] rounded-lg border p-1.5 transition-colors ${
+              className={`min-h-[120px] rounded-lg border p-2 transition-colors md:min-h-[100px] md:p-1.5 ${
                 day.isCurrentMonth
                   ? "bg-card"
                   : "bg-muted/20"
@@ -98,7 +98,7 @@ export function MatchCalendarGrid({ weeks, currentMonth }: MatchCalendarGridProp
                     <Link
                       key={match.id}
                       href={`/matches/${match.id}`}
-                      className={`group block rounded-md border px-1.5 py-1 text-[11px] leading-tight transition-all hover:shadow-sm ${
+                      className={`group block rounded-lg border px-2 py-1.5 text-xs leading-tight transition-all hover:shadow-sm md:rounded-md md:px-1.5 md:py-1 md:text-[11px] ${
                         isFinished
                           ? "bg-muted/30 border-border/50"
                           : "border-dashed border-border/40 hover:border-primary/30"
@@ -118,7 +118,7 @@ export function MatchCalendarGrid({ weeks, currentMonth }: MatchCalendarGridProp
                       </div>
 
                       {/* Teams */}
-                      <div className="mt-0.5 flex items-center gap-1 font-medium text-foreground">
+                      <div className="mt-0.5 flex items-center gap-1 font-medium text-foreground md:mt-0.5">
                         <span className="truncate">{match.localTeam.shortName}</span>
                         {hasScore ? (
                           <span className="shrink-0 font-bold tabular-nums">

@@ -119,6 +119,7 @@ export function MatchResultForm({ match }: MatchResultFormProps) {
         localScore: computedLocal,
         visitorScore: computedVisitor,
       })
+      setShowConfirm(false)
       toast.success("Resultado del partido guardado exitosamente")
       router.refresh()
     } catch (error) {

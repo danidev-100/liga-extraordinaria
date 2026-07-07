@@ -69,7 +69,7 @@ export default async function MatchesPage({
       localTeam: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true } },
       visitorTeam: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true } },
     },
-    orderBy: [{ date: "desc" }, { time: "desc" }],
+    orderBy: [{ round: "asc" }, { date: "asc" }, { time: "asc" }],
   })
 
   return (

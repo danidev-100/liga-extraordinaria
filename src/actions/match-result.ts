@@ -68,7 +68,6 @@ export async function finishMatch(matchId: string, data: FinishMatchFormData) {
   })
 
   if (!match) throw new Error("Partido no encontrado")
-  if (match.status === "FINISHED") throw new Error("El partido ya está finalizado")
 
   // Execute everything atomically
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
