@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
+import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { categorySchema, type CategoryFormData } from "@/lib/validations/category"
 
@@ -13,10 +14,11 @@ async function ensureAuth() {
   return session
 }
 
-export async function getCategories() {
+export async function getCategories(leagueId?: string) {
   await ensureAuth()
 
   return db.category.findMany({
+    where: leagueId ? { leagueId } : undefined,
     include: { league: { select: { name: true } } },
     orderBy: { name: "asc" },
   })
@@ -53,8 +55,9 @@ export async function createCategory(data: CategoryFormData) {
   return category
 }
 
-export async function updateCategory(id: string, data: Partial<CategoryFormData>) {
+export async function updateCategory(id: string, data: Partial<CategoryFormData>, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const parsed = categorySchema.partial().parse(data)
 
@@ -71,8 +74,9 @@ export async function updateCategory(id: string, data: Partial<CategoryFormData>
   return category
 }
 
-export async function deleteCategory(id: string) {
+export async function deleteCategory(id: string, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   await db.category.delete({
     where: { id },

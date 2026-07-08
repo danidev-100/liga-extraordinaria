@@ -23,6 +23,8 @@ export type PlayerRow = {
   teamLogoUrl: string | null
   teamColor: string | null
   categoryName: string
+  totalGoals: number
+  totalCards: number
 }
 
 interface PlayersTableProps {
@@ -98,6 +100,26 @@ const columns: ColumnDef<PlayerRow>[] = [
       <Badge variant={row.original.isActive ? "default" : "secondary"}>
         {row.original.isActive ? "Activo" : "Inactivo"}
       </Badge>
+    ),
+  },
+  {
+    accessorKey: "totalGoals",
+    header: "Goles",
+    meta: { align: "right" },
+    cell: ({ row }) => (
+      <span className="font-bold text-primary">
+        {row.original.totalGoals}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "totalCards",
+    header: "T",
+    meta: { align: "right" },
+    cell: ({ row }) => (
+      <span className="text-muted-foreground">
+        {row.original.totalCards}
+      </span>
     ),
   },
   {

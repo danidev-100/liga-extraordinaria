@@ -44,6 +44,7 @@ export default async function PlayersPage({
             category: { select: { name: true, id: true } },
           },
         },
+        _count: { select: { goals: true, cards: true } },
       },
       orderBy: [{ surname: "asc" }, { name: "asc" }],
     })
@@ -98,6 +99,8 @@ export default async function PlayersPage({
               teamLogoUrl: p.team.logoUrl,
               teamColor: p.team.color,
               categoryName: p.team.category.name,
+              totalGoals: p._count.goals,
+              totalCards: p._count.cards,
             }))}
           />
         </CardContent>

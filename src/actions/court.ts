@@ -1,5 +1,11 @@
 "use server"
 
+/**
+ * Courts are intentionally GLOBAL — shared across all leagues.
+ * They represent physical venues that multiple leagues can use.
+ * No league scoping is needed for this module.
+ */
+
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import db from "@/lib/db"

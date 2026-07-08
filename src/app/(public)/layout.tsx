@@ -16,24 +16,34 @@ import {
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { cn } from "@/lib/utils"
 
-const navLinks = [
-  { href: "/matches", label: "Partidos", icon: Calendar },
-  { href: "/teams", label: "Equipos", icon: Users },
-  { href: "/standings", label: "Posiciones", icon: ListOrdered },
-  { href: "/goleadores", label: "Goleadores", icon: Goal },
-  { href: "/tarjetas", label: "Tarjetas", icon: ShieldAlert },
+const navLinkDefs = [
+  { scopedPath: "partidos", oldPath: "/matches", label: "Partidos", icon: Calendar },
+  { scopedPath: "equipos", oldPath: "/teams", label: "Equipos", icon: Users },
+  { scopedPath: "posiciones", oldPath: "/standings", label: "Posiciones", icon: ListOrdered },
+  { scopedPath: "goleadores", oldPath: "/goleadores", label: "Goleadores", icon: Goal },
+  { scopedPath: "tarjetas", oldPath: "/tarjetas", label: "Tarjetas", icon: ShieldAlert },
 ]
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  // Extract league slug from pathname: /liga/[slug]/...
+  const leagueMatch = pathname.match(/^\/liga\/([^/]+)/)
+  const leagueSlug = leagueMatch?.[1] ?? null
+
+  // Build nav links: scoped when on a league page, old paths otherwise
+  const navLinks = navLinkDefs.map((link) => ({
+    ...link,
+    href: leagueSlug ? `/liga/${leagueSlug}/${link.scopedPath}` : link.oldPath,
+  }))
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Public header — glassmorphism nav */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/80 dark:bg-black/50 dark:supports-[backdrop-filter]:bg-black/50">
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2.5 group min-w-0 shrink">
+          <Link href={leagueSlug ? `/liga/${leagueSlug}/posiciones` : "/"} className="flex items-center gap-2.5 group min-w-0 shrink">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-transform group-hover:scale-105">
               <Trophy className="h-5 w-5" />
             </div>

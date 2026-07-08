@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
+import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { calculateStandings, type TeamInfo, type MatchResultData, type CardData } from "@/lib/standings"
 
@@ -27,8 +28,9 @@ export async function getStandingsByCategory(categoryId: string) {
   return standings
 }
 
-export async function recalculateStandings(categoryId: string) {
+export async function recalculateStandings(categoryId: string, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   // Fetch all data needed
   const [teams, matches, cards] = await Promise.all([
@@ -93,6 +95,21 @@ export async function getAllCategories(leagueId?: string) {
 
   return db.category.findMany({
     where: leagueId ? { leagueId } : undefined,
+    include: { league: { select: { name: true } } },
+    orderBy: { name: "asc" },
+  })
+}
+
+/**
+ * Returns categories scoped to a league identified by slug.
+ * Resolves the slug via ensureScope for authorization.
+ */
+export async function getCategoriesBySlug(slug: string) {
+  await ensureAuth()
+  const { leagueId } = await ensureScope(slug)
+
+  return db.category.findMany({
+    where: { leagueId },
     include: { league: { select: { name: true } } },
     orderBy: { name: "asc" },
   })

@@ -20,23 +20,47 @@ import {
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import { LeagueSwitcher } from "@/components/layout/league-switcher"
 
-const navItems = [
-  { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/admin/categories", label: "Categorías", icon: Shield },
-  { href: "/admin/teams", label: "Equipos", icon: Users },
-  { href: "/admin/players", label: "Jugadores", icon: UserCircle },
-  { href: "/admin/matches", label: "Partidos", icon: Calendar },
-  { href: "/admin/courts", label: "Canchas", icon: MapPin },
-  { href: "/admin/leagues", label: "Ligas", icon: Trophy },
-  { href: "/admin/standings", label: "Posiciones", icon: ListOrdered },
-]
+interface League {
+  id: string
+  name: string
+  slug: string | null
+  season: string
+}
 
-export function Sidebar({ email }: { email?: string | null }) {
+function getNavItems(leagueSlug?: string) {
+  const base = leagueSlug ? `/admin/ligas/${leagueSlug}` : "/admin"
+  return [
+    { href: base, label: "Dashboard", icon: LayoutDashboard },
+    { href: `${base}/categories`, label: "Categorías", icon: Shield },
+    { href: `${base}/teams`, label: "Equipos", icon: Users },
+    { href: `${base}/players`, label: "Jugadores", icon: UserCircle },
+    { href: `${base}/matches`, label: "Partidos", icon: Calendar },
+    { href: `${base}/courts`, label: "Canchas", icon: MapPin },
+    { href: `${base}/leagues`, label: "Ligas", icon: Trophy },
+    { href: `${base}/standings`, label: "Posiciones", icon: ListOrdered },
+  ]
+}
+
+export function Sidebar({
+  email,
+  leagueSlug,
+  leagueName,
+  isSuperAdmin,
+  allLeagues,
+}: {
+  email?: string | null
+  leagueSlug?: string
+  leagueName?: string | null
+  isSuperAdmin?: boolean
+  allLeagues?: League[]
+}) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const userInitial = email?.charAt(0)?.toUpperCase() ?? "U"
+  const navItems = getNavItems(leagueSlug)
 
   return (
     <>
@@ -71,22 +95,35 @@ export function Sidebar({ email }: { email?: string | null }) {
           <div className="flex size-8 items-center justify-center rounded-lg bg-white/20">
             <Trophy className="size-4 text-sidebar-primary-foreground" />
           </div>
-          <div>
-            <h1 className="text-sm font-bold tracking-tight text-sidebar-primary-foreground">
-              Liga Deportiva
-            </h1>
-            <p className="text-[11px] leading-tight text-sidebar-primary-foreground/70">
-              Panel de Administración
-            </p>
-          </div>
+          {isSuperAdmin && allLeagues ? (
+            <div>
+              <LeagueSwitcher
+                leagues={allLeagues}
+                currentSlug={leagueSlug}
+                currentName={leagueName}
+              />
+              <p className="text-[11px] leading-tight text-sidebar-primary-foreground/70">
+                Panel de Administración
+              </p>
+            </div>
+          ) : (
+            <div>
+              <h1 className="text-sm font-bold tracking-tight text-sidebar-primary-foreground">
+                {leagueName ?? "Liga Deportiva"}
+              </h1>
+              <p className="text-[11px] leading-tight text-sidebar-primary-foreground/70">
+                Panel de Administración
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Navigation */}
         <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
           {navItems.map((item) => {
             const isActive =
-              item.href === "/admin"
-                ? pathname === "/admin"
+              item.href === (leagueSlug ? `/admin/ligas/${leagueSlug}` : "/admin")
+                ? pathname === item.href
                 : pathname.startsWith(item.href)
 
             return (

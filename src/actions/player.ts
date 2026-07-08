@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
+import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { playerSchema, type PlayerFormData } from "@/lib/validations/player"
 
@@ -13,10 +14,11 @@ async function ensureAuth() {
   return session
 }
 
-export async function getPlayers() {
+export async function getPlayers(leagueId?: string) {
   await ensureAuth()
 
   return db.player.findMany({
+    where: leagueId ? { team: { category: { leagueId } } } : undefined,
     include: {
       team: {
         select: {
@@ -43,8 +45,9 @@ export async function getPlayerById(id: string) {
   })
 }
 
-export async function createPlayer(data: PlayerFormData) {
+export async function createPlayer(data: PlayerFormData, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const parsed = playerSchema.parse(data)
 
@@ -64,8 +67,9 @@ export async function createPlayer(data: PlayerFormData) {
   return player
 }
 
-export async function updatePlayer(id: string, data: Partial<PlayerFormData>) {
+export async function updatePlayer(id: string, data: Partial<PlayerFormData>, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const parsed = playerSchema.partial().parse(data)
 
@@ -87,8 +91,9 @@ export async function updatePlayer(id: string, data: Partial<PlayerFormData>) {
   return player
 }
 
-export async function deletePlayer(id: string) {
+export async function deletePlayer(id: string, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   await db.player.delete({
     where: { id },

@@ -146,13 +146,14 @@ async function main() {
   const league = await prisma.league.create({
     data: {
       name: 'Liga Extraordinaria 2026',
+      slug: 'liga-extraordinaria-2026',
       season: '2026',
       startDate: new Date('2026-01-01'),
       endDate: new Date('2026-12-31'),
       isActive: true,
     },
   })
-  console.log(`✓ Liga: ${league.name}\n`)
+  console.log(`✓ Liga: ${league.name} (slug: ${league.slug})\n`)
 
   // 3. Categories
   const categoryRows = await Promise.all(

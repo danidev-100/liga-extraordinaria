@@ -21,6 +21,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         const admin = await db.admin.findUnique({
           where: { email },
+          include: { league: { select: { slug: true } } },
         })
 
         if (!admin) {
@@ -38,6 +39,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: admin.email,
           name: admin.name,
           role: admin.role,
+          leagueId: admin.leagueId,
+          leagueSlug: admin.league?.slug ?? null,
         }
       },
     }),
@@ -47,6 +50,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.role = user.role
         token.id = user.id
+        token.leagueId = user.leagueId
+        token.leagueSlug = user.leagueSlug
       }
       return token
     },
@@ -54,6 +59,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.role = token.role as string
         session.user.id = token.id as string
+        session.user.leagueId = token.leagueId as string | null
+        session.user.leagueSlug = token.leagueSlug as string | null
       }
       return session
     },

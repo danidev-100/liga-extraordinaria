@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { signIn, useSession } from "next-auth/react"
-import { CircleDot, Eye, EyeOff, LogIn, Trophy, Shield } from "lucide-react"
+import { CircleDot, Eye, EyeOff, LogIn, Trophy, Shield, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -19,7 +19,7 @@ import { Label } from "@/components/ui/label"
 export function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { status } = useSession()
+  const { data: session, status } = useSession()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -28,9 +28,14 @@ export function LoginForm() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/admin")
+      const slug = session?.user?.leagueSlug
+      if (slug) {
+        router.push(`/admin/ligas/${slug}/dashboard`)
+      } else {
+        router.push("/create-league")
+      }
     }
-  }, [status, router])
+  }, [status, session, router])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -50,7 +55,6 @@ export function LoginForm() {
         return
       }
 
-      router.push("/admin")
       router.refresh()
     } catch {
       setError("Ocurrió un error al iniciar sesión")
@@ -213,8 +217,16 @@ export function LoginForm() {
           </CardFooter>
         </Card>
 
-        {/* Back link */}
-        <div className="mt-6 text-center">
+        {/* Links */}
+        <div className="mt-6 space-y-3 text-center">
+          <a
+            href="/register"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Crear una liga nueva
+          </a>
+          <br />
           <a
             href="/"
             className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-primary hover:underline"

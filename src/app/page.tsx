@@ -1,7 +1,10 @@
 import Link from "next/link"
-import { Trophy, Shield, Calendar, Goal, Users, ArrowRight } from "lucide-react"
+import { redirect } from "next/navigation"
+import { Trophy, Shield, Calendar, Goal, Users, ArrowRight, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import db from "@/lib/db"
+import { auth } from "@/lib/auth"
 
 async function getStats() {
   try {
@@ -17,7 +20,35 @@ async function getStats() {
 }
 
 export default async function Home() {
+  // 1. Authenticated with league → redirect to admin dashboard
+  const session = await auth()
+  if (session?.user?.leagueId) {
+    const league = await db.league.findUnique({
+      where: { id: session.user.leagueId },
+      select: { slug: true },
+    })
+    if (league?.slug) {
+      redirect(`/admin/ligas/${league.slug}/dashboard`)
+    }
+  }
+
+  // 2. Single active league → redirect to its public page
+  const activeLeagues = await db.league.findMany({
+    where: { isActive: true, slug: { not: null } },
+    take: 2,
+    orderBy: { createdAt: "asc" },
+  })
+  if (activeLeagues.length === 1 && activeLeagues[0].slug) {
+    redirect(`/liga/${activeLeagues[0].slug}/posiciones`)
+  }
+
+  // 3. Multiple leagues or no leagues → show landing page with directory
   const { teamCount, playerCount, matchCount } = await getStats()
+  const leagues = await db.league.findMany({
+    where: { isActive: true, slug: { not: null } },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true, slug: true, season: true },
+  })
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -34,16 +65,32 @@ export default async function Home() {
           </Link>
 
           <div className="flex items-center gap-2">
-            <Link href="/matches">
-              <Button variant="ghost" size="sm">
-                Partidos
-              </Button>
-            </Link>
-            <Link href="/standings">
-              <Button variant="ghost" size="sm">
-                Posiciones
-              </Button>
-            </Link>
+            {leagues.length > 0 ? (
+              <Link href={`/liga/${leagues[0].slug}/partidos`}>
+                <Button variant="ghost" size="sm">
+                  Partidos
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/matches">
+                <Button variant="ghost" size="sm">
+                  Partidos
+                </Button>
+              </Link>
+            )}
+            {leagues.length > 0 ? (
+              <Link href={`/liga/${leagues[0].slug}/posiciones`}>
+                <Button variant="ghost" size="sm">
+                  Posiciones
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/standings">
+                <Button variant="ghost" size="sm">
+                  Posiciones
+                </Button>
+              </Link>
+            )}
             <Link href="/login">
               <Button size="sm" className="gap-1.5">
                 <Shield className="h-3.5 w-3.5" />
@@ -217,6 +264,80 @@ export default async function Home() {
                   Tabla actualizada automáticamente con cada resultado. Puntos,
                   goles, tarjetas, todo sincronizado en tiempo real.
                 </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* League directory — shown when multiple leagues exist */}
+        {leagues.length > 1 && (
+          <section className="border-t bg-muted/30 py-20">
+            <div className="container mx-auto px-4">
+              <div className="mx-auto mb-12 max-w-2xl text-center">
+                <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+                  Ligas activas
+                </h2>
+                <p className="mt-4 text-muted-foreground">
+                  Explorá las ligas disponibles y seguí los resultados
+                </p>
+              </div>
+
+              <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {leagues.map((l) => (
+                  <Link key={l.id} href={`/liga/${l.slug}/posiciones`} className="group">
+                    <Card className="h-full transition-all duration-200 hover:shadow-lg hover:ring-2 hover:ring-primary/30">
+                      <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                          <Trophy className="h-7 w-7" />
+                        </div>
+                        <div>
+                          <h3 className="font-heading text-lg font-semibold">{l.name}</h3>
+                          <p className="mt-0.5 text-sm text-muted-foreground">
+                            Temporada {l.season}
+                          </p>
+                        </div>
+                        <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+                          Ver liga <ArrowRight className="h-3.5 w-3.5" />
+                        </span>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* CTA — Create your league */}
+        <section className="py-20">
+          <div className="container mx-auto px-4 text-center">
+            <div className="mx-auto max-w-2xl">
+              <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/20">
+                <Plus className="h-8 w-8 text-white" />
+              </div>
+              <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+                ¿Tenés tu propia liga?
+              </h2>
+              <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
+                Creá tu liga en segundos, gestioná equipos, partidos y estadísticas
+                desde un solo lugar. Gratis y sin complicaciones.
+              </p>
+              <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <Link href="/register">
+                  <Button
+                    size="lg"
+                    className="gap-2 px-8 text-base shadow-lg shadow-primary/20 transition-all hover:shadow-xl hover:shadow-primary/30 active:scale-[0.98]"
+                  >
+                    <Plus className="h-5 w-5" />
+                    Crear mi liga
+                  </Button>
+                </Link>
+                <Link href="/login">
+                  <Button variant="outline" size="lg" className="gap-2 px-8 text-base">
+                    <Shield className="h-5 w-5" />
+                    Ya tengo cuenta
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

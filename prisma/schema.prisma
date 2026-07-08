@@ -28,6 +28,8 @@ model Admin {
   email        String   @unique
   passwordHash String   @map("password_hash")
   role         UserRole @default(ADMIN)
+  leagueId     String?  @map("league_id") @db.Uuid
+  league       League?  @relation(fields: [leagueId], references: [id])
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
@@ -37,6 +39,7 @@ model Admin {
 model League {
   id         String     @id @default(uuid()) @db.Uuid
   name       String
+  slug       String?    @unique @map("slug")
   season     String
   startDate  DateTime   @map("start_date")
   endDate    DateTime   @map("end_date")
@@ -44,6 +47,7 @@ model League {
   createdAt  DateTime   @default(now()) @map("created_at")
   updatedAt  DateTime   @updatedAt @map("updated_at")
   categories Category[]
+  admins     Admin[]
 
   @@map("leagues")
 }
@@ -54,7 +58,7 @@ model Category {
   minAge   Int      @map("min_age")
   maxAge   Int      @map("max_age")
   leagueId String   @map("league_id") @db.Uuid
-  league   League   @relation(fields: [leagueId], references: [id], onDelete: Restrict)
+  league   League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
   teams    Team[]
   matches  Match[]
   standings Standing[]
@@ -70,7 +74,7 @@ model Team {
   logoUrl      String?  @map("logo_url")
   color        String?
   categoryId   String   @map("category_id") @db.Uuid
-  category     Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  category     Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
   players      Player[]
@@ -92,7 +96,7 @@ model Player {
   birthDate    DateTime @map("birth_date")
   photoUrl     String?  @map("photo_url")
   teamId       String   @map("team_id") @db.Uuid
-  team         Team     @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  team         Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   jerseyNumber Int?     @map("jersey_number")
   isActive     Boolean  @default(true) @map("is_active")
   createdAt    DateTime @default(now()) @map("created_at")
@@ -119,7 +123,7 @@ model Court {
 model Match {
   id            String      @id @default(uuid()) @db.Uuid
   categoryId    String      @map("category_id") @db.Uuid
-  category      Category    @relation(fields: [categoryId], references: [id])
+  category      Category    @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   courtId       String      @map("court_id") @db.Uuid
   court         Court       @relation(fields: [courtId], references: [id])
   date          DateTime
@@ -174,7 +178,7 @@ model Card {
 model Standing {
   id         String   @id @default(uuid()) @db.Uuid
   categoryId String   @map("category_id") @db.Uuid
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   teamId     String   @map("team_id") @db.Uuid @unique
   team       Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
   pts        Int      @default(0)

@@ -10,6 +10,10 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user
       const isOnAdmin = nextUrl.pathname.startsWith("/admin")
       if (isOnAdmin && !isLoggedIn) return false
+
+      // League-scoped public routes are always accessible
+      if (nextUrl.pathname.startsWith("/liga/")) return true
+
       return true
     },
   },

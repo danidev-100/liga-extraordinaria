@@ -42,6 +42,7 @@ const statusConfig = {
 
 export default async function AdminDashboard() {
   const session = await auth()
+  const isSuperAdmin = session?.user?.role === "SUPER_ADMIN"
 
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
@@ -52,6 +53,7 @@ export default async function AdminDashboard() {
     leagueCount, categoryCount, teamCount, playerCount,
     courtCount, matchCount, finishedCount, todayMatchCount,
     pendingMatchCount, recentMatches,
+    allLeagues,
   ] = await Promise.all([
     db.league.count(),
     db.category.count(),
@@ -71,6 +73,9 @@ export default async function AdminDashboard() {
         visitorTeam: { select: { shortName: true, name: true, color: true, logoUrl: true } },
       },
     }),
+    isSuperAdmin
+      ? db.league.findMany({ orderBy: { createdAt: "desc" } })
+      : Promise.resolve([]),
   ])
 
   const [
@@ -164,6 +169,7 @@ export default async function AdminDashboard() {
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Dashboard</h1>
           <p className="text-muted-foreground">
             Bienvenido, {session?.user?.name ?? "Administrador"}
+            {isSuperAdmin && <Badge variant="default" className="ml-2">SUPER_ADMIN</Badge>}
           </p>
         </div>
       </div>
@@ -319,6 +325,48 @@ export default async function AdminDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* SUPER_ADMIN: All leagues overview */}
+      {isSuperAdmin && allLeagues.length > 0 && (
+        <Card className="shadow-xs">
+          <CardHeader>
+            <CardTitle>Todas las ligas</CardTitle>
+            <CardDescription>
+              Vista general de todas las ligas del sistema
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {allLeagues.map((league) => (
+                <Link
+                  key={league.id}
+                  href={`/admin/ligas/${league.slug}`}
+                  className="group rounded-lg border bg-card p-4 transition-all hover:shadow-md hover:ring-2 hover:ring-primary/30"
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold group-hover:text-primary transition-colors">
+                      {league.name}
+                    </h3>
+                    <Badge
+                      variant={league.isActive ? "default" : "secondary"}
+                      className="text-[10px]"
+                    >
+                      {league.isActive ? "Activa" : "Inactiva"}
+                    </Badge>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Temporada {league.season}
+                  </p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {new Date(league.startDate).toLocaleDateString("es-AR")} —{" "}
+                    {new Date(league.endDate).toLocaleDateString("es-AR")}
+                  </p>
+                </Link>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Analytics Charts */}
       <ChartSection

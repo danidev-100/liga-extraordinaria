@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
+import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { teamSchema, type TeamFormData } from "@/lib/validations/team"
 
@@ -13,10 +14,11 @@ async function ensureAuth() {
   return session
 }
 
-export async function getTeams() {
+export async function getTeams(leagueId?: string) {
   await ensureAuth()
 
   return db.team.findMany({
+    where: leagueId ? { category: { leagueId } } : undefined,
     include: {
       category: {
         select: { name: true, league: { select: { name: true } } },
@@ -41,8 +43,9 @@ export async function getTeamById(id: string) {
   })
 }
 
-export async function createTeam(data: TeamFormData) {
+export async function createTeam(data: TeamFormData, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const parsed = teamSchema.parse(data)
 
@@ -60,8 +63,9 @@ export async function createTeam(data: TeamFormData) {
   return team
 }
 
-export async function updateTeam(id: string, data: Partial<TeamFormData>) {
+export async function updateTeam(id: string, data: Partial<TeamFormData>, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const parsed = teamSchema.partial().parse(data)
 
@@ -81,8 +85,9 @@ export async function updateTeam(id: string, data: Partial<TeamFormData>) {
   return team
 }
 
-export async function deleteTeam(id: string) {
+export async function deleteTeam(id: string, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   await db.team.delete({
     where: { id },

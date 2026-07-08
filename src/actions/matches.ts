@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
+import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { matchSchema, matchUpdateSchema, type MatchFormData, type MatchUpdateData } from "@/lib/validations/match"
 
@@ -13,12 +14,14 @@ async function ensureAuth() {
   return session
 }
 
-export async function getMatches(params?: { categoryId?: string }) {
+export async function getMatches(params?: { categoryId?: string; leagueId?: string }) {
   await ensureAuth()
 
   const where: Record<string, unknown> = {}
   if (params?.categoryId) {
     where.categoryId = params.categoryId
+  } else if (params?.leagueId) {
+    where.category = { leagueId: params.leagueId }
   }
 
   return db.match.findMany({
@@ -79,11 +82,12 @@ export async function getMatchById(id: string) {
   })
 }
 
-export async function getMatchFormData() {
+export async function getMatchFormData(leagueId?: string) {
   await ensureAuth()
 
   const [categories, courts] = await Promise.all([
     db.category.findMany({
+      where: leagueId ? { leagueId } : undefined,
       include: {
         league: { select: { name: true } },
         teams: {
@@ -99,8 +103,9 @@ export async function getMatchFormData() {
   return { categories, courts }
 }
 
-export async function createMatch(data: MatchFormData) {
+export async function createMatch(data: MatchFormData, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const parsed = matchSchema.parse(data)
 
@@ -151,8 +156,9 @@ export async function createMatch(data: MatchFormData) {
   return match
 }
 
-export async function updateMatch(id: string, data: MatchUpdateData) {
+export async function updateMatch(id: string, data: MatchUpdateData, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const parsed = matchUpdateSchema.parse(data)
 
@@ -202,8 +208,9 @@ export async function updateMatch(id: string, data: MatchUpdateData) {
   return match
 }
 
-export async function clearFinishedMatches() {
+export async function clearFinishedMatches(slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const deleted = await db.$transaction(async (tx: any) => {
@@ -229,8 +236,9 @@ export async function clearFinishedMatches() {
   return { count: deleted }
 }
 
-export async function deleteMatch(id: string) {
+export async function deleteMatch(id: string, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const match = await db.match.findUnique({
     where: { id },
@@ -258,8 +266,9 @@ export async function generateRoundRobin(data: {
   categoryId: string
   startDate: string
   baseTime: string
-}) {
+}, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const { categoryId, startDate, baseTime } = data
 

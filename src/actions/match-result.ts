@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
+import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { finishMatchSchema, type FinishMatchFormData } from "@/lib/validations/match-result"
 import { calculateStandings, type TeamInfo, type MatchResultData, type CardData } from "@/lib/standings"
@@ -57,8 +58,9 @@ function processCards(
   })
 }
 
-export async function finishMatch(matchId: string, data: FinishMatchFormData) {
+export async function finishMatch(matchId: string, data: FinishMatchFormData, slug?: string) {
   await ensureAuth()
+  if (slug) await ensureScope(slug)
 
   const parsed = finishMatchSchema.parse(data)
 

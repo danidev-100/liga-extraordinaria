@@ -7,7 +7,7 @@ import { Trash2, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { clearFinishedMatches } from "@/actions/matches"
 
-export function ClearFinishedButton() {
+export function ClearFinishedButton({ slug }: { slug?: string }) {
   const router = useRouter()
   const [isClearing, setIsClearing] = useState(false)
 
@@ -21,7 +21,7 @@ export function ClearFinishedButton() {
 
     setIsClearing(true)
     try {
-      const result = await clearFinishedMatches()
+      const result = await clearFinishedMatches(slug ?? "")
       toast.success(
         result.count > 0
           ? `${result.count} partido(s) finalizado(s) eliminados`
