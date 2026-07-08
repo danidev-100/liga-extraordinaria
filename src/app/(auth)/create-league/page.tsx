@@ -22,7 +22,7 @@ export default async function CreateLeaguePage() {
       include: { league: { select: { slug: true } } },
     })
     if (admin?.league?.slug) {
-      redirect(`/admin/ligas/${admin.league.slug}/dashboard`)
+      redirect(`/admin/ligas/${admin.league.slug}`)
     }
     redirect("/admin")
   }

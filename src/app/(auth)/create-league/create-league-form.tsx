@@ -50,7 +50,7 @@ export function CreateLeagueForm({ userName }: Props) {
         isActive: true,
       })
 
-      router.push(`/admin/ligas/${league.slug}/dashboard`)
+      router.push(`/admin/ligas/${league.slug}`)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error al crear la liga")

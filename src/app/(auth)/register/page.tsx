@@ -62,7 +62,7 @@ export default function RegisterPage() {
     }
 
     // Redirect to the new league's admin dashboard
-    router.push(`/admin/ligas/${result.slug}/dashboard`)
+    router.push(`/admin/ligas/${result.slug}`)
     router.refresh()
   }
 

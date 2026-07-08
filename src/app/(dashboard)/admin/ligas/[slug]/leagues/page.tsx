@@ -5,7 +5,7 @@ import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Edit, ToggleLeft, ToggleRight } from "lucide-react"
+import { Edit, ToggleLeft, ToggleRight, Plus } from "lucide-react"
 import { toggleLeagueActive } from "@/actions/league"
 import { Badge } from "@/components/ui/badge"
 
@@ -18,7 +18,7 @@ export default async function ScopedLeaguesPage({ params }: Props) {
   if (!session?.user?.id) redirect("/login")
 
   const { slug } = await params
-  const { leagueId } = await ensureScope(slug)
+  const { leagueId, isSuperAdmin } = await ensureScope(slug)
 
   // Scoped to only the user's league
   const league = await db.league.findUnique({
@@ -43,6 +43,14 @@ export default async function ScopedLeaguesPage({ params }: Props) {
             Configuración de tu liga
           </p>
         </div>
+        {isSuperAdmin && (
+          <Link href="/admin/leagues/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Nueva Liga
+            </Button>
+          </Link>
+        )}
       </div>
 
       <Card className="shadow-xs">
@@ -83,7 +91,7 @@ export default async function ScopedLeaguesPage({ params }: Props) {
                   )}
                 </Button>
               </form>
-              <Link href={`/admin/ligas/${slug}/leagues/${league.id}`}>
+              <Link href={`/admin/leagues/${league.id}`}>
                 <Button variant="outline" size="sm">
                   <Edit className="h-4 w-4" />
                 </Button>

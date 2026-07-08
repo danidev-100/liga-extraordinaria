@@ -99,9 +99,9 @@ export function Sidebar({
       >
         {/* Sporty green header */}
         <div className="flex h-16 items-center gap-3 bg-sidebar-primary px-5">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-white/20">
+          <Link href="/" className="flex size-8 items-center justify-center rounded-lg bg-white/20 transition-opacity hover:opacity-80">
             <Trophy className="size-4 text-sidebar-primary-foreground" />
-          </div>
+          </Link>
           {isSuperAdmin && allLeagues ? (
             <div>
               <LeagueSwitcher
@@ -114,14 +114,14 @@ export function Sidebar({
               </p>
             </div>
           ) : (
-            <div>
-              <h1 className="text-sm font-bold tracking-tight text-sidebar-primary-foreground">
+            <Link href="/" className="min-w-0 transition-opacity hover:opacity-80">
+              <h1 className="text-sm font-bold tracking-tight text-sidebar-primary-foreground truncate">
                 {leagueName ?? "Liga Deportiva"}
               </h1>
               <p className="text-[11px] leading-tight text-sidebar-primary-foreground/70">
                 Panel de Administración
               </p>
-            </div>
+            </Link>
           )}
         </div>
 

@@ -29,8 +29,11 @@ export function LoginForm() {
   useEffect(() => {
     if (status === "authenticated") {
       const slug = session?.user?.leagueSlug
+      const role = session?.user?.role
       if (slug) {
-        router.push(`/admin/ligas/${slug}/dashboard`)
+        router.push(`/admin/ligas/${slug}`)
+      } else if (role === "SUPER_ADMIN") {
+        router.push("/admin")
       } else {
         router.push("/create-league")
       }
