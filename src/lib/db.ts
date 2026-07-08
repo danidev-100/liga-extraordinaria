@@ -1,21 +1,17 @@
 import { PrismaClient } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-function createClient(): PrismaClient {
-  // @prisma/adapter-pg optimizes for Neon (used in production). In local dev it
-  // falls back to standard PrismaClient which works with any PostgreSQL.
-  try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { PrismaPg } = require('@prisma/adapter-pg') as typeof import('@prisma/adapter-pg')
+const prismaClientSingleton = () => {
+  // @prisma/adapter-pg uses the `pg` driver which has SCRAM auth issues with
+  // local PostgreSQL. Only use it on Vercel (Neon), standard client elsewhere.
+  if (process.env.VERCEL) {
     const adapter = new PrismaPg({
       connectionString: process.env.DATABASE_URL,
     })
     return new PrismaClient({ adapter })
-  } catch {
-    return new PrismaClient()
   }
+  return new PrismaClient()
 }
-
-const prismaClientSingleton = () => createClient()
 
 declare const globalThis: {
   prismaGlobal: ReturnType<typeof prismaClientSingleton>
