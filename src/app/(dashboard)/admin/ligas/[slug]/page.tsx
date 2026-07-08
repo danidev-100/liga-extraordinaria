@@ -228,19 +228,19 @@ export default async function LeagueDashboardPage({ params }: Props) {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
-              <Link href={`/admin/ligas/${slug}/matches/new`}>
+              <Link href={`/admin/matches/new`}>
                 <Button variant="outline" className="h-auto w-full flex-col gap-2 py-4 transition-all hover:border-primary/40 hover:bg-primary/5">
                   <Plus className="h-5 w-5 text-primary" />
                   <span className="text-xs font-medium">Nuevo Partido</span>
                 </Button>
               </Link>
-              <Link href={`/admin/ligas/${slug}/players/new`}>
+              <Link href={`/admin/players/new`}>
                 <Button variant="outline" className="h-auto w-full flex-col gap-2 py-4 transition-all hover:border-primary/40 hover:bg-primary/5">
                   <UserRound className="h-5 w-5 text-primary" />
                   <span className="text-xs font-medium">Nuevo Jugador</span>
                 </Button>
               </Link>
-              <Link href={`/admin/ligas/${slug}/teams/new`}>
+              <Link href={`/admin/teams/new`}>
                 <Button variant="outline" className="h-auto w-full flex-col gap-2 py-4 transition-all hover:border-primary/40 hover:bg-primary/5">
                   <Shield className="h-5 w-5 text-primary" />
                   <span className="text-xs font-medium">Nuevo Equipo</span>
@@ -278,7 +278,7 @@ export default async function LeagueDashboardPage({ params }: Props) {
                 No hay partidos registrados aún.
                 <br />
                 <Link
-                  href={`/admin/ligas/${slug}/matches/new`}
+                  href={`/admin/matches/new`}
                   className="mt-1 inline-block text-primary hover:underline"
                 >
                   Crear el primer partido
@@ -293,7 +293,7 @@ export default async function LeagueDashboardPage({ params }: Props) {
                   return (
                     <Link
                       key={match.id}
-                      href={`/admin/ligas/${slug}/matches/${match.id}`}
+                      href={`/admin/matches/${match.id}`}
                       className="flex items-center justify-between rounded-lg border bg-card px-4 py-2.5 transition-all hover:bg-muted hover:border-primary/20"
                     >
                       <div className="flex items-center gap-3">

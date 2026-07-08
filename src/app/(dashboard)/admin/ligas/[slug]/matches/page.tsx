@@ -86,13 +86,13 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ClearFinishedButton slug={slug} />
-          <Link href={`/admin/ligas/${slug}/matches/fixture/new`}>
+          <Link href={`/admin/matches/fixture/new`}>
             <Button variant="outline">
               <Calendar className="mr-2 h-4 w-4" />
               Generar<span className="hidden sm:inline"> Temporada</span>
             </Button>
           </Link>
-          <Link href={`/admin/ligas/${slug}/matches/new`}>
+          <Link href={`/admin/matches/new`}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Nuevo<span className="hidden sm:inline"> Partido</span>
@@ -196,7 +196,7 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
 
                   {/* Right: actions */}
                   <div className="flex flex-wrap items-center gap-2">
-                    <Link href={`/admin/ligas/${slug}/matches/${match.id}`}>
+                    <Link href={`/admin/matches/${match.id}`}>
                       <Button
                         variant={
                           match.status === "SCHEDULED" ? "default" : "outline"

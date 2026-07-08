@@ -34,7 +34,7 @@ export default async function ScopedCourtsPage({ params }: Props) {
             Gestioná las canchas disponibles
           </p>
         </div>
-        <Link href={`/admin/ligas/${slug}/courts/new`}>
+        <Link href={`/admin/courts/new`}>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Nueva Cancha
@@ -67,7 +67,7 @@ export default async function ScopedCourtsPage({ params }: Props) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/admin/ligas/${slug}/courts/${court.id}`}>
+                    <Link href={`/admin/courts/${court.id}`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>

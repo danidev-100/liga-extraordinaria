@@ -26,6 +26,7 @@ interface CourtFormProps {
     address: string | null
     city: string
     capacity: number | null
+    googleMapsLink: string | null
   }
 }
 
@@ -41,12 +42,14 @@ export function CourtForm({ initialData }: CourtFormProps) {
           address: initialData.address ?? "",
           city: initialData.city,
           capacity: initialData.capacity,
+          googleMapsLink: initialData.googleMapsLink ?? "",
         }
       : {
           name: "",
           address: "",
           city: "",
           capacity: null,
+          googleMapsLink: "",
         },
   })
 
@@ -134,6 +137,22 @@ export function CourtForm({ initialData }: CourtFormProps) {
               <FormLabel>Dirección</FormLabel>
               <FormControl>
                 <Input placeholder="Av. Libertador 1234" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="googleMapsLink"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Google Maps</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="https://maps.app.goo.gl/..."
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

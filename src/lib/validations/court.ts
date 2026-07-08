@@ -21,6 +21,12 @@ export const courtSchema = z.object({
     .max(100000, "La capacidad no puede exceder 100.000")
     .nullable()
     .optional(),
+  googleMapsLink: z
+    .string()
+    .url("Debe ser una URL válida")
+    .max(500, "La URL no puede exceder 500 caracteres")
+    .optional()
+    .or(z.literal("")),
 })
 
 export type CourtFormData = z.input<typeof courtSchema>

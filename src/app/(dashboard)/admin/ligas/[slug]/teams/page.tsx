@@ -53,7 +53,7 @@ export default async function ScopedTeamsPage({ params, searchParams }: Props) {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href={`/admin/ligas/${slug}/teams/new`}>
+          <Link href={`/admin/teams/new`}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Equipo
@@ -132,7 +132,7 @@ export default async function ScopedTeamsPage({ params, searchParams }: Props) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/admin/ligas/${slug}/teams/${team.id}`}>
+                    <Link href={`/admin/teams/${team.id}`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>

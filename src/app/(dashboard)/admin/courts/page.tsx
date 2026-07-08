@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Edit } from "lucide-react"
+import { Plus, Edit, MapPin } from "lucide-react"
 import { DeleteButton } from "@/components/forms/delete-button"
 import { deleteCourt } from "@/actions/court"
 
@@ -54,6 +54,20 @@ export default async function CourtsPage() {
                       {court.city}
                       {court.address ? ` · ${court.address}` : ""}
                       {court.capacity ? ` · Cap. ${court.capacity}` : ""}
+                      {court.googleMapsLink ? (
+                        <>
+                          {" · "}
+                          <a
+                            href={court.googleMapsLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-primary hover:underline"
+                          >
+                            <MapPin className="h-3 w-3" />
+                            Ver mapa
+                          </a>
+                        </>
+                      ) : null}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">

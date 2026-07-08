@@ -58,7 +58,7 @@ export default async function ScopedPlayersPage({ params, searchParams }: Props)
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href={`/admin/ligas/${slug}/players/new`}>
+          <Link href={`/admin/players/new`}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
               Nuevo Jugador

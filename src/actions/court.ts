@@ -46,6 +46,7 @@ export async function createCourt(data: CourtFormData) {
       address: parsed.address || null,
       city: parsed.city,
       capacity: parsed.capacity ?? null,
+      googleMapsLink: parsed.googleMapsLink || null,
     },
   })
 
@@ -63,6 +64,7 @@ export async function updateCourt(id: string, data: Partial<CourtFormData>) {
   if (parsed.address !== undefined) updateData.address = parsed.address || null
   if (parsed.city !== undefined) updateData.city = parsed.city
   if (parsed.capacity !== undefined) updateData.capacity = parsed.capacity ?? null
+  if (parsed.googleMapsLink !== undefined) updateData.googleMapsLink = parsed.googleMapsLink || null
 
   const court = await db.court.update({
     where: { id },

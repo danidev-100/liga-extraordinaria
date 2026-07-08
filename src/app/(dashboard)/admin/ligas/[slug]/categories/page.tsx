@@ -38,7 +38,7 @@ export default async function ScopedCategoriesPage({ params }: Props) {
             Gestioná las categorías por edades
           </p>
         </div>
-        <Link href={`/admin/ligas/${slug}/categories/new`}>
+        <Link href={`/admin/categories/new`}>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
             Nueva Categoría
@@ -71,7 +71,7 @@ export default async function ScopedCategoriesPage({ params }: Props) {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link href={`/admin/ligas/${slug}/categories/${cat.id}`}>
+                    <Link href={`/admin/categories/${cat.id}`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />
                       </Button>

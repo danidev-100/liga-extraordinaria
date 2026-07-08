@@ -37,6 +37,7 @@ export default async function EditCourtPage({
               address: court.address,
               city: court.city,
               capacity: court.capacity,
+              googleMapsLink: court.googleMapsLink,
             }}
           />
         </CardContent>

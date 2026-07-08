@@ -108,14 +108,15 @@ model Player {
 }
 
 model Court {
-  id        String   @id @default(uuid()) @db.Uuid
-  name      String
-  address   String?
-  city      String
-  capacity  Int?
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  matches   Match[]
+  id              String   @id @default(uuid()) @db.Uuid
+  name            String
+  address         String?
+  city            String
+  capacity        Int?
+  googleMapsLink  String?  @map("google_maps_link")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+  matches         Match[]
 
   @@map("courts")
 }

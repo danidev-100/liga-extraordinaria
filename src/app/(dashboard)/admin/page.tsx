@@ -1,5 +1,6 @@
 import { auth } from "@/lib/auth"
 import db from "@/lib/db"
+import { redirect } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -43,6 +44,17 @@ const statusConfig = {
 export default async function AdminDashboard() {
   const session = await auth()
   const isSuperAdmin = session?.user?.role === "SUPER_ADMIN"
+
+  // Redirect to league-scoped dashboard if user belongs to a league
+  if (session?.user?.leagueId) {
+    const userLeague = await db.league.findUnique({
+      where: { id: session.user.leagueId },
+      select: { slug: true },
+    })
+    if (userLeague?.slug) {
+      redirect(`/admin/ligas/${userLeague.slug}`)
+    }
+  }
 
   const todayStart = new Date()
   todayStart.setHours(0, 0, 0, 0)
