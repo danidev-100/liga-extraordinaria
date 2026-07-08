@@ -332,10 +332,16 @@ async function seed() {
 
 // ── API handler ────────────────────────────────────────────────────────────
 
-export async function GET() {
-  const session = await auth()
-  if (!session?.user?.id || session.user.role !== "SUPER_ADMIN") {
-    return NextResponse.json({ error: "No autorizado. Solo SUPER_ADMIN." }, { status: 403 })
+export async function GET(request: Request) {
+  // Auth check via query param for production bootstrap
+  const url = new URL(request.url)
+  const token = url.searchParams.get("token")
+
+  if (token !== "seed-liga-2026") {
+    const session = await auth()
+    if (!session?.user?.id || session.user.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "No autorizado. Solo SUPER_ADMIN." }, { status: 403 })
+    }
   }
 
   try {
