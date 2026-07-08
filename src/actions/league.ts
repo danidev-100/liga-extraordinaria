@@ -76,7 +76,7 @@ export async function createLeague(data: LeagueFormData) {
       slug,
       startDate: new Date(parsed.startDate),
       endDate: new Date(parsed.endDate),
-      isActive: parsed.isActive ?? false,
+      isActive: parsed.isActive ?? true,
     },
   })
 

@@ -49,7 +49,7 @@ export function LeagueForm({ initialData }: LeagueFormProps) {
           season: "",
           startDate: "",
           endDate: "",
-          isActive: false,
+          isActive: true,
         },
   })
 

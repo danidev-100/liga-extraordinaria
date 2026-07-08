@@ -11,7 +11,7 @@ export const leagueSchema = z.object({
     .max(20, "La temporada no puede exceder 20 caracteres"),
   startDate: z.string().min(1, "La fecha de inicio es requerida"),
   endDate: z.string().min(1, "La fecha de fin es requerida"),
-  isActive: z.boolean().default(false),
+  isActive: z.boolean().default(true),
 })
 
 export type LeagueFormData = z.input<typeof leagueSchema>
