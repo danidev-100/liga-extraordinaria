@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { Trophy, Shield, Calendar, Goal, Users, ArrowRight, Plus } from "lucide-react"
+
+export const dynamic = "force-dynamic"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import db from "@/lib/db"

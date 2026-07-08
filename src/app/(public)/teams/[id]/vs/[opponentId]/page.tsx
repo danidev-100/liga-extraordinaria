@@ -41,6 +41,13 @@ export default async function VsPage({ params }: PageProps) {
 
   if (!teamA || !teamB) notFound()
 
+  // Get the league slug for scoped URLs
+  const teamCategory = await db.category.findUnique({
+    where: { id: teamA.categoryId },
+    select: { league: { select: { slug: true } } },
+  })
+  const leagueSlug = teamCategory?.league?.slug ?? ""
+
   // 2. Fetch ALL finished matches between these two teams
   const matches = await db.match.findMany({
     where: {
@@ -132,7 +139,7 @@ export default async function VsPage({ params }: PageProps) {
     <div className="space-y-8">
       {/* Back link */}
       <Link
-        href={`/teams/${id}`}
+        href={`/liga/${leagueSlug}/equipos/${id}`}
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="h-4 w-4" />
@@ -143,7 +150,7 @@ export default async function VsPage({ params }: PageProps) {
       <div className="flex items-center justify-center gap-6 sm:gap-10">
         {/* Team A */}
         <Link
-          href={`/teams/${teamA.id}`}
+          href={`/liga/${leagueSlug}/equipos/${teamA.id}`}
           className="group flex flex-col items-center gap-2 transition-colors hover:text-primary"
         >
           <TeamLogo logoUrl={teamA.logoUrl} color={teamA.color} name={teamA.name} size="xl" />
@@ -162,7 +169,7 @@ export default async function VsPage({ params }: PageProps) {
 
         {/* Team B */}
         <Link
-          href={`/teams/${teamB.id}`}
+          href={`/liga/${leagueSlug}/equipos/${teamB.id}`}
           className="group flex flex-col items-center gap-2 transition-colors hover:text-primary"
         >
           <TeamLogo logoUrl={teamB.logoUrl} color={teamB.color} name={teamB.name} size="xl" />
