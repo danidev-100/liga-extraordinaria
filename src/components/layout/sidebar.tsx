@@ -13,6 +13,7 @@ import {
   MapPin,
   Trophy,
   ListOrdered,
+  ShieldAlert,
   LogOut,
   Menu,
   X,
@@ -152,6 +153,42 @@ export function Sidebar({
               </Link>
             )
           })}
+
+          {/* Admin management — SUPER_ADMIN only */}
+          {isSuperAdmin && (
+            <>
+              <div className="my-2 border-t border-sidebar-border" />
+              <div className="px-1.5 py-1 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/60">
+                Super Admin
+              </div>
+              {(() => {
+                const isActive = pathname.startsWith("/admin/admins")
+                return (
+                  <Link
+                    href="/admin/admins"
+                    onClick={() => setMobileOpen(false)}
+                    className={cn(
+                      "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all",
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    )}
+                  >
+                    {isActive && (
+                      <div className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-primary" />
+                    )}
+                    <ShieldAlert
+                      className={cn(
+                        "size-4 shrink-0",
+                        isActive ? "text-primary" : "text-muted-foreground group-hover:text-sidebar-accent-foreground",
+                      )}
+                    />
+                    <span>Administradores</span>
+                  </Link>
+                )
+              })()}
+            </>
+          )}
         </nav>
 
         {/* User & logout section */}
