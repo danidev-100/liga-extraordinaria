@@ -32,6 +32,7 @@ interface StandingEntry {
 interface StandingsTableProps {
   standings: StandingEntry[]
   categoryName: string
+  leagueSlug: string
 }
 
 const positionBadge = (pos: number) => {
@@ -44,7 +45,7 @@ const positionBadge = (pos: number) => {
   return "bg-muted/50 text-muted-foreground ring-border/50"
 }
 
-export function StandingsTable({ standings, categoryName }: StandingsTableProps) {
+export function StandingsTable({ standings, categoryName, leagueSlug }: StandingsTableProps) {
   return (
     <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
       {/* Category header */}
@@ -102,7 +103,7 @@ export function StandingsTable({ standings, categoryName }: StandingsTableProps)
                     <div className="flex items-center gap-2">
                       <TeamLogo logoUrl={row.team.logoUrl} color={row.team.color} name={row.team.name} size="md" />
                       <Link
-                        href={`/teams/${row.team.id}`}
+                        href={`/liga/${leagueSlug}/equipos/${row.team.id}`}
                         className="font-medium transition-colors hover:text-primary hover:underline"
                       >
                         {row.team.shortName}

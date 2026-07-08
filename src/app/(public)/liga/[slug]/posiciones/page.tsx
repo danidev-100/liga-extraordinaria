@@ -107,6 +107,7 @@ async function StandingsContent({
         <StandingsTable
           standings={standings}
           categoryName={`${selectedCategory.name} — ${selectedCategory.league.name}`}
+          leagueSlug={slug}
         />
       )}
 
