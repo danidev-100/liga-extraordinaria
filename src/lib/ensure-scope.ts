@@ -21,5 +21,10 @@ export async function ensureScope(leagueSlug: string): Promise<Scope> {
     throw new Error("No tenés acceso a esta liga")
   }
 
+  // Block regular admins from accessing inactive leagues
+  if (!isSuperAdmin && !league.isActive) {
+    throw new Error("Esta liga está desactivada. Contactá al administrador.")
+  }
+
   return { leagueId: league.id, isSuperAdmin }
 }

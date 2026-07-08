@@ -30,10 +30,10 @@ export default async function DashboardLayout({
   // SUPER_ADMIN can switch between all leagues
   const isSuperAdmin = session.user?.role === "SUPER_ADMIN"
 
-  let allLeagues: { id: string; name: string; slug: string | null; season: string }[] = []
+  let allLeagues: { id: string; name: string; slug: string | null; season: string; isActive: boolean }[] = []
   if (isSuperAdmin) {
     allLeagues = await db.league.findMany({
-      select: { id: true, name: true, slug: true, season: true },
+      select: { id: true, name: true, slug: true, season: true, isActive: true },
       orderBy: { createdAt: "desc" },
     })
   }

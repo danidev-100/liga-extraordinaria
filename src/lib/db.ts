@@ -1,16 +1,18 @@
 import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { Pool } from 'pg'
 
 const prismaClientSingleton = () => {
-  // @prisma/adapter-pg uses the `pg` driver which has SCRAM auth issues with
-  // local PostgreSQL. Only use it on Vercel (Neon), standard client elsewhere.
-  if (process.env.VERCEL) {
-    const adapter = new PrismaPg({
-      connectionString: process.env.DATABASE_URL,
-    })
-    return new PrismaClient({ adapter })
-  }
-  return new PrismaClient()
+  const pool = new Pool({
+    user: process.env.PGUSER || 'postgres',
+    password: process.env.PGPASSWORD || '1234',
+    host: process.env.PGHOST || 'localhost',
+    port: Number(process.env.PGPORT) || 5432,
+    database: process.env.PGDATABASE || 'liga-extraordinaria',
+    ssl: process.env.VERCEL ? { rejectUnauthorized: false } : false,
+  })
+  const adapter = new PrismaPg(pool)
+  return new PrismaClient({ adapter })
 }
 
 declare const globalThis: {
