@@ -61,7 +61,13 @@ export function Sidebar({
   const [mobileOpen, setMobileOpen] = useState(false)
 
   const userInitial = email?.charAt(0)?.toUpperCase() ?? "U"
-  const navItems = getNavItems(leagueSlug)
+
+  // For SUPER_ADMIN, detect the current league slug from the URL
+  // so the sidebar nav items stay scoped when switching leagues
+  const effectiveSlug = isSuperAdmin
+    ? pathname.match(/^\/admin\/ligas\/([^/]+)/)?.[1] || leagueSlug
+    : leagueSlug
+  const navItems = getNavItems(effectiveSlug)
 
   return (
     <>
@@ -100,7 +106,7 @@ export function Sidebar({
             <div>
               <LeagueSwitcher
                 leagues={allLeagues}
-                currentSlug={leagueSlug}
+                currentSlug={effectiveSlug}
                 currentName={leagueName}
               />
               <p className="text-[11px] leading-tight text-sidebar-primary-foreground/70">
