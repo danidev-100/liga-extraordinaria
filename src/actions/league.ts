@@ -137,13 +137,19 @@ export async function deleteLeague(id: string, slug?: string) {
 }
 
 export async function toggleLeagueActive(id: string, slug?: string) {
-  await ensureAuth()
-  if (slug) await ensureScope(slug)
+  const session = await ensureAuth()
+
+  if (slug) {
+    // Scoped toggle: verify user has access to this league
+    await ensureScope(slug)
+  } else if (session.user.role !== "SUPER_ADMIN") {
+    // Global toggle without slug: only SUPER_ADMIN can toggle any league
+    throw new Error("No autorizado. Solo SUPER_ADMIN puede cambiar el estado de cualquier liga.")
+  }
 
   const league = await db.league.findUnique({ where: { id } })
   if (!league) throw new Error("Liga no encontrada")
 
-  // Per-tenant toggle: do NOT deactivate other leagues
   const updated = await db.league.update({
     where: { id },
     data: { isActive: !league.isActive },
