@@ -1,12 +1,21 @@
 import { PrismaClient } from '@prisma/client'
-import { PrismaPg } from '@prisma/adapter-pg'
 
-const prismaClientSingleton = () => {
-  const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-  })
-  return new PrismaClient({ adapter }) as PrismaClient
+function createClient(): PrismaClient {
+  // @prisma/adapter-pg optimizes for Neon (used in production). In local dev it
+  // falls back to standard PrismaClient which works with any PostgreSQL.
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { PrismaPg } = require('@prisma/adapter-pg') as typeof import('@prisma/adapter-pg')
+    const adapter = new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+    })
+    return new PrismaClient({ adapter })
+  } catch {
+    return new PrismaClient()
+  }
 }
+
+const prismaClientSingleton = () => createClient()
 
 declare const globalThis: {
   prismaGlobal: ReturnType<typeof prismaClientSingleton>
