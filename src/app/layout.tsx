@@ -22,7 +22,7 @@ export const metadata: Metadata = {
     template: "%s — Liga Extraordinaria",
   },
   description: "Gestión de ligas de fútbol, equipos, partidos y posiciones",
-  manifest: "/manifest.json",
+  manifest: "/manifest",
   icons: [{ rel: "icon", url: "/icon.svg", type: "image/svg+xml" }],
   appleWebApp: {
     capable: true,
