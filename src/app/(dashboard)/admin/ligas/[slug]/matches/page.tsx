@@ -4,7 +4,7 @@ import { redirect } from "next/navigation"
 import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
-import { Plus, Edit, Clock, Play, CheckCircle2, Calendar } from "lucide-react"
+import { Plus, Edit, Clock, Play, CheckCircle2, Calendar, ArrowUpDown, FileDown } from "lucide-react"
 import { DeleteButton } from "@/components/forms/delete-button"
 import { ClearFinishedButton } from "@/components/forms/clear-finished-button"
 import { deleteMatch } from "@/actions/matches"
@@ -86,6 +86,12 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ClearFinishedButton slug={slug} />
+          <Link href={`/admin/matches/reorder`}>
+            <Button variant="outline">
+              <ArrowUpDown className="mr-2 h-4 w-4" />
+              Reordenar
+            </Button>
+          </Link>
           <Link href={`/admin/matches/fixture/new`}>
             <Button variant="outline">
               <Calendar className="mr-2 h-4 w-4" />

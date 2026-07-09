@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { FixtureForm } from "@/components/forms/fixture-form"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { ExportFixturePDF } from "@/components/forms/export-fixture-pdf"
 
 export default async function NewFixturePage() {
   const session = await auth()
@@ -29,6 +30,15 @@ export default async function NewFixturePage() {
         </CardHeader>
         <CardContent>
           <FixtureForm categories={categories} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Exportar fixture a PDF</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ExportFixturePDF categories={categories} />
         </CardContent>
       </Card>
     </div>

@@ -3,10 +3,11 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus } from "lucide-react"
+import { Plus, Upload } from "lucide-react"
 import { CategoryFilter } from "@/components/ui/category-filter"
 import { LeagueSelector } from "@/components/ui/league-selector"
 import { PlayersTable } from "@/components/tables/players-table"
+import { ImportPlayersCSV } from "@/components/forms/import-players-csv"
 
 export default async function PlayersPage({
   searchParams,
@@ -26,6 +27,12 @@ export default async function PlayersPage({
     where: leagueId ? { leagueId } : undefined,
     select: { id: true, name: true },
     orderBy: { name: "asc" },
+  })
+
+  const teams = await db.team.findMany({
+    where: leagueId ? { category: { leagueId } } : undefined,
+    include: { category: { select: { name: true } } },
+    orderBy: [{ category: { name: "asc" } }, { name: "asc" }],
   })
 
   const players = await db.player.findMany({
@@ -61,6 +68,7 @@ export default async function PlayersPage({
           </p>
         </div>
         <div className="flex items-center gap-3">
+          <ImportPlayersCSV teams={teams.map(t => ({ id: t.id, name: t.name, shortName: t.shortName, category: t.category }))} />
           <Link href="/admin/players/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
