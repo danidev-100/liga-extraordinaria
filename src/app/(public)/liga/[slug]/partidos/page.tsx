@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic"
 
 import Link from "next/link"
 import { notFound } from "next/navigation"
@@ -104,7 +105,7 @@ async function MatchesContent({
         </div>
         <div className="flex flex-col items-end gap-2">
           <PrintButton />
-          <MatchScheduleFilter categories={categories} currentCategoryId={categoryId} />
+          <MatchScheduleFilter categories={categories} currentCategoryId={categoryId} leagueSlug={slug} />
         </div>
       </div>
 

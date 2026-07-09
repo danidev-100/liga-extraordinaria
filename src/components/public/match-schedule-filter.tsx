@@ -12,18 +12,21 @@ interface CategoryOption {
 export function MatchScheduleFilter({
   categories,
   currentCategoryId,
+  leagueSlug,
 }: {
   categories: CategoryOption[]
   currentCategoryId?: string
+  leagueSlug?: string
 }) {
   const router = useRouter()
+  const basePath = leagueSlug ? `/liga/${leagueSlug}/partidos` : "/matches"
 
   function handleSelect(categoryId: string | null) {
     if (!categoryId) {
-      router.push("/matches")
+      router.push(basePath)
       return
     }
-    router.push(`/matches?categoryId=${categoryId}`)
+    router.push(`${basePath}?categoryId=${categoryId}`)
   }
 
   return (

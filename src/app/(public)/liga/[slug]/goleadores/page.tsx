@@ -1,5 +1,6 @@
-import Link from "next/link"
+export const dynamic = "force-dynamic"
 
+import Link from "next/link"
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { getLeagueBySlug } from "@/lib/get-league"
