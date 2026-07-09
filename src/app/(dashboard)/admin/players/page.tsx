@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Upload } from "lucide-react"
+import { Plus } from "lucide-react"
 import { CategoryFilter } from "@/components/ui/category-filter"
 import { LeagueSelector } from "@/components/ui/league-selector"
 import { PlayersTable } from "@/components/tables/players-table"
@@ -110,6 +110,7 @@ export default async function PlayersPage({
               totalGoals: p._count.goals,
               totalCards: p._count.cards,
             }))}
+            teams={teams.map(t => ({ id: t.id, shortName: t.shortName, name: t.name }))}
           />
         </CardContent>
       </Card>

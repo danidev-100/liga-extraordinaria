@@ -1,12 +1,20 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import type { ColumnDef } from "@tanstack/react-table"
 import { DataTable } from "@/components/data-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { DeleteButton } from "@/components/forms/delete-button"
-import { Edit } from "lucide-react"
+import { Edit, Filter } from "lucide-react"
 import { deletePlayer } from "@/actions/player"
 import { TeamLogo } from "@/components/ui/team-logo"
 
@@ -29,6 +37,7 @@ export type PlayerRow = {
 
 interface PlayersTableProps {
   players: PlayerRow[]
+  teams?: { id: string; shortName: string; name: string }[]
 }
 
 function formatDate(isoDate: string): string {
@@ -40,7 +49,7 @@ function formatDate(isoDate: string): string {
   })
 }
 
-const columns: ColumnDef<PlayerRow>[] = [
+const baseColumns: ColumnDef<PlayerRow>[] = [
   {
     accessorFn: (row) => `${row.name} ${row.surname}`,
     header: "Nombre",
@@ -140,13 +149,52 @@ const columns: ColumnDef<PlayerRow>[] = [
   },
 ]
 
-export function PlayersTable({ players }: PlayersTableProps) {
+export function PlayersTable({ players, teams }: PlayersTableProps) {
+  const [teamFilter, setTeamFilter] = useState("")
+
+  const filteredPlayers = teamFilter && teamFilter !== "all"
+    ? players.filter((p) => p.teamShortName === teamFilter)
+    : players
+
+  // Extract unique teams from data if not provided
+  const teamOptions = teams ?? Array.from(new Set(players.map((p) => ({
+    id: p.teamShortName,
+    shortName: p.teamShortName,
+    name: p.teamName,
+  })))).sort((a, b) => a.shortName.localeCompare(b.shortName, "es"))
+
   return (
-    <DataTable
-      columns={columns}
-      data={players}
-      searchKey="name"
-      searchPlaceholder="Buscar por nombre..."
-    />
+    <div className="space-y-4">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        {/* Team filter */}
+        {teamOptions.length > 0 && (
+          <div className="w-full sm:w-56">
+            <Select value={teamFilter} onValueChange={(v: string | null) => setTeamFilter(v ?? "")}>
+              <SelectTrigger>
+                <Filter className="mr-2 h-4 w-4 shrink-0 text-muted-foreground" />
+                <SelectValue placeholder="Filtrar por equipo..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">
+                  Todos los equipos
+                </SelectItem>
+                {teamOptions.map((t) => (
+                  <SelectItem key={t.id} value={t.shortName}>
+                    {t.shortName}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      </div>
+
+      <DataTable
+        columns={baseColumns}
+        data={filteredPlayers}
+        searchKey="name"
+        searchPlaceholder="Buscar por nombre..."
+      />
+    </div>
   )
 }

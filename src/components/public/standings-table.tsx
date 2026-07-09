@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
 import { TeamLogo } from "@/components/ui/team-logo"
+import { CardIcon } from "@/components/ui/card-icons"
 
 interface StandingEntry {
   id: string
@@ -143,16 +144,16 @@ export function StandingsTable({ standings, categoryName, leagueSlug }: Standing
                     </span>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell text-center">
-                    <span className="inline-flex items-center gap-1">
-                      <span className="inline-block h-2 w-2 rounded-sm bg-yellow-400" />
-                      {row.ta}
-                    </span>
-                  </TableCell>
-                  <TableCell className="hidden sm:table-cell text-center">
-                    <span className="inline-flex items-center gap-1">
-                      <span className="inline-block h-2 w-2 rounded-sm bg-red-500" />
-                      {row.tr}
-                    </span>
+                      <span className="inline-flex items-center gap-1">
+                        <CardIcon type="YELLOW" />
+                        {row.ta}
+                      </span>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-center">
+                      <span className="inline-flex items-center gap-1">
+                        <CardIcon type="RED" />
+                        {row.tr}
+                      </span>
                   </TableCell>
                 </TableRow>
               )

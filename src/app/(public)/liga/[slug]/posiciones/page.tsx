@@ -1,4 +1,4 @@
-import { Suspense } from "react"
+
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { getLeagueBySlug } from "@/lib/get-league"
@@ -138,15 +138,5 @@ export default async function LeagueStandingsPage({ params, searchParams }: Prop
   const { slug } = await params
   const { categoryId } = await searchParams
 
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center py-20">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        </div>
-      }
-    >
-      <StandingsContent slug={slug} categoryId={categoryId} />
-    </Suspense>
-  )
+  return <StandingsContent slug={slug} categoryId={categoryId} />
 }

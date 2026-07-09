@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Suspense } from "react"
+
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { getLeagueBySlug } from "@/lib/get-league"
@@ -177,9 +177,5 @@ export default async function LeagueGoleadoresPage({ params, searchParams }: Pro
   const { slug } = await params
   const { categoryId } = await searchParams
 
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center py-20"><div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" /></div>}>
-      <GoleadoresContent slug={slug} categoryId={categoryId} />
-    </Suspense>
-  )
+  return <GoleadoresContent slug={slug} categoryId={categoryId} />
 }

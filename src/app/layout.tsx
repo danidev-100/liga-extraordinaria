@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Barlow, Barlow_Condensed } from "next/font/google"
+import { Barlow, Oswald } from "next/font/google"
 import "./globals.css"
 import Providers from "@/components/providers"
 import { Toaster } from "@/components/ui/sonner"
@@ -10,7 +10,7 @@ const barlow = Barlow({
   weight: ["300", "400", "500", "600", "700"],
 })
 
-const barlowCondensed = Barlow_Condensed({
+const oswald = Oswald({
   variable: "--font-heading",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
@@ -43,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${barlow.variable} ${barlowCondensed.variable} h-full antialiased`}
+      className={`${barlow.variable} ${oswald.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">

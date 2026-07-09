@@ -1,4 +1,5 @@
 import { TeamLogo } from "@/components/ui/team-logo"
+import { GoalBall, CardIcon } from "@/components/ui/card-icons"
 
 interface TimelineGoal {
   id: string
@@ -88,12 +89,9 @@ function GoalItem({
 
   return (
     <li className="relative flex items-start gap-3 pb-4 last:pb-0">
-      {/* Dot */}
-      <span
-        className="relative z-10 mt-1 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full text-xs ring-2 ring-background"
-        style={{ backgroundColor: teamColor }}
-      >
-        ⚽
+      {/* Goal dot */}
+      <span className="relative z-10 mt-1 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full ring-2 ring-background">
+        <GoalBall />
       </span>
 
       {/* Content */}
@@ -133,20 +131,9 @@ function CardItem({
 
   return (
     <li className="relative flex items-start gap-3 pb-4 last:pb-0">
-      {/* Dot */}
-      <span className="relative z-10 mt-1 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full ring-2 ring-background">
-        {isDoubleYellowRed ? (
-          <span className="flex -space-x-0.5">
-            <span className="inline-block h-3 w-1.5 rounded-sm bg-yellow-400" />
-            <span className="inline-block h-3 w-1.5 rounded-sm bg-red-500" />
-          </span>
-        ) : (
-          <span
-            className={`inline-block h-3 w-1.5 rounded-sm ${
-              card.type === "YELLOW" ? "bg-yellow-400" : "bg-red-500"
-            }`}
-          />
-        )}
+      {/* Card icon */}
+      <span className="relative z-10 mt-0.5 flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full ring-2 ring-background">
+        <CardIcon type={card.type} isSecondYellow={isDoubleYellowRed} />
       </span>
 
       {/* Content */}

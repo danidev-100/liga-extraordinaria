@@ -1,3 +1,5 @@
+import { CardIcon } from "@/components/ui/card-icons"
+
 interface StatsTeam {
   id: string
   name: string
@@ -98,7 +100,7 @@ export function MatchStats({
         <div className="grid grid-cols-3 items-center gap-4 px-5 py-3 text-sm">
           <span className="text-right font-medium">{localYellow}</span>
           <span className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
-            <span className="inline-block h-2 w-1.5 rounded-sm bg-yellow-400 align-middle" />{" "}
+            <CardIcon type="YELLOW" className="align-middle" />{" "}
             Amarillas
           </span>
           <span className="font-medium">{visitorYellow}</span>
@@ -108,7 +110,7 @@ export function MatchStats({
         <div className="grid grid-cols-3 items-center gap-4 px-5 py-3 text-sm">
           <span className="text-right font-medium">{localRed}</span>
           <span className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
-            <span className="inline-block h-2 w-1.5 rounded-sm bg-red-500 align-middle" />{" "}
+            <CardIcon type="RED" className="align-middle" />{" "}
             Rojas
           </span>
           <span className="font-medium">{visitorRed}</span>

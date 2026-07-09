@@ -17,6 +17,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle"
 import { cn } from "@/lib/utils"
 
 const navLinkDefs = [
+  { scopedPath: "", oldPath: "/", label: "Inicio", icon: Trophy },
   { scopedPath: "partidos", oldPath: "/matches", label: "Partidos", icon: Calendar },
   { scopedPath: "equipos", oldPath: "/teams", label: "Equipos", icon: Users },
   { scopedPath: "posiciones", oldPath: "/standings", label: "Posiciones", icon: ListOrdered },
@@ -56,7 +57,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             {/* Desktop nav — hidden below md */}
             <nav className="mr-2 hidden items-center gap-1 md:flex">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href || pathname.startsWith(link.href + "/")
+                const isHome = link.scopedPath === ""
+                const isActive = isHome
+                  ? pathname === link.href
+                  : pathname === link.href || pathname.startsWith(link.href + "/")
                 return (
                   <Link
                     key={link.href}
@@ -120,7 +124,10 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
               {navLinks.map((link) => {
                 const Icon = link.icon
-                const isActive = pathname === link.href || pathname.startsWith(link.href + "/")
+                const isHome = link.scopedPath === ""
+                const isActive = isHome
+                  ? pathname === link.href
+                  : pathname === link.href || pathname.startsWith(link.href + "/")
                 return (
                   <Link
                     key={link.href}

@@ -1,4 +1,4 @@
-import { Suspense } from "react"
+
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { MatchScheduleFilter } from "@/components/public/match-schedule-filter"
 import { cn } from "@/lib/utils"
 import { TeamLogo } from "@/components/ui/team-logo"
+import { GoalBall, CardIcon } from "@/components/ui/card-icons"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -171,7 +172,10 @@ async function MatchesContent({
                       <Link
                         key={match.id}
                         href={`/liga/${slug}/partidos/${match.id}`}
-                        className="group relative block overflow-hidden rounded-xl border bg-card shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        className="group relative block overflow-hidden rounded-xl border border-l-[3px] bg-card shadow-sm transition-all duration-200 hover:scale-[1.02] hover:shadow-lg hover:border-primary/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                        style={{
+                          borderLeftColor: match.localTeam.color || undefined,
+                        }}
                       >
                         {isPlaying && <span className="absolute inset-x-0 top-0 h-1 bg-accent" />}
 
@@ -241,9 +245,7 @@ async function MatchesContent({
                                     const isLocal = goal.teamId === match.localTeam.id
                                     return (
                                       <div key={goal.id} className="flex items-center gap-1.5 text-xs">
-                                        <span className="inline-flex h-4 w-4 items-center justify-center rounded-full text-[10px]"
-                                          style={{ backgroundColor: isLocal ? (match.localTeam.color || "var(--primary)") : (match.visitorTeam.color || "#64748b") }}
-                                        >⚽</span>
+                                        <GoalBall />
                                         <TeamLogo logoUrl={goal.team.logoUrl} color={goal.team.color} name={goal.team.name} size="sm" />
                                         <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">{goal.team.shortName}</span>
                                         <span className="font-medium">{goal.player.name} {goal.player.surname}</span>
@@ -262,14 +264,7 @@ async function MatchesContent({
                                     const isDoubleYellowRed = card.type === "RED" && card.isSecondYellow
                                     return (
                                       <div key={card.id} className="flex items-center gap-1.5 text-xs">
-                                        {isDoubleYellowRed ? (
-                                          <>
-                                            <span className="inline-block h-2.5 w-1.5 rounded-sm bg-yellow-400" />
-                                            <span className="inline-block h-2.5 w-1.5 rounded-sm bg-red-500 -ml-0.5" />
-                                          </>
-                                        ) : (
-                                          <span className={`inline-block h-2.5 w-1.5 rounded-sm ${card.type === "YELLOW" ? "bg-yellow-400" : "bg-red-500"}`} />
-                                        )}
+                                        <CardIcon type={card.type as "YELLOW" | "RED"} isSecondYellow={isDoubleYellowRed} />
                                         <TeamLogo logoUrl={card.team.logoUrl} color={card.team.color} name={card.team.name} size="sm" />
                                         <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">{card.team.shortName}</span>
                                         <span className="font-medium">{card.player.name} {card.player.surname}</span>
@@ -307,15 +302,5 @@ export default async function LeagueMatchesPage({ params, searchParams }: Props)
   const { slug } = await params
   const { categoryId } = await searchParams
 
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center py-20">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        </div>
-      }
-    >
-      <MatchesContent slug={slug} categoryId={categoryId} />
-    </Suspense>
-  )
+  return <MatchesContent slug={slug} categoryId={categoryId} />
 }

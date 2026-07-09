@@ -5,7 +5,7 @@ import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Upload } from "lucide-react"
+import { Plus } from "lucide-react"
 import { PlayersTable } from "@/components/tables/players-table"
 import { ImportPlayersCSV } from "@/components/forms/import-players-csv"
 
@@ -130,6 +130,7 @@ export default async function ScopedPlayersPage({ params, searchParams }: Props)
               totalGoals: p._count.goals,
               totalCards: p._count.cards,
             }))}
+            teams={teams.map(t => ({ id: t.id, shortName: t.shortName, name: t.name }))}
           />
         </CardContent>
       </Card>
