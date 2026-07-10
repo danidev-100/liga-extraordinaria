@@ -11,6 +11,7 @@ import { MatchScheduleFilter } from "@/components/public/match-schedule-filter"
 import { cn } from "@/lib/utils"
 import { TeamLogo } from "@/components/ui/team-logo"
 import { GoalBall, CardIcon } from "@/components/ui/card-icons"
+import { CourtMapLink } from "@/components/ui/court-map-link"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -53,7 +54,7 @@ async function MatchesContent({
     where,
     include: {
       category: { select: { name: true } },
-      court: { select: { name: true } },
+      court: { select: { name: true, address: true, city: true, googleMapsLink: true } },
       localTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       visitorTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       goals: {
@@ -232,7 +233,16 @@ async function MatchesContent({
                           </div>
 
                           <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-                            <span>{match.court.name}</span>
+                            {(() => {
+                              const mapsHref = match.court.googleMapsLink || (match.court.address
+                                ? `https://www.google.com/maps/search/${encodeURIComponent([match.court.address, match.court.city, "Argentina"].filter(Boolean).join(", "))}`
+                                : null)
+                              return mapsHref ? (
+                                <CourtMapLink href={mapsHref} name={match.court.name} />
+                              ) : (
+                                <span>{match.court.name}</span>
+                              )
+                            })()}
                             <span>&middot;</span>
                             <span>{match.category.name}</span>
                           </div>

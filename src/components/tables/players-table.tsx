@@ -38,6 +38,7 @@ export type PlayerRow = {
 interface PlayersTableProps {
   players: PlayerRow[]
   teams?: { id: string; shortName: string; name: string }[]
+  leagueSlug?: string
 }
 
 function formatDate(isoDate: string): string {
@@ -49,107 +50,113 @@ function formatDate(isoDate: string): string {
   })
 }
 
-const baseColumns: ColumnDef<PlayerRow>[] = [
-  {
-    accessorFn: (row) => `${row.name} ${row.surname}`,
-    header: "Nombre",
-    id: "name",
-    cell: ({ row }) => (
-      <Link
-        href={`/players/${row.original.id}`}
-        className="font-medium hover:underline transition-colors"
-      >
-        {row.original.name} {row.original.surname}
-      </Link>
-    ),
-  },
-  {
-    accessorKey: "dni",
-    header: "DNI",
-  },
-  {
-    id: "birthDate",
-    header: "Fecha Nac.",
-    accessorFn: (row) => formatDate(row.birthDate),
-    cell: ({ row }) => (
-      <span className="text-muted-foreground text-sm">
-        {formatDate(row.original.birthDate)}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "categoryName",
-    header: "Categoría",
-  },
-  {
-    accessorKey: "teamShortName",
-    header: "Equipo",
-    cell: ({ row }) => (
-      <span className="flex items-center gap-2">
-        <TeamLogo logoUrl={row.original.teamLogoUrl} color={row.original.teamColor} name={row.original.teamName} size="md" />
-        {row.original.teamShortName}
-      </span>
-    ),
-  },
-  {
-    id: "jerseyNumber",
-    header: "Camiseta",
-    accessorFn: (row) => (row.jerseyNumber ? `#${row.jerseyNumber}` : ""),
-    cell: ({ row }) =>
-      row.original.jerseyNumber ? (
-        <Badge variant="outline">#{row.original.jerseyNumber}</Badge>
-      ) : (
-        <span className="text-muted-foreground">—</span>
-      ),
-  },
-  {
-    accessorKey: "isActive",
-    header: "Estado",
-    cell: ({ row }) => (
-      <Badge variant={row.original.isActive ? "default" : "secondary"}>
-        {row.original.isActive ? "Activo" : "Inactivo"}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "totalGoals",
-    header: "Goles",
-    meta: { align: "right" },
-    cell: ({ row }) => (
-      <span className="font-bold text-primary">
-        {row.original.totalGoals}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "totalCards",
-    header: "T",
-    meta: { align: "right" },
-    cell: ({ row }) => (
-      <span className="text-muted-foreground">
-        {row.original.totalCards}
-      </span>
-    ),
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => (
-      <div className="flex items-center gap-2">
-        <Link href={`/admin/players/${row.original.id}`}>
-          <Button variant="outline" size="sm">
-            <Edit className="h-4 w-4" />
-          </Button>
-        </Link>
-        <DeleteButton
-          action={deletePlayer.bind(null, row.original.id)}
-          confirmMessage="¿Eliminar este jugador?"
-        />
-      </div>
-    ),
-  },
-]
+function useColumns(leagueSlug?: string): ColumnDef<PlayerRow>[] {
+  const playerHref = (id: string) =>
+    leagueSlug ? `/liga/${leagueSlug}/jugadores/${id}` : `/players/${id}`
 
-export function PlayersTable({ players, teams }: PlayersTableProps) {
+  return [
+    {
+      accessorFn: (row) => `${row.name} ${row.surname}`,
+      header: "Nombre",
+      id: "name",
+      cell: ({ row }) => (
+        <Link
+          href={playerHref(row.original.id)}
+          className="font-medium hover:underline transition-colors"
+        >
+          {row.original.name} {row.original.surname}
+        </Link>
+      ),
+    },
+    {
+      accessorKey: "dni",
+      header: "DNI",
+    },
+    {
+      id: "birthDate",
+      header: "Fecha Nac.",
+      accessorFn: (row) => formatDate(row.birthDate),
+      cell: ({ row }) => (
+        <span className="text-muted-foreground text-sm">
+          {formatDate(row.original.birthDate)}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "categoryName",
+      header: "Categoría",
+    },
+    {
+      accessorKey: "teamShortName",
+      header: "Equipo",
+      cell: ({ row }) => (
+        <span className="flex items-center gap-2">
+          <TeamLogo logoUrl={row.original.teamLogoUrl} color={row.original.teamColor} name={row.original.teamName} size="md" />
+          {row.original.teamShortName}
+        </span>
+      ),
+    },
+    {
+      id: "jerseyNumber",
+      header: "Camiseta",
+      accessorFn: (row) => (row.jerseyNumber ? `#${row.jerseyNumber}` : ""),
+      cell: ({ row }) =>
+        row.original.jerseyNumber ? (
+          <Badge variant="outline">#{row.original.jerseyNumber}</Badge>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
+    },
+    {
+      accessorKey: "isActive",
+      header: "Estado",
+      cell: ({ row }) => (
+        <Badge variant={row.original.isActive ? "default" : "secondary"}>
+          {row.original.isActive ? "Activo" : "Inactivo"}
+        </Badge>
+      ),
+    },
+    {
+      accessorKey: "totalGoals",
+      header: "Goles",
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="font-bold text-primary">
+          {row.original.totalGoals}
+        </span>
+      ),
+    },
+    {
+      accessorKey: "totalCards",
+      header: "T",
+      meta: { align: "right" },
+      cell: ({ row }) => (
+        <span className="text-muted-foreground">
+          {row.original.totalCards}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      cell: ({ row }) => (
+        <div className="flex items-center gap-2">
+          <Link href={`/admin/players/${row.original.id}`}>
+            <Button variant="outline" size="sm">
+              <Edit className="h-4 w-4" />
+            </Button>
+          </Link>
+          <DeleteButton
+            action={deletePlayer.bind(null, row.original.id)}
+            confirmMessage="¿Eliminar este jugador?"
+          />
+        </div>
+      ),
+    },
+  ]
+}
+
+export function PlayersTable({ players, teams, leagueSlug }: PlayersTableProps) {
+  const columns = useColumns(leagueSlug)
   const [teamFilter, setTeamFilter] = useState("")
 
   const filteredPlayers = teamFilter && teamFilter !== "all"
@@ -190,7 +197,7 @@ export function PlayersTable({ players, teams }: PlayersTableProps) {
       </div>
 
       <DataTable
-        columns={baseColumns}
+        columns={columns}
         data={filteredPlayers}
         searchKey="name"
         searchPlaceholder="Buscar por nombre..."

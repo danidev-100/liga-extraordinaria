@@ -114,6 +114,7 @@ export default async function ScopedPlayersPage({ params, searchParams }: Props)
         </CardHeader>
         <CardContent>
           <PlayersTable
+            leagueSlug={slug}
             players={players.map((p) => ({
               id: p.id,
               name: p.name,
