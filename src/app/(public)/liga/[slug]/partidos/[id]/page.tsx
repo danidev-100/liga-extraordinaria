@@ -87,6 +87,7 @@ export default async function LeagueMatchDetailPage({ params }: Props) {
       </Link>
 
       <MatchHeader
+        leagueSlug={slug}
         localTeam={match.localTeam}
         visitorTeam={match.visitorTeam}
         localScore={match.localScore}

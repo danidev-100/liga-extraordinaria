@@ -21,6 +21,7 @@ interface MatchHeaderProps {
   court: { name: string }
   date: Date
   time: string
+  leagueSlug: string
 }
 
 const statusConfig = {
@@ -39,6 +40,7 @@ export function MatchHeader({
   court,
   date,
   time,
+  leagueSlug,
 }: MatchHeaderProps) {
   const statusInfo = statusConfig[status]
   const matchDate = new Date(date)
@@ -95,7 +97,7 @@ export function MatchHeader({
         <div className="flex flex-1 flex-col items-center gap-3 text-center">
           <TeamLogo logoUrl={localTeam.logoUrl} color={localTeam.color} name={localTeam.name} size="xl" />
           <Link
-            href={`/teams/${localTeam.id}`}
+            href={`/liga/${leagueSlug}/equipos/${localTeam.id}`}
             className="font-heading text-lg font-semibold leading-tight transition-colors hover:text-primary sm:text-xl"
           >
             {localTeam.name}
@@ -135,7 +137,7 @@ export function MatchHeader({
         <div className="flex flex-1 flex-col items-center gap-3 text-center">
           <TeamLogo logoUrl={visitorTeam.logoUrl} color={visitorTeam.color} name={visitorTeam.name} size="xl" />
           <Link
-            href={`/teams/${visitorTeam.id}`}
+            href={`/liga/${leagueSlug}/equipos/${visitorTeam.id}`}
             className="font-heading text-lg font-semibold leading-tight transition-colors hover:text-primary sm:text-xl"
           >
             {visitorTeam.name}

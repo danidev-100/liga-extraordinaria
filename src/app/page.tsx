@@ -106,7 +106,7 @@ export default async function Home() {
         <section className="border-y bg-muted/30">
           <div className="container mx-auto px-4 py-16">
             <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-3">
-              <div className="flex flex-col items-center gap-2 text-center">
+              <div className="flex flex-col items-center gap-2 rounded-xl bg-card/60 backdrop-blur-xl p-6 text-center shadow-lg transition-transform duration-200 hover:scale-[1.03]">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
                   <Shield className="h-7 w-7 text-primary" />
                 </div>
@@ -117,7 +117,7 @@ export default async function Home() {
                   Equipos
                 </span>
               </div>
-              <div className="flex flex-col items-center gap-2 text-center">
+              <div className="flex flex-col items-center gap-2 rounded-xl bg-card/60 backdrop-blur-xl p-6 text-center shadow-lg transition-transform duration-200 hover:scale-[1.03]">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
                   <Users className="h-7 w-7 text-primary" />
                 </div>
@@ -128,7 +128,7 @@ export default async function Home() {
                   Jugadores
                 </span>
               </div>
-              <div className="flex flex-col items-center gap-2 text-center">
+              <div className="flex flex-col items-center gap-2 rounded-xl bg-card/60 backdrop-blur-xl p-6 text-center shadow-lg transition-transform duration-200 hover:scale-[1.03]">
                 <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
                   <Goal className="h-7 w-7 text-primary" />
                 </div>
@@ -157,7 +157,7 @@ export default async function Home() {
 
             <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
               {/* Feature 1 */}
-              <div className="group relative rounded-xl border bg-card p-8 transition-all hover:shadow-lg hover:shadow-primary/5">
+              <div className="group relative rounded-xl border bg-card/70 backdrop-blur-xl p-8 shadow-xl transition-all duration-200 hover:scale-[1.03] hover:shadow-2xl hover:shadow-primary/10">
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <Shield className="h-6 w-6" />
                 </div>
@@ -169,7 +169,7 @@ export default async function Home() {
               </div>
 
               {/* Feature 2 */}
-              <div className="group relative rounded-xl border bg-card p-8 transition-all hover:shadow-lg hover:shadow-primary/5">
+              <div className="group relative rounded-xl border bg-card/70 backdrop-blur-xl p-8 shadow-xl transition-all duration-200 hover:scale-[1.03] hover:shadow-2xl hover:shadow-primary/10">
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <Calendar className="h-6 w-6" />
                 </div>
@@ -181,7 +181,7 @@ export default async function Home() {
               </div>
 
               {/* Feature 3 */}
-              <div className="group relative rounded-xl border bg-card p-8 transition-all hover:shadow-lg hover:shadow-primary/5">
+              <div className="group relative rounded-xl border bg-card/70 backdrop-blur-xl p-8 shadow-xl transition-all duration-200 hover:scale-[1.03] hover:shadow-2xl hover:shadow-primary/10">
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <Trophy className="h-6 w-6" />
                 </div>
@@ -211,7 +211,7 @@ export default async function Home() {
               <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {leagues.map((l) => (
                   <Link key={l.id} href={`/liga/${l.slug}/posiciones`} className="group">
-                    <Card className="h-full transition-all duration-200 hover:shadow-lg hover:ring-2 hover:ring-primary/30">
+                    <Card className="h-full bg-card/70 backdrop-blur-xl shadow-xl transition-all duration-200 hover:scale-[1.03] hover:shadow-2xl hover:ring-2 hover:ring-primary/30">
                       <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                           <Trophy className="h-7 w-7" />

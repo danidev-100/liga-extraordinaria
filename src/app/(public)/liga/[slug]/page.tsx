@@ -109,7 +109,7 @@ export default async function LeagueHomePage({ params }: Props) {
 
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <Card className="border-l-4 border-l-primary">
+        <Card className="border-l-4 border-l-primary bg-card/70 backdrop-blur-xl shadow-xl transition-transform duration-200 hover:scale-[1.02]">
           <CardContent className="flex items-center justify-between pt-5">
             <div>
               <p className="text-xs font-medium text-muted-foreground">Equipos</p>
@@ -120,7 +120,7 @@ export default async function LeagueHomePage({ params }: Props) {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="border-l-4 border-l-blue-500 bg-card/70 backdrop-blur-xl shadow-xl transition-transform duration-200 hover:scale-[1.02]">
           <CardContent className="flex items-center justify-between pt-5">
             <div>
               <p className="text-xs font-medium text-muted-foreground">Jugadores</p>
@@ -131,7 +131,7 @@ export default async function LeagueHomePage({ params }: Props) {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-amber-500">
+        <Card className="border-l-4 border-l-amber-500 bg-card/70 backdrop-blur-xl shadow-xl transition-transform duration-200 hover:scale-[1.02]">
           <CardContent className="flex items-center justify-between pt-5">
             <div>
               <p className="text-xs font-medium text-muted-foreground">Partidos</p>
@@ -142,7 +142,7 @@ export default async function LeagueHomePage({ params }: Props) {
             </div>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-emerald-500">
+        <Card className="border-l-4 border-l-emerald-500 bg-card/70 backdrop-blur-xl shadow-xl transition-transform duration-200 hover:scale-[1.02]">
           <CardContent className="flex items-center justify-between pt-5">
             <div>
               <p className="text-xs font-medium text-muted-foreground">Finalizados</p>
@@ -161,7 +161,7 @@ export default async function LeagueHomePage({ params }: Props) {
           <Link
             key={card.href}
             href={card.href}
-            className="group rounded-xl border bg-card p-4 transition-all hover:shadow-md hover:ring-2 hover:ring-primary/20"
+            className="group rounded-xl border bg-card/70 backdrop-blur-xl p-4 shadow-lg transition-all duration-200 hover:scale-[1.03] hover:shadow-xl hover:ring-2 hover:ring-primary/20"
           >
             <div className={cn("mb-3 inline-flex rounded-lg p-2.5", card.color)}>
               <card.icon className="h-5 w-5" />
@@ -177,7 +177,7 @@ export default async function LeagueHomePage({ params }: Props) {
       {/* Recent + Upcoming */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent results */}
-        <Card>
+        <Card className="bg-card/70 backdrop-blur-xl shadow-xl transition-transform duration-200 hover:scale-[1.01]">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Últimos resultados</CardTitle>
             <Link href={`/liga/${slug}/partidos`} className="text-xs text-primary hover:underline">
@@ -217,7 +217,7 @@ export default async function LeagueHomePage({ params }: Props) {
         </Card>
 
         {/* Upcoming matches */}
-        <Card>
+        <Card className="bg-card/70 backdrop-blur-xl shadow-xl transition-transform duration-200 hover:scale-[1.01]">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Próximos partidos</CardTitle>
             <Link href={`/liga/${slug}/partidos`} className="text-xs text-primary hover:underline">
@@ -257,7 +257,7 @@ export default async function LeagueHomePage({ params }: Props) {
 
       {/* Standings top 5 */}
       {standingsData.length > 0 && (
-        <Card>
+        <Card className="bg-card/70 backdrop-blur-xl shadow-xl transition-transform duration-200 hover:scale-[1.01]">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="text-base">Tabla de posiciones</CardTitle>
             <Link href={`/liga/${slug}/posiciones`} className="text-xs text-primary hover:underline">
