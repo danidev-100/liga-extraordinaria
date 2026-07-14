@@ -3,9 +3,10 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, Edit } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Plus, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 import { DeleteButton } from "@/components/forms/delete-button"
-import { deleteCategory } from "@/actions/category"
+import { deleteCategory, toggleCategoryActive } from "@/actions/category"
 
 export default async function CategoriesPage() {
   const session = await auth()
@@ -53,7 +54,15 @@ export default async function CategoriesPage() {
                   className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
                 >
                   <div className="space-y-1 min-w-0">
-                    <p className="font-medium truncate">{cat.name}</p>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <p className="font-medium truncate">{cat.name}</p>
+                      <Badge
+                        variant={cat.isActive ? "default" : "secondary"}
+                        className="shrink-0"
+                      >
+                        {cat.isActive ? "Activa" : "Inactiva"}
+                      </Badge>
+                    </div>
                     <p className="text-sm text-muted-foreground truncate">
                       Edades: {cat.minAge} — {cat.maxAge} años ·{" "}
                       {cat.league.name} ({cat.league.season}) ·{" "}
@@ -61,6 +70,20 @@ export default async function CategoriesPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
+                    <form
+                      action={async () => {
+                        "use server"
+                        await toggleCategoryActive(cat.id)
+                      }}
+                    >
+                      <Button variant="outline" size="sm" type="submit">
+                        {cat.isActive ? (
+                          <ToggleRight className="h-4 w-4 text-primary" />
+                        ) : (
+                          <ToggleLeft className="h-4 w-4" />
+                        )}
+                      </Button>
+                    </form>
                     <Link href={`/admin/categories/${cat.id}`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />

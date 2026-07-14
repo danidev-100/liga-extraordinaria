@@ -48,6 +48,7 @@ export async function createCategory(data: CategoryFormData) {
       minAge: parsed.minAge,
       maxAge: parsed.maxAge,
       leagueId: parsed.leagueId,
+      isActive: parsed.isActive,
     },
   })
 
@@ -72,6 +73,23 @@ export async function updateCategory(id: string, data: Partial<CategoryFormData>
 
   revalidatePath("/admin/categories")
   return category
+}
+
+export async function toggleCategoryActive(id: string, slug?: string) {
+  await ensureAuth()
+  if (slug) await ensureScope(slug)
+
+  const category = await db.category.findUnique({ where: { id } })
+  if (!category) throw new Error("Categoría no encontrada")
+
+  const updated = await db.category.update({
+    where: { id },
+    data: { isActive: !category.isActive },
+  })
+
+  revalidatePath("/admin/ligas/[slug]/categories")
+  revalidatePath("/admin/categories")
+  return updated
 }
 
 export async function deleteCategory(id: string, slug?: string) {

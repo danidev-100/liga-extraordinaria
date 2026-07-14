@@ -16,6 +16,7 @@ export const categorySchema = z.object({
     .min(4, "La edad máxima debe ser al menos 4")
     .max(100, "La edad máxima no puede exceder 100"),
   leagueId: z.string().uuid("Debe seleccionar una liga"),
+  isActive: z.boolean().default(true),
 })
 
 export type CategoryFormData = z.input<typeof categorySchema>

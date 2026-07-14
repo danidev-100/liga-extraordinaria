@@ -17,7 +17,7 @@ export default async function LeagueTeamsPage({ params }: Props) {
   if (!league) notFound()
 
   const categories = await db.category.findMany({
-    where: { leagueId: league.id },
+    where: { leagueId: league.id, isActive: true },
     select: {
       id: true,
       name: true,

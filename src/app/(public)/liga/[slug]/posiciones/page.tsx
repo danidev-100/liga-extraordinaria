@@ -24,7 +24,7 @@ async function StandingsContent({
   if (!league) notFound()
 
   const categories = await db.category.findMany({
-    where: { leagueId: league.id },
+    where: { leagueId: league.id, isActive: true },
     include: { league: { select: { name: true } } },
     orderBy: { name: "asc" },
   })

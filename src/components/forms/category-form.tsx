@@ -22,6 +22,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
 import { Loader2 } from "lucide-react"
 import { categorySchema, type CategoryFormData } from "@/lib/validations/category"
 import { createCategory, updateCategory } from "@/actions/category"
@@ -40,6 +42,7 @@ interface CategoryFormProps {
     minAge: number
     maxAge: number
     leagueId: string
+    isActive?: boolean
   }
 }
 
@@ -60,12 +63,14 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
           minAge: initialData.minAge,
           maxAge: initialData.maxAge,
           leagueId: initialData.leagueId,
+          isActive: initialData.isActive ?? true,
         }
       : {
           name: "",
           minAge: 4,
           maxAge: 99,
           leagueId: "",
+          isActive: true,
         },
   })
 
@@ -173,6 +178,27 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                   </SelectContent>
                 </Select>
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="isActive"
+          render={({ field }) => (
+            <FormItem>
+              <div className="flex items-center gap-3 rounded-lg border px-4 py-3">
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => field.onChange(checked)}
+                />
+                <Label className="text-sm font-medium leading-none cursor-pointer">
+                  Categoría activa
+                </Label>
+              </div>
+              <p className="text-xs text-muted-foreground pl-1">
+                Si desactivás la categoría, no se mostrará en la página pública
+              </p>
               <FormMessage />
             </FormItem>
           )}

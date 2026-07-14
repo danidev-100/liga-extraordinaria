@@ -40,7 +40,7 @@ export default async function LeagueHomePage({ params }: Props) {
     recentResults,
     standingsData,
   ] = await Promise.all([
-    db.category.count({ where: { leagueId: league.id } }),
+    db.category.count({ where: { leagueId: league.id, isActive: true } }),
     db.team.count({ where: { category: { leagueId: league.id } } }),
     db.player.count({ where: { team: { category: { leagueId: league.id } } } }),
     db.match.count({ where: { category: { leagueId: league.id } } }),

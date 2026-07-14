@@ -57,6 +57,7 @@ model Category {
   name     String
   minAge   Int      @map("min_age")
   maxAge   Int      @map("max_age")
+  isActive Boolean  @default(true) @map("is_active")
   leagueId String   @map("league_id") @db.Uuid
   league   League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
   teams    Team[]

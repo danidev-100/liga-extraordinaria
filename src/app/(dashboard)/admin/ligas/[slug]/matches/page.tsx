@@ -92,7 +92,7 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
               Reordenar
             </Button>
           </Link>
-          <Link href={`/admin/matches/fixture/new`}>
+          <Link href={`/admin/ligas/${slug}/fixture/new`}>
             <Button variant="outline">
               <Calendar className="mr-2 h-4 w-4" />
               Generar<span className="hidden sm:inline"> Temporada</span>
