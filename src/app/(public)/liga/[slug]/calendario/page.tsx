@@ -59,7 +59,16 @@ async function CalendarContent({
   const monthName = now.toLocaleDateString("es-AR", { month: "long", year: "numeric" })
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {/* Background image */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+        <img
+          src="/noche.png"
+          alt=""
+          className="h-full w-full object-cover object-center opacity-15"
+        />
+      </div>
+
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-3xl font-bold tracking-tight">

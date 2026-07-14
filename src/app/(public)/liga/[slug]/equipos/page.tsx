@@ -51,7 +51,16 @@ export default async function LeagueTeamsPage({ params }: Props) {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="relative space-y-8">
+      {/* Background image */}
+      <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
+        <img
+          src="/equipo.jpeg"
+          alt=""
+          className="h-full w-full object-cover object-center opacity-10"
+        />
+      </div>
+
       <div>
         <h1 className="font-heading text-2xl font-bold tracking-tight md:text-3xl">
           {league.name} — Equipos

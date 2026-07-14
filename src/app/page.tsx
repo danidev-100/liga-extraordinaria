@@ -4,6 +4,7 @@ import { Trophy, Shield, Calendar, Goal, Users, ArrowRight, Plus } from "lucide-
 export const dynamic = "force-dynamic"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { FadeInView } from "@/components/public/fade-in-view"
 import db from "@/lib/db"
 import { auth } from "@/lib/auth"
 
@@ -49,15 +50,22 @@ export default async function Home() {
         </div>
       </header>
 
-      {/* Hero */}
+      {/* Hero + Stats */}
       <main className="flex-1">
-        <section className="relative overflow-hidden">
-          {/* Background decorations */}
+        <div className="relative">
+          {/* Background — imagen + orbs */}
           <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+            <img
+              src="/cancha.png"
+              alt=""
+              className="h-full w-full object-cover object-center opacity-[0.27]"
+            />
             {/* Gradient orbs */}
-            <div className="absolute -right-60 -top-60 h-[500px] w-[500px] rounded-full bg-primary/10 blur-3xl" />
-            <div className="absolute -bottom-60 -left-60 h-[400px] w-[400px] rounded-full bg-emerald-500/10 blur-3xl" />
-            <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/[0.04] blur-3xl" />
+            <div className="absolute inset-0">
+              <div className="absolute -right-60 -top-60 h-[500px] w-[500px] rounded-full bg-primary/10 blur-3xl" />
+              <div className="absolute -bottom-60 -left-60 h-[400px] w-[400px] rounded-full bg-emerald-500/10 blur-3xl" />
+              <div className="absolute left-1/2 top-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/[0.04] blur-3xl" />
+            </div>
 
             {/* Subtle grid pattern */}
             <svg
@@ -73,77 +81,83 @@ export default async function Home() {
             </svg>
           </div>
 
-          <div className="container relative mx-auto px-4 py-20 md:py-32 lg:py-40">
-            <div className="mx-auto max-w-4xl text-center">
-              {/* Badge */}
-              <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary">
-                <Trophy className="h-4 w-4" />
-                Gestión de ligas deportivas
-              </div>
-
-              {/* Main title */}
-              <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                Administrá tu liga con{" "}
-                <span className="bg-gradient-to-r from-green-600 via-emerald-500 to-green-500 bg-clip-text text-transparent dark:from-green-400 dark:via-emerald-400 dark:to-green-300">
-                  potencia
-                </span>
-              </h1>
-
-              {/* Subtitle */}
-              <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
-                Gestioná equipos, jugadores, partidos y posiciones al instante.
-                La plataforma todo-en-uno para tu liga de fútbol con fixture automático
-                y estadísticas en tiempo real.
-              </p>
-
-              {/* CTA Buttons */}
-
-            </div>
-          </div>
-        </section>
-
-        {/* Stats */}
-        <section className="border-y bg-muted/30">
-          <div className="container mx-auto px-4 py-16">
-            <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-3">
-              <div className="flex flex-col items-center gap-2 rounded-xl bg-card/60 backdrop-blur-xl p-6 text-center shadow-lg transition-transform duration-200 hover:scale-[1.03]">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                  <Shield className="h-7 w-7 text-primary" />
+          <section>
+            <div className="container mx-auto px-4 py-12 md:py-32 lg:py-40">
+              <div className="mx-auto max-w-4xl text-center">
+                {/* Badge */}
+                <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary">
+                  <Trophy className="h-4 w-4" />
+                  Gestión de ligas deportivas
                 </div>
-                <span className="font-heading text-4xl font-bold tracking-tight">
-                  {teamCount}
-                </span>
-                <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                  Equipos
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-2 rounded-xl bg-card/60 backdrop-blur-xl p-6 text-center shadow-lg transition-transform duration-200 hover:scale-[1.03]">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                  <Users className="h-7 w-7 text-primary" />
-                </div>
-                <span className="font-heading text-4xl font-bold tracking-tight">
-                  {playerCount}
-                </span>
-                <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                  Jugadores
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-2 rounded-xl bg-card/60 backdrop-blur-xl p-6 text-center shadow-lg transition-transform duration-200 hover:scale-[1.03]">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
-                  <Goal className="h-7 w-7 text-primary" />
-                </div>
-                <span className="font-heading text-4xl font-bold tracking-tight">
-                  {matchCount}
-                </span>
-                <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
-                  Partidos
-                </span>
+
+                {/* Main title */}
+                <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+                  Administrá tu liga con{" "}
+                  <span className="bg-gradient-to-r from-green-600 via-emerald-500 to-green-500 bg-clip-text text-transparent dark:from-green-400 dark:via-emerald-400 dark:to-green-300">
+                    potencia
+                  </span>
+                </h1>
+
+                {/* Subtitle */}
+                <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
+                  Gestioná equipos, jugadores, partidos y posiciones al instante.
+                  La plataforma todo-en-uno para tu liga de fútbol con fixture automático
+                  y estadísticas en tiempo real.
+                </p>
+
+                {/* CTA Buttons */}
+
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+
+          {/* Stats */}
+          <section className="bg-muted/10 border-t border-white/10">
+            <div className="container mx-auto px-4 py-16">
+              <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 sm:grid-cols-3">
+                <div className="flex flex-col items-center gap-2 rounded-xl p-6 text-center shadow-2xl shadow-black/10 ring-1 ring-white/20 transition-transform duration-200 hover:scale-[1.03]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
+                    <Shield className="h-7 w-7 text-white" />
+                  </div>
+                  <span className="font-heading text-4xl font-bold tracking-tight text-white drop-shadow-sm">
+                    {teamCount}
+                  </span>
+                  <span className="text-sm font-medium uppercase tracking-wider text-white/60">
+                    Equipos
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-2 rounded-xl p-6 text-center shadow-2xl shadow-black/10 ring-1 ring-white/20 transition-transform duration-200 hover:scale-[1.03]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
+                    <Users className="h-7 w-7 text-white" />
+                  </div>
+                  <span className="font-heading text-4xl font-bold tracking-tight text-white drop-shadow-sm">
+                    {playerCount}
+                  </span>
+                  <span className="text-sm font-medium uppercase tracking-wider text-white/60">
+                    Jugadores
+                  </span>
+                </div>
+                <div className="flex flex-col items-center gap-2 rounded-xl p-6 text-center shadow-2xl shadow-black/10 ring-1 ring-white/20 transition-transform duration-200 hover:scale-[1.03]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10">
+                    <Goal className="h-7 w-7 text-white" />
+                  </div>
+                  <span className="font-heading text-4xl font-bold tracking-tight text-white drop-shadow-sm">
+                    {matchCount}
+                  </span>
+                  <span className="text-sm font-medium uppercase tracking-wider text-white/60">
+                    Partidos
+                  </span>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* Gradient transition */}
+        <div className="h-16 bg-gradient-to-b from-muted/10 to-background" />
 
         {/* Features */}
+        <FadeInView>
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="mx-auto mb-12 max-w-2xl text-center">
@@ -194,10 +208,11 @@ export default async function Home() {
             </div>
           </div>
         </section>
+      </FadeInView>
 
         {/* League directory — shown when at least one league exists */}
         {leagues.length > 0 && (
-          <section className="border-t bg-muted/30 py-20">
+          <section id="ligas" className="border-t bg-muted/30 py-20 scroll-mt-24">
             <div className="container mx-auto px-4">
               <div className="mx-auto mb-12 max-w-2xl text-center">
                 <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
@@ -211,7 +226,7 @@ export default async function Home() {
               <div className="mx-auto grid max-w-4xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {leagues.map((l) => (
                   <Link key={l.id} href={`/liga/${l.slug}/posiciones`} className="group">
-                    <Card className="h-full bg-card/70 backdrop-blur-xl shadow-xl transition-all duration-200 hover:scale-[1.03] hover:shadow-2xl hover:ring-2 hover:ring-primary/30">
+                    <Card className="h-full bg-card/70 backdrop-blur-xl shadow-xl transition-all duration-300 hover:-rotate-1 hover:scale-[1.05] hover:shadow-2xl hover:ring-2 hover:ring-primary/30">
                       <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
                         <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                           <Trophy className="h-7 w-7" />
@@ -274,22 +289,20 @@ export default async function Home() {
             <p className="text-center text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Liga Extraordinaria. Todos los derechos reservados.
             </p>
+            <a
+              href="https://wa.me/542616095070"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-green-600"
+            >
+              <svg viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5 text-green-500">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              Para información por WhatsApp
+            </a>
           </div>
         </div>
       </footer>
-
-      {/* Floating WhatsApp button */}
-      <a
-        href="https://wa.me/542616095070"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-green-500 text-white shadow-lg transition-all hover:bg-green-600 hover:shadow-xl hover:scale-105 active:scale-95 sm:bottom-6 sm:right-6 sm:h-14 sm:w-14"
-        aria-label="Contactar por WhatsApp"
-      >
-        <svg viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6 sm:h-7 sm:w-7">
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-        </svg>
-      </a>
     </div>
   )
 }
