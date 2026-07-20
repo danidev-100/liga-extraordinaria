@@ -102,3 +102,34 @@ export async function deleteCategory(id: string, slug?: string) {
 
   revalidatePath("/admin/categories")
 }
+
+export async function resetCategory(id: string, slug?: string) {
+  await ensureAuth()
+  if (slug) await ensureScope(slug)
+
+  await db.$transaction(async (tx) => {
+    // Delete standings for the category
+    await tx.standing.deleteMany({ where: { categoryId: id } })
+
+    // Find all matches in this category first
+    const matches = await tx.match.findMany({
+      where: { categoryId: id },
+      select: { id: true },
+    })
+    const matchIds = matches.map((m) => m.id)
+
+    if (matchIds.length > 0) {
+      // Delete goals and cards explicitly (cascade should handle it, but be safe)
+      await tx.goal.deleteMany({ where: { matchId: { in: matchIds } } })
+      await tx.card.deleteMany({ where: { matchId: { in: matchIds } } })
+      await tx.match.deleteMany({ where: { id: { in: matchIds } } })
+    }
+  })
+
+  revalidatePath("/admin/categories")
+  revalidatePath("/admin/standings")
+  if (slug) {
+    revalidatePath(`/admin/ligas/${slug}/categories`)
+    revalidatePath(`/admin/ligas/${slug}/standings`)
+  }
+}

@@ -8,7 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Edit, ToggleLeft, ToggleRight } from "lucide-react"
 import { DeleteButton } from "@/components/forms/delete-button"
-import { deleteCategory, toggleCategoryActive } from "@/actions/category"
+import { ResetCategoryButton } from "@/components/forms/reset-category-button"
+import { deleteCategory, toggleCategoryActive, resetCategory } from "@/actions/category"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -97,6 +98,11 @@ export default async function ScopedCategoriesPage({ params }: Props) {
                         <Edit className="h-4 w-4" />
                       </Button>
                     </Link>
+                    {cat._count.matches > 0 && (
+                      <ResetCategoryButton
+                        action={resetCategory.bind(null, cat.id, slug)}
+                      />
+                    )}
                     <DeleteButton
                       action={deleteCategory.bind(null, cat.id, slug)}
                       confirmMessage="¿Eliminar esta categoría?"
