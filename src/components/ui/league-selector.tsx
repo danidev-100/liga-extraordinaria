@@ -35,7 +35,7 @@ export function LeagueSelector({ leagues }: { leagues: League[] }) {
             : "bg-muted text-muted-foreground hover:bg-muted/80",
         )}
       >
-        Todas las Ligas
+        Todos los Torneos
       </button>
       {leagues.map((league) => {
         const isActive = league.id === currentLeagueId

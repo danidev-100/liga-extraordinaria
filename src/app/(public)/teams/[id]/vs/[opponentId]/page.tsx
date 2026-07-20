@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils"
 import { TeamLogo } from "@/components/ui/team-logo"
 
 export const metadata = {
-  title: "Enfrentamiento directo — Liga",
+  title: "Enfrentamiento directo — Torneo Pro",
   description: "Historial completo entre dos equipos",
 }
 

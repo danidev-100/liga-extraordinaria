@@ -2,9 +2,9 @@ import type { MetadataRoute } from "next"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Liga Extraordinaria",
-    short_name: "Liga Extra",
-    description: "Gestión de ligas de fútbol, equipos, partidos y posiciones",
+    name: "Torneo Pro",
+    short_name: "Torneo Pro",
+    description: "Gestión de torneos de fútbol, equipos, partidos y posiciones",
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",

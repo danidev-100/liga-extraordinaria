@@ -121,8 +121,12 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                     type="number"
                     min={4}
                     max={100}
-                    value={field.value ?? ""}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    value={Number.isNaN(field.value) ? "" : field.value}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const raw = e.target.value
+                      field.onChange(raw === "" ? NaN : Number(raw))
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -140,8 +144,12 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
                     type="number"
                     min={4}
                     max={100}
-                    value={field.value ?? ""}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
+                    value={Number.isNaN(field.value) ? "" : field.value}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const raw = e.target.value
+                      field.onChange(raw === "" ? NaN : Number(raw))
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -154,16 +162,16 @@ export function CategoryForm({ initialData }: CategoryFormProps) {
           name="leagueId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Liga *</FormLabel>
+              <FormLabel>Torneo *</FormLabel>
               <FormControl>
                 <Select
                   value={field.value}
                   onValueChange={field.onChange}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Seleccionar liga...">
+                    <SelectValue placeholder="Seleccionar torneo...">
                       {(value: string | null) => {
-                        if (!value) return "Seleccionar liga..."
+                        if (!value) return "Seleccionar torneo..."
                         const league = leagues.find((l) => l.id === value)
                         return league ? `${league.name} (${league.season})` : null
                       }}

@@ -85,7 +85,7 @@ export default async function MatchesPage({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ClearFinishedButton />
+          <ClearFinishedButton leagueId={leagueId} />
           <Link href="/admin/matches/reorder">
             <Button variant="outline">
               <ArrowUpDown className="mr-2 h-4 w-4" />

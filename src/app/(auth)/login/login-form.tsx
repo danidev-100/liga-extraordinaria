@@ -102,7 +102,7 @@ export function LoginForm() {
             <Trophy className="h-6 w-6 text-primary-foreground" />
           </div>
           <h2 className="font-heading text-xl font-bold tracking-wide">
-            Liga <span className="text-primary">Extraordinaria</span>
+            Torneo <span className="text-primary">Pro</span>
           </h2>
         </div>
 
@@ -152,7 +152,7 @@ export function LoginForm() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@liga.com"
+                  placeholder="admin@torneo.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -215,7 +215,7 @@ export function LoginForm() {
           </CardContent>
           <CardFooter className="flex justify-center border-t pt-6">
             <p className="text-center text-xs text-muted-foreground">
-              &copy; {new Date().getFullYear()} Liga Extraordinaria &mdash; Gestión de ligas deportivas
+              &copy; {new Date().getFullYear()} Torneo Pro &mdash; Gestión de torneos deportivos
             </p>
           </CardFooter>
         </Card>
@@ -227,7 +227,7 @@ export function LoginForm() {
             className="inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline"
           >
             <Plus className="h-3.5 w-3.5" />
-            Crear una liga nueva
+            Crear un torneo nuevo
           </a>
           <br />
           <a

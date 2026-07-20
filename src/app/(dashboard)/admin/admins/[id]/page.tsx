@@ -173,16 +173,16 @@ export default function EditAdminPage({ params }: { params: Promise<{ id: string
                   name="leagueId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Liga</FormLabel>
+                      <FormLabel>Torneo</FormLabel>
                       <FormControl>
                         <Select
                           value={field.value ?? ""}
                           onValueChange={(value) => field.onChange(value || undefined)}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Sin liga...">
+                            <SelectValue placeholder="Sin torneo...">
                               {(value: string | null) => {
-                                if (!value) return "Sin liga..."
+                                if (!value) return "Sin torneo..."
                                 const league = leagues.find((l) => l.id === value)
                                 return league ? `${league.name} (${league.season})` : null
                               }}

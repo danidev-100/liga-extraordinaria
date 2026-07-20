@@ -144,7 +144,7 @@ export default function NewAdminPage() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Nuevo Administrador</h1>
         <p className="text-muted-foreground">
-          Creá un usuario para que administre una liga
+          Creá un usuario para que administre un torneo
         </p>
       </div>
       <Card className="max-w-lg">
@@ -185,16 +185,16 @@ export default function NewAdminPage() {
                 name="leagueId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Liga *</FormLabel>
+                    <FormLabel>Torneo *</FormLabel>
                     <FormControl>
                       <Select
                         value={field.value}
                         onValueChange={field.onChange}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar liga...">
+                          <SelectValue placeholder="Seleccionar torneo...">
                             {(value: string | null) => {
-                              if (!value) return "Seleccionar liga..."
+                              if (!value) return "Seleccionar torneo..."
                               const league = leagues.find((l) => l.id === value)
                               return league ? `${league.name} (${league.season})` : null
                             }}
@@ -203,7 +203,7 @@ export default function NewAdminPage() {
                         <SelectContent>
                           {leagues.length === 0 ? (
                             <div className="px-2 py-4 text-center text-sm text-muted-foreground">
-                              No hay ligas disponibles
+                              No hay torneos disponibles
                             </div>
                           ) : (
                             leagues.map((league) => (

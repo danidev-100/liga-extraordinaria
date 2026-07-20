@@ -9,9 +9,9 @@ interface Props {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const league = await getLeagueBySlug(slug)
-  if (!league) return { title: "Liga no encontrada — Liga Extraordinaria" }
+  if (!league) return { title: "Torneo no encontrado — Torneo Pro" }
   return {
-    title: `${league.name} — Liga Extraordinaria`,
+    title: `${league.name} — Torneo Pro`,
     description: `${league.name} — Temporada ${league.season}`,
   }
 }

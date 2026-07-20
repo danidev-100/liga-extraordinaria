@@ -5,14 +5,14 @@ export default function NewLeaguePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Nueva Liga</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Nuevo Torneo</h1>
         <p className="text-muted-foreground">
-          Creá una nueva liga o temporada
+          Creá un nuevo torneo o temporada
         </p>
       </div>
       <Card>
         <CardHeader>
-          <CardTitle>Datos de la liga</CardTitle>
+          <CardTitle>Datos del torneo</CardTitle>
         </CardHeader>
         <CardContent>
           <LeagueForm />

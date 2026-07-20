@@ -25,10 +25,10 @@ export function LeagueSwitcher({ leagues, currentSlug, currentName }: LeagueSwit
     <div className="relative group">
       <button
         className="flex items-center gap-1 text-sm font-bold tracking-tight text-sidebar-primary-foreground hover:text-sidebar-primary-foreground/80 transition-colors"
-        aria-label="Cambiar de liga"
+        aria-label="Cambiar de torneo"
       >
         <Trophy className="size-4 shrink-0" />
-        <span className="truncate max-w-[120px]">{currentName ?? "Liga Deportiva"}</span>
+        <span className="truncate max-w-[120px]">{currentName ?? "Torneo Deportivo"}</span>
         <ChevronDown className="size-3 shrink-0 opacity-70" />
       </button>
 
@@ -36,7 +36,7 @@ export function LeagueSwitcher({ leagues, currentSlug, currentName }: LeagueSwit
       <div className="absolute left-0 top-full mt-1 w-56 origin-top-left rounded-lg bg-popover text-popover-foreground shadow-md ring-1 ring-foreground/10 opacity-0 invisible group-focus-within:opacity-100 group-focus-within:visible group-hover:opacity-100 group-hover:visible transition-all duration-100 z-50">
         <div className="p-1">
           <div className="px-1.5 py-1 text-xs font-medium text-muted-foreground">
-            Todas las ligas
+            Todos los torneos
           </div>
           {leagues.map((league) => {
             const isActive = league.slug === currentSlug

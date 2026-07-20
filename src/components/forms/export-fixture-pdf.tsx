@@ -106,7 +106,7 @@ export function ExportFixturePDF({ categories }: Props) {
         doc.setFontSize(8)
         doc.setTextColor(150)
         doc.text(
-          `Generado el ${new Date().toLocaleDateString("es-AR")} · Liga Extraordinaria`,
+          `Generado el ${new Date().toLocaleDateString("es-AR")} · Torneo Pro`,
           14,
           doc.internal.pageSize.height - 10,
         )

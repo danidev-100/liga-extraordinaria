@@ -20,9 +20,9 @@ export default async function EditLeaguePage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Editar Liga</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Editar Torneo</h1>
         <p className="text-muted-foreground">
-          Modificá los datos de la liga
+          Modificá los datos del torneo
         </p>
       </div>
       <Card>

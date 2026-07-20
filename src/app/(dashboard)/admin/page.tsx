@@ -135,7 +135,7 @@ export default async function AdminDashboard() {
 
   const navCards = [
     {
-      title: "Ligas",
+      title: "Torneos",
       value: leagueCount,
       icon: Trophy,
       href: "/admin/leagues",
@@ -342,9 +342,9 @@ export default async function AdminDashboard() {
       {isSuperAdmin && allLeagues.length > 0 && (
         <Card className="shadow-xs">
           <CardHeader>
-            <CardTitle>Todas las ligas</CardTitle>
+            <CardTitle>Todos los torneos</CardTitle>
             <CardDescription>
-              Vista general de todas las ligas del sistema
+              Vista general de todos los torneos del sistema
             </CardDescription>
           </CardHeader>
           <CardContent>

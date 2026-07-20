@@ -39,7 +39,7 @@ function getNavItems(leagueSlug?: string) {
     { href: `${base}/players`, label: "Jugadores", icon: UserCircle },
     { href: `${base}/matches`, label: "Partidos", icon: Calendar },
     { href: `${base}/courts`, label: "Canchas", icon: MapPin },
-    { href: `${base}/leagues`, label: "Ligas", icon: Trophy },
+    { href: `${base}/leagues`, label: "Torneos", icon: Trophy },
     { href: `${base}/standings`, label: "Posiciones", icon: ListOrdered },
   ]
 }
@@ -116,7 +116,7 @@ export function Sidebar({
           ) : (
             <Link href="/" className="min-w-0 transition-opacity hover:opacity-80">
               <h1 className="text-sm font-bold tracking-tight text-sidebar-primary-foreground truncate">
-                {leagueName ?? "Liga Deportiva"}
+                {leagueName ?? "Torneo Deportivo"}
               </h1>
               <p className="text-[11px] leading-tight text-sidebar-primary-foreground/70">
                 Panel de Administración

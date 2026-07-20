@@ -53,7 +53,7 @@ export function CreateLeagueForm({ userName }: Props) {
       router.push(`/admin/ligas/${league.slug}`)
       router.refresh()
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error al crear la liga")
+      setError(err instanceof Error ? err.message : "Error al crear el torneo")
       setLoading(false)
     }
   }
@@ -71,7 +71,7 @@ export function CreateLeagueForm({ userName }: Props) {
             <Trophy className="h-6 w-6 text-primary-foreground" />
           </div>
           <h2 className="font-heading text-xl font-bold tracking-wide">
-            Crear <span className="text-primary">Liga</span>
+            Crear <span className="text-primary">Torneo</span>
           </h2>
           {userName && (
             <p className="mt-1 text-sm text-muted-foreground">
@@ -83,10 +83,10 @@ export function CreateLeagueForm({ userName }: Props) {
         <Card className="shadow-xl shadow-primary/5 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold tracking-tight">
-              Nueva Liga
+              Nuevo Torneo
             </CardTitle>
             <CardDescription>
-              Configurá los datos básicos de tu liga
+              Configurá los datos básicos de tu torneo
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -101,12 +101,12 @@ export function CreateLeagueForm({ userName }: Props) {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="name">Nombre de la liga</Label>
+                <Label htmlFor="name">Nombre del torneo</Label>
                 <Input
                   id="name"
                   name="name"
                   type="text"
-                  placeholder="Ej: Liga de Fútbol 2026"
+                  placeholder="Ej: Torneo de Fútbol 2026"
                   required
                   minLength={2}
                   maxLength={100}
@@ -160,12 +160,12 @@ export function CreateLeagueForm({ userName }: Props) {
                 {loading ? (
                   <>
                     <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Creando liga...
+                    Creando torneo...
                   </>
                 ) : (
                   <>
                     <Plus className="h-4 w-4" />
-                    Crear Liga
+                    Crear Torneo
                   </>
                 )}
               </Button>

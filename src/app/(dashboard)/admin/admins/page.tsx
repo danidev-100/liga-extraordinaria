@@ -30,7 +30,7 @@ export default async function AdminsPage() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Administradores</h1>
           <p className="text-muted-foreground">
-            Gestioná los usuarios que administran cada liga
+            Gestioná los usuarios que administran cada torneo
           </p>
         </div>
         <Link href="/admin/admins/new">
@@ -91,8 +91,8 @@ export default async function AdminsPage() {
                         </p>
                         <p className="text-xs text-muted-foreground/70">
                           {admin.league
-                            ? `Liga: ${admin.league.name} (${admin.league.season})`
-                            : "Sin liga asignada"
+                            ? `Torneo: ${admin.league.name} (${admin.league.season})`
+                            : "Sin torneo asignado"
                           }
                           {" · "}
                           Creado {new Date(admin.createdAt).toLocaleDateString("es-AR")}

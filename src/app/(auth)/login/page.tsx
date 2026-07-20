@@ -4,8 +4,8 @@ import { LoginForm } from "./login-form"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export const metadata: Metadata = {
-  title: "Iniciar Sesión — Liga Extraordinaria",
-  description: "Accedé al panel de administración de tu liga",
+  title: "Iniciar Sesión — Torneo Pro",
+  description: "Accedé al panel de administración de tu torneo",
 }
 
 function LoginFallback() {

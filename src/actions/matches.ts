@@ -208,15 +208,32 @@ export async function updateMatch(id: string, data: MatchUpdateData, slug?: stri
   return match
 }
 
-export async function clearFinishedMatches(slug?: string) {
+export async function clearFinishedMatches(slug?: string, leagueId?: string) {
   await ensureAuth()
-  if (slug) await ensureScope(slug)
+  let targetLeagueId = leagueId
+  if (slug) {
+    const scope = await ensureScope(slug)
+    targetLeagueId = scope.leagueId
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const deleted = await db.$transaction(async (tx: any) => {
+    // Find categories for the league if scoped
+    let categoryFilter: { id: string }[] | undefined
+    if (targetLeagueId) {
+      categoryFilter = await tx.category.findMany({
+        where: { leagueId: targetLeagueId },
+        select: { id: true },
+      })
+      if (categoryFilter.length === 0) return 0
+    }
+
     // Delete goals and cards from finished matches first (cascade should handle it, but be explicit)
     const finishedMatches: { id: string }[] = await tx.match.findMany({
-      where: { status: "FINISHED" },
+      where: {
+        status: "FINISHED",
+        ...(categoryFilter ? { categoryId: { in: categoryFilter.map((c) => c.id) } } : {}),
+      },
       select: { id: true },
     })
 
@@ -233,6 +250,10 @@ export async function clearFinishedMatches(slug?: string) {
 
   revalidatePath("/admin/matches")
   revalidatePath("/admin/standings")
+  if (slug) {
+    revalidatePath(`/admin/ligas/${slug}/matches`)
+    revalidatePath(`/admin/ligas/${slug}/standings`)
+  }
   return { count: deleted }
 }
 

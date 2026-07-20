@@ -22,27 +22,27 @@ export default async function LeaguesPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Ligas</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Torneos</h1>
           <p className="text-muted-foreground">
-            Gestioná las ligas y temporadas
+            Gestioná los torneos y temporadas
           </p>
         </div>
         <Link href="/admin/leagues/new">
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Nueva Liga
+            Nuevo Torneo
           </Button>
         </Link>
       </div>
 
       <Card className="shadow-xs">
         <CardHeader>
-          <CardTitle>Todas las ligas</CardTitle>
+          <CardTitle>Todos los torneos</CardTitle>
         </CardHeader>
         <CardContent>
           {leagues.length === 0 ? (
             <p className="text-center text-muted-foreground py-8">
-              No hay ligas registradas. Creá la primera liga.
+              No hay torneos registrados. Creá el primer torneo.
             </p>
           ) : (
             <div className="divide-y">
@@ -89,7 +89,7 @@ export default async function LeaguesPage() {
                     </Link>
                     <DeleteButton
                       action={deleteLeague.bind(null, league.id)}
-                      confirmMessage="¿Eliminar esta liga?"
+                      confirmMessage="¿Eliminar este torneo?"
                     />
                   </div>
                 </div>

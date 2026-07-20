@@ -4,8 +4,8 @@ import db from "@/lib/db"
 import { CreateLeagueForm } from "./create-league-form"
 
 export const metadata = {
-  title: "Crear Liga — Liga Extraordinaria",
-  description: "Creá tu propia liga para empezar a gestionar equipos y partidos",
+  title: "Crear Torneo — Torneo Pro",
+  description: "Creá tu propio torneo para empezar a gestionar equipos y partidos",
 }
 
 export default async function CreateLeaguePage() {

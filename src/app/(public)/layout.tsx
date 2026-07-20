@@ -23,7 +23,7 @@ const navLinkDefs = [
   { scopedPath: "posiciones", oldPath: "/standings", label: "Posiciones", icon: ListOrdered },
   { scopedPath: "goleadores", oldPath: "/goleadores", label: "Goleadores", icon: Goal },
   { scopedPath: "tarjetas", oldPath: "/tarjetas", label: "Tarjetas", icon: ShieldAlert },
-  { scopedPath: "ligas", oldPath: "/#ligas", label: "Ligas", icon: Trophy },
+  { scopedPath: "ligas", oldPath: "/#ligas", label: "Torneos", icon: Trophy },
 ]
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
@@ -52,7 +52,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               <Trophy className="h-5 w-5" />
             </div>
             <span className="font-heading text-lg sm:text-xl font-bold tracking-wide text-foreground truncate">
-              Liga <span className="text-primary">Extraordinaria</span>
+              Torneo <span className="text-primary">Pro</span>
             </span>
           </Link>
 
@@ -115,7 +115,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </div>
               <div>
                 <h1 className="text-sm font-bold tracking-tight text-primary-foreground">
-                  Liga Extraordinaria
+                  Torneo Pro
                 </h1>
                 <p className="text-[11px] leading-tight text-primary-foreground/70">
                   Navegación
@@ -180,7 +180,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Liga Extraordinaria. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} Torneo Pro. Todos los derechos reservados.
             </p>
             <a
               href="https://wa.me/542616095070"

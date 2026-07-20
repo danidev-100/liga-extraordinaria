@@ -28,8 +28,8 @@ export default async function ScopedLeaguesPage({ params }: Props) {
   if (!league) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Liga</h1>
-        <p className="text-muted-foreground">Liga no encontrada.</p>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Torneo</h1>
+        <p className="text-muted-foreground">Torneo no encontrado.</p>
       </div>
     )
   }
@@ -38,16 +38,16 @@ export default async function ScopedLeaguesPage({ params }: Props) {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Mi Liga</h1>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-heading">Mi Torneo</h1>
           <p className="text-muted-foreground">
-            Configuración de tu liga
+            Configuración de tu torneo
           </p>
         </div>
         {isSuperAdmin && (
           <Link href="/admin/leagues/new">
             <Button>
               <Plus className="mr-2 h-4 w-4" />
-              Nueva Liga
+              Nuevo Torneo
             </Button>
           </Link>
         )}
@@ -55,7 +55,7 @@ export default async function ScopedLeaguesPage({ params }: Props) {
 
       <Card className="shadow-xs">
         <CardHeader>
-          <CardTitle>Detalle de la liga</CardTitle>
+          <CardTitle>Detalle del torneo</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2">

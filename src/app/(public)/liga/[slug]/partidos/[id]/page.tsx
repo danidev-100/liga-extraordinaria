@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props) {
     },
   })
 
-  if (!match) return { title: "Partido no encontrado — Liga" }
+  if (!match) return { title: "Partido no encontrado — Torneo Pro" }
 
   const matchDate = new Date(match.date).toLocaleDateString("es-AR", {
     day: "numeric", month: "short", year: "numeric",

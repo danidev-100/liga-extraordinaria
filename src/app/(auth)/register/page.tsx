@@ -89,10 +89,10 @@ export default function RegisterPage() {
             <Trophy className="h-6 w-6 text-primary-foreground" />
           </div>
           <h2 className="font-heading text-xl font-bold tracking-wide">
-            Crear cuenta — Liga <span className="text-primary">Extraordinaria</span>
+            Crear cuenta — Torneo <span className="text-primary">Pro</span>
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Creá tu liga en un solo paso
+            Creá tu torneo en un solo paso
           </p>
         </div>
 
@@ -100,7 +100,7 @@ export default function RegisterPage() {
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold tracking-tight">Registrate</CardTitle>
             <CardDescription>
-              Completá tus datos y creá tu liga
+              Completá tus datos y creá tu torneo
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -205,17 +205,17 @@ export default function RegisterPage() {
               <div className="space-y-4">
                 <div className="border-t pt-4">
                   <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                    Tu liga
+                    Tu torneo
                   </h3>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="leagueName">Nombre de la liga</Label>
+                  <Label htmlFor="leagueName">Nombre del torneo</Label>
                   <Input
                     id="leagueName"
                     name="leagueName"
                     type="text"
-                    placeholder="Ej: Liga de Fútbol 2026"
+                    placeholder="Ej: Torneo de Fútbol 2026"
                     required
                     minLength={2}
                     maxLength={100}
@@ -240,7 +240,7 @@ export default function RegisterPage() {
                 ) : (
                   <>
                     <UserPlus className="h-4 w-4" />
-                    Crear cuenta y liga
+                    Crear cuenta y torneo
                   </>
                 )}
               </Button>

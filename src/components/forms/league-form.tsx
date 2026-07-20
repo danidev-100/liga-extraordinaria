@@ -58,15 +58,15 @@ export function LeagueForm({ initialData }: LeagueFormProps) {
     try {
       if (initialData) {
         await updateLeague(initialData.id, data)
-        toast.success("Liga actualizada exitosamente")
+        toast.success("Torneo actualizado exitosamente")
       } else {
         await createLeague(data)
-        toast.success("Liga creada exitosamente")
+        toast.success("Torneo creado exitosamente")
       }
       router.push("/admin/leagues")
       router.refresh()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Error al guardar la liga")
+      toast.error(error instanceof Error ? error.message : "Error al guardar el torneo")
     } finally {
       setIsSubmitting(false)
     }
@@ -82,7 +82,7 @@ export function LeagueForm({ initialData }: LeagueFormProps) {
             <FormItem>
               <FormLabel>Nombre *</FormLabel>
               <FormControl>
-                <Input placeholder="Liga Verano 2026" {...field} />
+                <Input placeholder="Torneo Verano 2026" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -131,7 +131,7 @@ export function LeagueForm({ initialData }: LeagueFormProps) {
         </div>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {initialData ? "Actualizar Liga" : "Crear Liga"}
+          {initialData ? "Actualizar Torneo" : "Crear Torneo"}
         </Button>
       </form>
     </Form>

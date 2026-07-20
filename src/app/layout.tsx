@@ -18,16 +18,16 @@ const oswald = Oswald({
 
 export const metadata: Metadata = {
   title: {
-    default: "Liga Extraordinaria",
-    template: "%s — Liga Extraordinaria",
+    default: "Torneo Pro",
+    template: "%s — Torneo Pro",
   },
-  description: "Gestión de ligas de fútbol, equipos, partidos y posiciones",
+  description: "Gestión de torneos de fútbol, equipos, partidos y posiciones",
   manifest: "/manifest",
   icons: [{ rel: "icon", url: "/icon.svg", type: "image/svg+xml" }],
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Liga Extra",
+    title: "Torneo Pro",
   },
   other: {
     "mobile-web-app-capable": "yes",

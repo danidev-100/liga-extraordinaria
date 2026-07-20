@@ -42,7 +42,7 @@ export default async function Home() {
               <Trophy className="h-5 w-5" />
             </div>
             <span className="font-heading text-xl font-bold tracking-wide">
-              Liga <span className="text-primary">Extraordinaria</span>
+              Torneo <span className="text-primary">Pro</span>
             </span>
           </Link>
 
@@ -87,12 +87,12 @@ export default async function Home() {
                 {/* Badge */}
                 <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary">
                   <Trophy className="h-4 w-4" />
-                  Gestión de ligas deportivas
+                  Gestión de torneos deportivos
                 </div>
 
                 {/* Main title */}
                 <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                  Administrá tu liga con{" "}
+                  Administrá tu torneo con{" "}
                   <span className="bg-gradient-to-r from-green-600 via-emerald-500 to-green-500 bg-clip-text text-transparent dark:from-green-400 dark:via-emerald-400 dark:to-green-300">
                     potencia
                   </span>
@@ -101,7 +101,7 @@ export default async function Home() {
                 {/* Subtitle */}
                 <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground md:text-xl">
                   Gestioná equipos, jugadores, partidos y posiciones al instante.
-                  La plataforma todo-en-uno para tu liga de fútbol con fixture automático
+                  La plataforma todo-en-uno para tu torneo de fútbol con fixture automático
                   y estadísticas en tiempo real.
                 </p>
 
@@ -165,7 +165,7 @@ export default async function Home() {
                 Todo lo que necesitás
               </h2>
               <p className="mt-4 text-muted-foreground">
-                Una plataforma completa para gestionar tu liga de principio a fin
+                Una plataforma completa para gestionar tu torneo de principio a fin
               </p>
             </div>
 
@@ -216,10 +216,10 @@ export default async function Home() {
             <div className="container mx-auto px-4">
               <div className="mx-auto mb-12 max-w-2xl text-center">
                 <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
-                  Ligas activas
+                  Torneos activos
                 </h2>
                 <p className="mt-4 text-muted-foreground">
-                  Explorá las ligas disponibles y seguí los resultados
+                  Explorá los torneos disponibles y seguí los resultados
                 </p>
               </div>
 
@@ -238,7 +238,7 @@ export default async function Home() {
                           </p>
                         </div>
                         <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
-                          Ver liga <ArrowRight className="h-3.5 w-3.5" />
+                          Ver torneo <ArrowRight className="h-3.5 w-3.5" />
                         </span>
                       </CardContent>
                     </Card>
@@ -257,10 +257,10 @@ export default async function Home() {
                 <Plus className="h-8 w-8 text-white" />
               </div>
               <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
-                ¿Tenés tu propia liga?
+                ¿Tenés tu propio torneo?
               </h2>
               <p className="mx-auto mt-4 max-w-lg text-muted-foreground">
-                Creá tu liga en segundos, gestioná equipos, partidos y estadísticas
+                Creá tu torneo en segundos, gestioná equipos, partidos y estadísticas
                 desde un solo lugar.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -284,10 +284,10 @@ export default async function Home() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Trophy className="h-4 w-4" />
               </div>
-              <span className="font-heading text-lg font-bold">Liga Extraordinaria</span>
+              <span className="font-heading text-lg font-bold">Torneo Pro</span>
             </div>
             <p className="text-center text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Liga Extraordinaria. Todos los derechos reservados.
+              &copy; {new Date().getFullYear()} Torneo Pro. Todos los derechos reservados.
             </p>
             <a
               href="https://wa.me/542616095070"
