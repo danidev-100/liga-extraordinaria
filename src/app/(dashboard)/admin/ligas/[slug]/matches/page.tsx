@@ -6,7 +6,6 @@ import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
 import { Plus, Edit, Clock, Play, CheckCircle2, Calendar, ArrowUpDown, FileDown } from "lucide-react"
 import { DeleteButton } from "@/components/forms/delete-button"
-import { ClearFinishedButton } from "@/components/forms/clear-finished-button"
 import { deleteMatch } from "@/actions/matches"
 import { Badge } from "@/components/ui/badge"
 import { TeamLogo } from "@/components/ui/team-logo"
@@ -85,7 +84,6 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ClearFinishedButton slug={slug} />
           <Link href={`/admin/matches/reorder`}>
             <Button variant="outline">
               <ArrowUpDown className="mr-2 h-4 w-4" />
