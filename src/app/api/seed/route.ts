@@ -26,17 +26,13 @@ function shuffle<T>(arr: T[]): T[] {
 
 // ── Data ───────────────────────────────────────────────────────────────────
 
-const LIGAS = [
-  { name: "Supercampeones", slug: "supercampeones" },
-  { name: "Champions League", slug: "champions-league" },
-  { name: "Liga Extraterrestre", slug: "liga-extraterrestre" },
-]
+const TORNEO = {
+  name: "Torneo de Veteranos",
+  slug: "torneo-de-veteranos",
+  season: "2026",
+}
 
-const CATEGORIAS = [
-  { name: "+30", minAge: 30, maxAge: 39 },
-  { name: "+40", minAge: 40, maxAge: 49 },
-  { name: "+50", minAge: 50, maxAge: 99 },
-]
+const CATEGORIA = { name: "+50", minAge: 50, maxAge: 99 }
 
 const EQUIPOS = [
   { name: "Club Atlético River Plate", short: "River", color: "#E40000" },
@@ -47,9 +43,7 @@ const EQUIPOS = [
   { name: "Club Atlético Huracán", short: "Huracán", color: "#FF6600" },
   { name: "Club Atlético Vélez Sarsfield", short: "Vélez", color: "#006EB8" },
   { name: "Club Estudiantes La Plata", short: "Estudiantes", color: "#DD0F27" },
-  { name: "Club Gimnasia La Plata", short: "Gimnasia", color: "#0F4C3A" },
   { name: "Club Atlético Rosario Central", short: "Central", color: "#000080" },
-  { name: "Club Atlético Talleres", short: "Talleres", color: "#007B4B" },
   { name: "Club Atlético Belgrano", short: "Belgrano", color: "#1A5276" },
 ]
 
@@ -124,7 +118,7 @@ function getPrisma() {
 async function seed() {
   const prisma = getPrisma()
 
-  // Clean
+  // Clean — borra todo excepto admins
   await prisma.standing.deleteMany()
   await prisma.card.deleteMany()
   await prisma.goal.deleteMany()
@@ -134,13 +128,13 @@ async function seed() {
   await prisma.court.deleteMany()
   await prisma.category.deleteMany()
   await prisma.league.deleteMany()
-  await prisma.admin.updateMany({ where: { role: "ADMIN" }, data: { leagueId: null } })
+  await prisma.admin.updateMany({ data: { leagueId: null } })
 
   // Courts
-  await prisma.court.createMany({ data: CANCHAS })
+  await prisma.court.createMany({ data: CANCHAS.slice(0, 5) })
   const courts = await prisma.court.findMany()
 
-  // Admins
+  // Super admin check
   const passwordHash = await bcrypt.hash("admin123", 10)
   const superAdmin =
     (await prisma.admin.findUnique({ where: { email: "super@liga.com" } })) ??
@@ -148,186 +142,176 @@ async function seed() {
       data: { name: "Super Admin", email: "super@liga.com", passwordHash, role: "SUPER_ADMIN" },
     }))
 
-  const admins = await Promise.all(
-    LIGAS.map((l) =>
-      prisma.admin.upsert({
-        where: { email: `admin-${l.slug}@liga.com` },
-        update: { name: `Admin ${l.name}` },
-        create: {
-          name: `Admin ${l.name}`,
-          email: `admin-${l.slug}@liga.com`,
-          passwordHash,
-          role: "ADMIN",
+  // ── Un solo torneo: Torneo de Veteranos ────────────────────────────────
+  const league = await prisma.league.create({
+    data: {
+      name: TORNEO.name,
+      slug: TORNEO.slug,
+      season: TORNEO.season,
+      startDate: new Date("2026-03-01"),
+      endDate: new Date("2026-11-30"),
+      isActive: true,
+    },
+  })
+
+  const category = await prisma.category.create({
+    data: {
+      name: CATEGORIA.name,
+      minAge: CATEGORIA.minAge,
+      maxAge: CATEGORIA.maxAge,
+      leagueId: league.id,
+    },
+  })
+
+  // 10 equipos fijos (no shuffle — el usuario los quiere todos)
+  const teams: { id: string; shortName: string }[] = []
+  let dniBase = 30000000
+
+  for (const eq of EQUIPOS) {
+    const team = await prisma.team.create({
+      data: { name: eq.name, shortName: eq.short, color: eq.color, categoryId: category.id },
+    })
+    teams.push({ id: team.id, shortName: eq.short })
+
+    // 15 jugadores por equipo
+    const shuffledNames = shuffle(NOMBRES)
+    const shuffledApellidos = shuffle(APELLIDOS)
+    await prisma.player.createMany({
+      data: Array.from({ length: 15 }, (_, j) => ({
+        name: shuffledNames[j % shuffledNames.length],
+        surname: shuffledApellidos[j % shuffledApellidos.length],
+        dni: String(dniBase + j),
+        birthDate: new Date(randomInt(1965, 1976), randomInt(0, 11), randomInt(1, 28)),
+        jerseyNumber: j + 1,
+        teamId: team.id,
+        isActive: true,
+      })),
+    })
+    dniBase += 100
+  }
+
+  // Round-robin fixture: 10 equipos → 9 fechas ida + 9 fechas vuelta = 18 fechas
+  const fixture = generateFixture(teams.length)
+  const rounds = fixture.length / (teams.length / 2) // 18
+  const allPlayers = await prisma.player.findMany({
+    where: { team: { categoryId: category.id } },
+    select: { id: true, teamId: true },
+  })
+  const playersByTeam = new Map<string, string[]>()
+  for (const p of allPlayers) {
+    if (!playersByTeam.has(p.teamId)) playersByTeam.set(p.teamId, [])
+    playersByTeam.get(p.teamId)!.push(p.id)
+  }
+
+  const matchStartDate = new Date("2026-03-15")
+  for (let r = 0; r < rounds; r++) {
+    const roundDate = new Date(matchStartDate)
+    roundDate.setDate(roundDate.getDate() + r * 7)
+    for (let m = 0; m < teams.length / 2; m++) {
+      const fixtureIdx = r * (teams.length / 2) + m
+      const [homeIdx, awayIdx] = fixture[fixtureIdx]
+      const homeTeam = teams[homeIdx]
+      const awayTeam = teams[awayIdx]
+      const homeGoals = randomInt(0, 5)
+      const awayGoals = randomInt(0, 4)
+
+      const match = await prisma.match.create({
+        data: {
+          categoryId: category.id,
+          localTeamId: homeTeam.id,
+          visitorTeamId: awayTeam.id,
+          courtId: pick(courts).id,
+          date: new Date(roundDate.getFullYear(), roundDate.getMonth(), roundDate.getDate()),
+          time: `${randomInt(14, 22)}:00`,
+          round: r + 1,
+          status: "FINISHED",
+          localScore: homeGoals,
+          visitorScore: awayGoals,
         },
       })
-    )
-  )
 
-  // Seed each league
-  for (let i = 0; i < LIGAS.length; i++) {
-    const liga = LIGAS[i]
-    const league = await prisma.league.create({
-      data: {
-        name: liga.name,
-        slug: liga.slug,
-        season: "2026",
-        startDate: new Date("2026-03-01"),
-        endDate: new Date("2026-11-30"),
-        isActive: true,
-      },
-    })
-    await prisma.admin.update({ where: { id: admins[i].id }, data: { leagueId: league.id } })
+      const homePool = playersByTeam.get(homeTeam.id)!
+      const awayPool = playersByTeam.get(awayTeam.id)!
 
-    for (const catDef of CATEGORIAS) {
-      const category = await prisma.category.create({
-        data: { name: catDef.name, minAge: catDef.minAge, maxAge: catDef.maxAge, leagueId: league.id },
-      })
-
-      const pickedTeams = shuffle(EQUIPOS).slice(0, 6)
-      const teams: { id: string; shortName: string }[] = []
-      let dniBase = 30000000 + i * 100000 + CATEGORIAS.indexOf(catDef) * 10000
-
-      for (const eq of pickedTeams) {
-        const team = await prisma.team.create({
-          data: { name: eq.name, shortName: eq.short, color: eq.color, categoryId: category.id },
-        })
-        teams.push({ id: team.id, shortName: eq.short })
-        const shuffledNames = shuffle(NOMBRES)
-        const shuffledApellidos = shuffle(APELLIDOS)
-        await prisma.player.createMany({
-          data: Array.from({ length: 13 }, (_, j) => ({
-            name: shuffledNames[j % shuffledNames.length],
-            surname: shuffledApellidos[j % shuffledApellidos.length],
-            dni: String(dniBase + j),
-            birthDate: new Date(randomInt(1970, 1995), randomInt(0, 11), randomInt(1, 28)),
-            jerseyNumber: j + 1,
-            teamId: team.id,
-            isActive: true,
-          })),
-        })
-        dniBase += 100
+      // Goles
+      const goals: any[] = []
+      for (let g = 0; g < homeGoals; g++) {
+        goals.push({ matchId: match.id, playerId: pick(homePool), teamId: homeTeam.id, minute: randomInt(1, 90), isOwnGoal: false })
       }
-
-      const fixture = generateFixture(teams.length)
-      const rounds = fixture.length / (teams.length / 2)
-      const allPlayers = await prisma.player.findMany({
-        where: { team: { categoryId: category.id } },
-        select: { id: true, teamId: true },
-      })
-      const playersByTeam = new Map<string, string[]>()
-      for (const p of allPlayers) {
-        if (!playersByTeam.has(p.teamId)) playersByTeam.set(p.teamId, [])
-        playersByTeam.get(p.teamId)!.push(p.id)
+      for (let g = 0; g < awayGoals; g++) {
+        goals.push({ matchId: match.id, playerId: pick(awayPool), teamId: awayTeam.id, minute: randomInt(1, 90), isOwnGoal: false })
       }
+      if (goals.length > 0) await prisma.goal.createMany({ data: goals })
 
-      const matchStartDate = new Date("2026-03-15")
-      for (let r = 0; r < rounds; r++) {
-        const roundDate = new Date(matchStartDate)
-        roundDate.setDate(roundDate.getDate() + r * 7)
-        for (let m = 0; m < teams.length / 2; m++) {
-          const fixtureIdx = r * (teams.length / 2) + m
-          const [homeIdx, awayIdx] = fixture[fixtureIdx]
-          const homeTeam = teams[homeIdx]
-          const awayTeam = teams[awayIdx]
-          const homeGoals = randomInt(0, 5)
-          const awayGoals = randomInt(0, 4)
-
-          const match = await prisma.match.create({
-            data: {
-              categoryId: category.id,
-              localTeamId: homeTeam.id,
-              visitorTeamId: awayTeam.id,
-              courtId: pick(courts).id,
-              date: new Date(roundDate.getFullYear(), roundDate.getMonth(), roundDate.getDate()),
-              time: `${randomInt(14, 22)}:00`,
-              round: r + 1,
-              status: "FINISHED",
-              localScore: homeGoals,
-              visitorScore: awayGoals,
-            },
+      // Tarjetas
+      const cardCount = Math.random() < 0.6 ? randomInt(0, 3) : 0
+      if (cardCount > 0) {
+        const cards: any[] = []
+        for (let c = 0; c < cardCount; c++) {
+          const isRed = Math.random() < 0.12
+          const cardTeam = Math.random() < 0.5 ? homeTeam : awayTeam
+          const cardPool = cardTeam.id === homeTeam.id ? homePool : awayPool
+          cards.push({
+            matchId: match.id,
+            playerId: pick(cardPool),
+            teamId: cardTeam.id,
+            type: isRed ? "RED" : "YELLOW",
+            minute: randomInt(10, 90),
+            isSecondYellow: false,
           })
-
-          const homePool = playersByTeam.get(homeTeam.id)!
-          const awayPool = playersByTeam.get(awayTeam.id)!
-          const goals: any[] = []
-          for (let g = 0; g < homeGoals; g++) {
-            goals.push({ matchId: match.id, playerId: pick(homePool), teamId: homeTeam.id, minute: randomInt(1, 90), isOwnGoal: false })
-          }
-          for (let g = 0; g < awayGoals; g++) {
-            goals.push({ matchId: match.id, playerId: pick(awayPool), teamId: awayTeam.id, minute: randomInt(1, 90), isOwnGoal: false })
-          }
-          if (goals.length > 0) await prisma.goal.createMany({ data: goals })
-
-          const cardCount = Math.random() < 0.6 ? randomInt(0, 3) : 0
-          if (cardCount > 0) {
-            const cards: any[] = []
-            for (let c = 0; c < cardCount; c++) {
-              const isRed = Math.random() < 0.12
-              const cardTeam = Math.random() < 0.5 ? homeTeam : awayTeam
-              const cardPool = cardTeam.id === homeTeam.id ? homePool : awayPool
-              cards.push({
-                matchId: match.id,
-                playerId: pick(cardPool),
-                teamId: cardTeam.id,
-                type: isRed ? "RED" : "YELLOW",
-                minute: randomInt(10, 90),
-                isSecondYellow: false,
-              })
-            }
-            await prisma.card.createMany({ data: cards })
-          }
         }
+        await prisma.card.createMany({ data: cards })
       }
-
-      // Standings
-      const allMatches = await prisma.match.findMany({
-        where: { categoryId: category.id, status: "FINISHED" },
-        select: { localTeamId: true, visitorTeamId: true, localScore: true, visitorScore: true },
-      })
-      const allCards = await prisma.card.findMany({
-        where: { match: { categoryId: category.id, status: "FINISHED" } },
-        select: { teamId: true, type: true },
-      })
-
-      const stats = new Map<string, any>()
-      for (const t of teams) {
-        stats.set(t.id, { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, ta: 0, tr: 0 })
-      }
-      for (const m of allMatches) {
-        const home = stats.get(m.localTeamId)
-        const away = stats.get(m.visitorTeamId)
-        if (!home || !away || m.localScore === null || m.visitorScore === null) continue
-        home.pj++; away.pj++
-        home.gf += m.localScore; home.gc += m.visitorScore
-        away.gf += m.visitorScore; away.gc += m.localScore
-        if (m.localScore > m.visitorScore) { home.pg++; away.pp++ }
-        else if (m.localScore < m.visitorScore) { away.pg++; home.pp++ }
-        else { home.pe++; away.pe++ }
-      }
-      for (const card of allCards) {
-        const team = stats.get(card.teamId)
-        if (!team) continue
-        if (card.type === "YELLOW") team.ta++
-        else team.tr++
-      }
-
-      const standingData = Array.from(stats.entries())
-        .map(([teamId, s]) => ({
-          categoryId: category.id,
-          teamId,
-          pts: s.pg * 3 + s.pe,
-          pj: s.pj, pg: s.pg, pe: s.pe, pp: s.pp,
-          gf: s.gf, gc: s.gc, dg: s.gf - s.gc,
-          ta: s.ta, tr: s.tr,
-        }))
-        .sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf)
-        .map((s, i) => ({ ...s, position: i + 1 }))
-      await prisma.standing.createMany({ data: standingData })
     }
   }
 
+  // Standings
+  const allMatches = await prisma.match.findMany({
+    where: { categoryId: category.id, status: "FINISHED" },
+    select: { localTeamId: true, visitorTeamId: true, localScore: true, visitorScore: true },
+  })
+  const allCards = await prisma.card.findMany({
+    where: { match: { categoryId: category.id, status: "FINISHED" } },
+    select: { teamId: true, type: true },
+  })
+
+  const stats = new Map<string, any>()
+  for (const t of teams) {
+    stats.set(t.id, { pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, ta: 0, tr: 0 })
+  }
+  for (const m of allMatches) {
+    const home = stats.get(m.localTeamId)
+    const away = stats.get(m.visitorTeamId)
+    if (!home || !away || m.localScore === null || m.visitorScore === null) continue
+    home.pj++; away.pj++
+    home.gf += m.localScore; home.gc += m.visitorScore
+    away.gf += m.visitorScore; away.gc += m.localScore
+    if (m.localScore > m.visitorScore) { home.pg++; away.pp++ }
+    else if (m.localScore < m.visitorScore) { away.pg++; home.pp++ }
+    else { home.pe++; away.pe++ }
+  }
+  for (const card of allCards) {
+    const team = stats.get(card.teamId)
+    if (!team) continue
+    if (card.type === "YELLOW") team.ta++
+    else team.tr++
+  }
+
+  const standingData = Array.from(stats.entries())
+    .map(([teamId, s]) => ({
+      categoryId: category.id,
+      teamId,
+      pts: s.pg * 3 + s.pe,
+      pj: s.pj, pg: s.pg, pe: s.pe, pp: s.pp,
+      gf: s.gf, gc: s.gc, dg: s.gf - s.gc,
+      ta: s.ta, tr: s.tr,
+    }))
+    .sort((a, b) => b.pts - a.pts || b.dg - a.dg || b.gf - a.gf)
+    .map((s, i) => ({ ...s, position: i + 1 }))
+  await prisma.standing.createMany({ data: standingData })
+
   await prisma.$disconnect()
-  return { superAdmin: superAdmin.email, admins: admins.map((a) => a.email) }
+  return { torneo: TORNEO.name, categoria: CATEGORIA.name, equipos: teams.length, jugadores_por_equipo: 15, partidos: allMatches.length }
 }
 
 // ── API handler ────────────────────────────────────────────────────────────
