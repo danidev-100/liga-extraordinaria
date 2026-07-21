@@ -221,11 +221,12 @@ export async function clearFinishedMatches(slug?: string, leagueId?: string) {
     // Find categories for the league if scoped
     let categoryFilter: { id: string }[] | undefined
     if (targetLeagueId) {
-      categoryFilter = await tx.category.findMany({
+      const categories = await tx.category.findMany({
         where: { leagueId: targetLeagueId },
         select: { id: true },
       })
-      if (categoryFilter.length === 0) return 0
+      if (categories.length === 0) return 0
+      categoryFilter = categories
     }
 
     // Delete goals and cards from finished matches first (cascade should handle it, but be explicit)

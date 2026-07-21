@@ -6,12 +6,12 @@ export const categorySchema = z.object({
     .min(1, "El nombre es requerido")
     .max(50, "El nombre no puede exceder 50 caracteres"),
   minAge: z
-    .number({ invalid_type_error: "La edad mínima es requerida" })
+    .number({ message: "La edad mínima es requerida" })
     .int("Debe ser un número entero")
     .min(4, "La edad mínima debe ser al menos 4")
     .max(100, "La edad mínima no puede exceder 100"),
   maxAge: z
-    .number({ invalid_type_error: "La edad máxima es requerida" })
+    .number({ message: "La edad máxima es requerida" })
     .int("Debe ser un número entero")
     .min(4, "La edad máxima debe ser al menos 4")
     .max(100, "La edad máxima no puede exceder 100"),
