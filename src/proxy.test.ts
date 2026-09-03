@@ -1,10 +1,10 @@
 import { describe, it, expect } from "vitest"
 
-// The middleware.ts exports { auth as middleware } from "next-auth"
+// The proxy.ts exports { auth as proxy } from "next-auth"
 // and has config.matcher: ["/admin/:path*"]
 // Since next-auth requires a Next.js runtime, we test the config separately
 
-describe("middleware config", () => {
+describe("proxy config", () => {
   it("should match /admin/* paths", () => {
     const matcher = "/admin/:path*"
 
@@ -37,14 +37,14 @@ describe("middleware config", () => {
   })
 
   it("should protect admin routes and allow public routes", () => {
-    // This test verifies the middleware logic conceptually:
+    // This test verifies the proxy logic conceptually:
     // - Unauthenticated users accessing /admin/* → redirected to /login
     // - Authenticated users accessing /admin/* → allowed through
     // - All public routes (/, /standings, /matches, /login) → always allowed
 
     const redirectToLogin = "/login"
 
-    function middlewareLogic(
+    function proxyLogic(
       pathname: string,
       isAuthenticated: boolean,
     ): { redirect?: string; allow: boolean } {
@@ -56,25 +56,25 @@ describe("middleware config", () => {
     }
 
     // Authenticated user can access everything
-    expect(middlewareLogic("/admin/players", true).allow).toBe(true)
-    expect(middlewareLogic("/admin", true).allow).toBe(true)
-    expect(middlewareLogic("/standings", true).allow).toBe(true)
-    expect(middlewareLogic("/login", true).allow).toBe(true)
+    expect(proxyLogic("/admin/players", true).allow).toBe(true)
+    expect(proxyLogic("/admin", true).allow).toBe(true)
+    expect(proxyLogic("/standings", true).allow).toBe(true)
+    expect(proxyLogic("/login", true).allow).toBe(true)
 
     // Unauthenticated user redirected on admin routes
-    expect(middlewareLogic("/admin/players", false).allow).toBe(false)
-    expect(middlewareLogic("/admin/players", false).redirect).toBe(redirectToLogin)
-    expect(middlewareLogic("/admin", false).allow).toBe(false)
+    expect(proxyLogic("/admin/players", false).allow).toBe(false)
+    expect(proxyLogic("/admin/players", false).redirect).toBe(redirectToLogin)
+    expect(proxyLogic("/admin", false).allow).toBe(false)
 
     // Unauthenticated user can access public routes
-    expect(middlewareLogic("/standings", false).allow).toBe(true)
-    expect(middlewareLogic("/matches", false).allow).toBe(true)
-    expect(middlewareLogic("/login", false).allow).toBe(true)
-    expect(middlewareLogic("/", false).allow).toBe(true)
+    expect(proxyLogic("/standings", false).allow).toBe(true)
+    expect(proxyLogic("/matches", false).allow).toBe(true)
+    expect(proxyLogic("/login", false).allow).toBe(true)
+    expect(proxyLogic("/", false).allow).toBe(true)
   })
 
-  it("should define a config with matcher array for Next.js middleware", () => {
-    // Verify the config structure that middleware.ts exports
+  it("should define a config with matcher array for Next.js proxy", () => {
+    // Verify the config structure that proxy.ts exports
     const exportedConfig = { matcher: ["/admin/:path*"] }
 
     expect(exportedConfig.matcher).toBeDefined()
@@ -83,11 +83,11 @@ describe("middleware config", () => {
     expect(typeof exportedConfig.matcher[0]).toBe("string")
   })
 
-  it("should export a middleware function", () => {
+  it("should export a proxy function", () => {
     // We verify the module structure is compatible
-    // The actual import is: export { auth as middleware } from "@/lib/auth"
-    // which means middleware is the auth() function from next-auth
-    const middlewareType = "function"
-    expect(middlewareType).toBe("function")
+    // The actual import is: export { auth as proxy } from "@/lib/auth"
+    // which means proxy is the auth() function from next-auth
+    const proxyType = "function"
+    expect(proxyType).toBe("function")
   })
 })

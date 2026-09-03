@@ -4,7 +4,7 @@ import { NextResponse } from "next/server"
 
 const { auth } = NextAuth(authConfig)
 
-export default auth(async function middleware(req) {
+export default auth(async function proxy(req) {
   // Extract slug from /liga/[slug]/... paths and attach to query params
   const ligaMatch = req.nextUrl.pathname.match(/^\/liga\/([^/]+)/)
   if (ligaMatch) {
