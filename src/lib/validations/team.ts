@@ -17,9 +17,11 @@ export const teamSchema = z.object({
   categoryId: z.string().uuid("Debe seleccionar una categoría"),
   logoUrl: z
     .string()
-    .url("Debe ser una URL válida")
     .optional()
-    .or(z.literal("")),
+    .refine(
+      (v) => !v || v.startsWith("/") || z.string().url().safeParse(v).success,
+      { message: "Debe ser una URL válida o una ruta local (ej: /escudos/escudo.png)" },
+    ),
 })
 
 export type TeamFormData = z.input<typeof teamSchema>

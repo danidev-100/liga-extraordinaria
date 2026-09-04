@@ -160,7 +160,7 @@ export function TeamForm({ initialData }: TeamFormProps) {
                       {...field}
                     />
                   </div>
-                  {field.value && /^https?:\/\/.+\./.test(field.value) && (
+                  {field.value && (field.value.startsWith("/") || /^https?:\/\//.test(field.value)) && (
                     <TeamLogo
                       logoUrl={field.value}
                       color={form.watch("color") || null}
