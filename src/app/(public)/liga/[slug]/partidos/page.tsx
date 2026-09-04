@@ -83,10 +83,20 @@ async function MatchesContent({
     orderBy: { name: "asc" },
   })
 
+  const hiddenRounds = await db.roundVisibility.findMany({
+    where: { categoryId: { in: leagueCategoryIds }, hidden: true },
+    select: { categoryId: true, round: true },
+  })
+  const hiddenRoundKeys = new Set(hiddenRounds.map((h) => `${h.categoryId}:${h.round}`))
+
+  const visibleMatches = matches.filter(
+    (match) => !hiddenRoundKeys.has(`${match.categoryId}:${match.round}`),
+  )
+
   const categoryNameById = new Map(categories.map((c) => [c.id, c.name]))
 
   const playedByCategoryRound = new Map<string, Map<number, Set<string>>>()
-  for (const match of matches) {
+  for (const match of visibleMatches) {
     if (!playedByCategoryRound.has(match.categoryId)) {
       playedByCategoryRound.set(match.categoryId, new Map())
     }
@@ -98,7 +108,7 @@ async function MatchesContent({
     roundMap.get(match.round)!.add(match.visitorTeamId)
   }
 
-  const groupedByRound = matches.reduce(
+  const groupedByRound = visibleMatches.reduce(
     (acc, match) => {
       const round = match.round
       if (!acc[round]) acc[round] = []
@@ -178,7 +188,7 @@ async function MatchesContent({
         </Link>
       </div>
 
-      {matches.length === 0 ? (
+      {visibleMatches.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
           <Calendar className="mb-4 h-12 w-12 text-muted-foreground/40" />
           <p className="text-lg font-medium text-muted-foreground">No hay partidos programados</p>

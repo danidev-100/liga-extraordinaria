@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/select"
 import { MatchScheduleEditor } from "@/components/forms/match-schedule-editor"
 import { getMatchesByRound } from "@/actions/match-order"
+import { getRoundVisibility } from "@/actions/round-visibility"
 import { Loader2 } from "lucide-react"
 
 interface Category {
@@ -26,6 +27,7 @@ interface Props {
 export function ReorderClient({ categories }: Props) {
   const [categoryId, setCategoryId] = useState("")
   const [rounds, setRounds] = useState<Awaited<ReturnType<typeof getMatchesByRound>>["rounds"] | null>(null)
+  const [hiddenRounds, setHiddenRounds] = useState<Record<number, boolean>>({})
   const [loading, setLoading] = useState(false)
 
   const categoriesWithMatches = categories.filter((c) => c._count.matches > 0)
@@ -34,11 +36,15 @@ export function ReorderClient({ categories }: Props) {
     const id = value ?? ""
     setCategoryId(id)
     setRounds(null)
+    setHiddenRounds({})
     if (!id) return
 
     setLoading(true)
-    getMatchesByRound(id)
-      .then((data) => setRounds(data.rounds))
+    Promise.all([getMatchesByRound(id), getRoundVisibility(id)])
+      .then(([data, visibility]) => {
+        setRounds(data.rounds)
+        setHiddenRounds(visibility)
+      })
       .catch(() => setRounds([]))
       .finally(() => setLoading(false))
   }
@@ -71,7 +77,12 @@ export function ReorderClient({ categories }: Props) {
       )}
 
       {!loading && categoryId && rounds && (
-        <MatchScheduleEditor rounds={rounds} />
+        <MatchScheduleEditor
+          key={categoryId}
+          rounds={rounds}
+          categoryId={categoryId}
+          hiddenRounds={hiddenRounds}
+        />
       )}
 
       {!loading && categoryId && rounds && rounds.length === 0 && (

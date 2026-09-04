@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { TimeInput } from "@/components/ui/time-input"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, Save, ArrowUpDown, RefreshCw, CheckCircle2 } from "lucide-react"
+import { Calendar, Clock, Save, ArrowUpDown, RefreshCw, CheckCircle2, EyeOff } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { bulkUpdateMatches, swapMatchRound } from "@/actions/match-order"
+import { setRoundVisibility } from "@/actions/round-visibility"
 
 interface Match {
   id: string
@@ -27,14 +28,30 @@ interface RoundGroup {
 
 interface Props {
   rounds: RoundGroup[]
+  categoryId: string
+  hiddenRounds?: Record<number, boolean>
 }
 
 type EditMap = Record<string, { date: string; time: string; round: number }>
 
-export function MatchScheduleEditor({ rounds }: Props) {
+export function MatchScheduleEditor({ rounds, categoryId, hiddenRounds = {} }: Props) {
   const [edits, setEdits] = useState<EditMap>({})
   const [saving, setSaving] = useState<Set<string>>(new Set())
   const [bulkSaving, setBulkSaving] = useState(false)
+  const [localHiddenRounds, setLocalHiddenRounds] = useState<Record<number, boolean>>(hiddenRounds)
+
+  async function toggleRoundVisibility(round: number) {
+    const currentlyHidden = localHiddenRounds[round] ?? false
+    const next = !currentlyHidden
+    setLocalHiddenRounds((prev) => ({ ...prev, [round]: next }))
+    try {
+      await setRoundVisibility(categoryId, round, next)
+      toast.success(next ? "Jornada oculta" : "Jornada visible")
+    } catch (error) {
+      setLocalHiddenRounds((prev) => ({ ...prev, [round]: currentlyHidden }))
+      toast.error(error instanceof Error ? error.message : "Error al actualizar")
+    }
+  }
 
   function initEdit(m: Match) {
     if (edits[m.id]) return
@@ -153,7 +170,7 @@ export function MatchScheduleEditor({ rounds }: Props) {
       ) : (
         rounds.map(({ round, matches: roundMatches }) => (
           <section key={round} className="space-y-3">
-            <h3 className="flex items-center gap-2 text-lg font-semibold font-heading">
+            <h3 className="flex flex-wrap items-center gap-2 text-lg font-semibold font-heading">
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
                 {round}
               </span>
@@ -161,6 +178,22 @@ export function MatchScheduleEditor({ rounds }: Props) {
               <span className="text-sm font-normal text-muted-foreground">
                 {roundMatches.length} partido{roundMatches.length !== 1 ? "s" : ""}
               </span>
+              {localHiddenRounds[round] && (
+                <Badge variant="secondary" className="gap-1">
+                  <EyeOff className="h-3 w-3" />
+                  Jornada oculta
+                </Badge>
+              )}
+              <Button
+                type="button"
+                size="xs"
+                variant={localHiddenRounds[round] ? "default" : "outline"}
+                className="gap-1"
+                onClick={() => toggleRoundVisibility(round)}
+              >
+                <EyeOff className="h-3 w-3" />
+                {localHiddenRounds[round] ? "Mostrar jornada" : "Ocultar jornada"}
+              </Button>
             </h3>
 
             <div className="space-y-2">

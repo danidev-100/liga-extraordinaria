@@ -61,9 +61,10 @@ model Category {
   isActive Boolean  @default(true) @map("is_active")
   leagueId String   @map("league_id") @db.Uuid
   league   League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
-  teams    Team[]
-  matches  Match[]
-  standings Standing[]
+  teams            Team[]
+  matches          Match[]
+  standings        Standing[]
+  roundVisibilities RoundVisibility[]
 
   @@unique([name, leagueId])
   @@map("categories")
@@ -210,4 +211,17 @@ model Standing {
   position   Int      @default(0)
 
   @@map("standings")
+}
+
+model RoundVisibility {
+  id         String   @id @default(uuid()) @db.Uuid
+  categoryId String   @map("category_id") @db.Uuid
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  round      Int
+  hidden     Boolean  @default(false)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([categoryId, round])
+  @@map("round_visibilities")
 }

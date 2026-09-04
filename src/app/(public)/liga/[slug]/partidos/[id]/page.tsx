@@ -76,6 +76,12 @@ export default async function LeagueMatchDetailPage({ params }: Props) {
 
   if (!match) notFound()
 
+  const visibility = await db.roundVisibility.findUnique({
+    where: { categoryId_round: { categoryId: match.categoryId, round: match.round } },
+    select: { hidden: true },
+  })
+  if (visibility?.hidden) notFound()
+
   return (
     <div className="space-y-6">
       <Link

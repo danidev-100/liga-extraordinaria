@@ -34,11 +34,12 @@ async function CalendarContent({
   const monthStart = new Date(year, month, 1)
   const monthEnd = new Date(year, month + 1, 0, 23, 59, 59, 999)
 
+  const leagueCategoryIds = categories.map((c) => c.id)
+
   const where: Record<string, unknown> = {}
   if (categoryId) {
     where.categoryId = categoryId
   } else {
-    const leagueCategoryIds = categories.map((c) => c.id)
     if (leagueCategoryIds.length > 0) {
       where.categoryId = { in: leagueCategoryIds }
     }
@@ -55,7 +56,17 @@ async function CalendarContent({
     orderBy: [{ date: "asc" }, { time: "asc" }],
   })
 
-  const weeks = buildCalendarWeeks(year, month, matches)
+  const hiddenRounds = await db.roundVisibility.findMany({
+    where: { categoryId: { in: leagueCategoryIds }, hidden: true },
+    select: { categoryId: true, round: true },
+  })
+  const hiddenRoundKeys = new Set(hiddenRounds.map((h) => `${h.categoryId}:${h.round}`))
+
+  const visibleMatches = matches.filter(
+    (match) => !hiddenRoundKeys.has(`${match.categoryId}:${match.round}`),
+  )
+
+  const weeks = buildCalendarWeeks(year, month, visibleMatches)
   const monthName = now.toLocaleDateString("es-AR", { month: "long", year: "numeric" })
 
   return (
@@ -83,7 +94,7 @@ async function CalendarContent({
         </div>
       </div>
 
-      {matches.length === 0 ? (
+      {visibleMatches.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
           <Calendar className="mb-4 h-12 w-12 text-muted-foreground/40" />
           <p className="text-lg font-medium text-muted-foreground">No hay partidos en este período</p>

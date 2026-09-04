@@ -77,6 +77,16 @@ export default async function LeagueHomePage({ params }: Props) {
     }),
   ])
 
+  const hiddenRounds = await db.roundVisibility.findMany({
+    where: { category: { leagueId: league.id }, hidden: true },
+    select: { categoryId: true, round: true },
+  })
+  const hiddenRoundKeys = new Set(hiddenRounds.map((h) => `${h.categoryId}:${h.round}`))
+
+  const visibleUpcoming = upcomingMatches.filter(
+    (match) => !hiddenRoundKeys.has(`${match.categoryId}:${match.round}`),
+  )
+
   const navCards = [
     { label: "Partidos", href: `/liga/${slug}/partidos`, icon: Calendar, count: matchCount, color: "text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-950/40" },
     { label: "Equipos", href: `/liga/${slug}/equipos`, icon: Users, count: teamCount, color: "text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-950/40" },
@@ -235,11 +245,11 @@ export default async function LeagueHomePage({ params }: Props) {
             </Link>
           </CardHeader>
           <CardContent>
-            {upcomingMatches.length === 0 ? (
+            {visibleUpcoming.length === 0 ? (
               <p className="py-4 text-center text-sm text-muted-foreground">No hay partidos programados</p>
             ) : (
               <div className="space-y-2">
-                {upcomingMatches.map((m) => (
+                {visibleUpcoming.map((m) => (
                   <Link
                     key={m.id}
                     href={`/liga/${slug}/partidos/${m.id}`}
