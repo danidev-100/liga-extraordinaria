@@ -249,13 +249,13 @@ export default async function MatchesPage({
                           </div>
 
                           {/* Teams */}
-                          <p className="font-heading text-lg font-bold leading-tight flex items-center gap-2">
+                          <div className="font-heading text-lg font-bold leading-tight flex items-center gap-2">
                             <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
                             <span>{match.localTeam.shortName}</span>
                             <span className="text-muted-foreground">vs</span>
                             <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
                             <span>{match.visitorTeam.shortName}</span>
-                          </p>
+                          </div>
 
                           {/* Score for finished matches */}
                           {match.status === "FINISHED" &&
