@@ -38,7 +38,6 @@ export type PlayerRow = {
 interface PlayersTableProps {
   players: PlayerRow[]
   teams?: { id: string; shortName: string; name: string }[]
-  leagueSlug?: string
 }
 
 function formatDate(isoDate: string): string {
@@ -50,10 +49,7 @@ function formatDate(isoDate: string): string {
   })
 }
 
-function useColumns(leagueSlug?: string): ColumnDef<PlayerRow>[] {
-  const playerHref = (id: string) =>
-    leagueSlug ? `/liga/${leagueSlug}/jugadores/${id}` : `/players/${id}`
-
+function useColumns(): ColumnDef<PlayerRow>[] {
   return [
     {
       accessorFn: (row) => `${row.name} ${row.surname}`,
@@ -61,7 +57,7 @@ function useColumns(leagueSlug?: string): ColumnDef<PlayerRow>[] {
       id: "name",
       cell: ({ row }) => (
         <Link
-          href={playerHref(row.original.id)}
+          href={`/admin/players/${row.original.id}`}
           className="font-medium hover:underline transition-colors"
         >
           {row.original.name} {row.original.surname}
@@ -155,8 +151,8 @@ function useColumns(leagueSlug?: string): ColumnDef<PlayerRow>[] {
   ]
 }
 
-export function PlayersTable({ players, teams, leagueSlug }: PlayersTableProps) {
-  const columns = useColumns(leagueSlug)
+export function PlayersTable({ players, teams }: PlayersTableProps) {
+  const columns = useColumns()
   const [teamFilter, setTeamFilter] = useState("")
 
   const filteredPlayers = teamFilter && teamFilter !== "all"

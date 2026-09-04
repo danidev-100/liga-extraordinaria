@@ -118,7 +118,7 @@ export default async function ScopedTeamsPage({ params, searchParams }: Props) {
                     <div className="space-y-1 min-w-0">
                       <div className="flex items-center gap-2 min-w-0">
                         <Link
-                          href={`/teams/${team.id}`}
+                          href={`/admin/teams/${team.id}`}
                           className="font-medium truncate hover:underline transition-colors"
                         >
                           {team.name}
