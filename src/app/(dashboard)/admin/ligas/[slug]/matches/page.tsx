@@ -9,6 +9,7 @@ import { DeleteButton } from "@/components/forms/delete-button"
 import { deleteMatch, postponeMatch, rescheduleMatch } from "@/actions/matches"
 import { Badge } from "@/components/ui/badge"
 import { TeamLogo } from "@/components/ui/team-logo"
+import { RoundVisibilityToggle } from "@/components/ui/round-visibility-toggle"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -77,6 +78,11 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
     },
     orderBy: [{ round: "asc" }, { date: "asc" }, { time: "asc" }],
   })
+
+  const hiddenRounds = await db.roundVisibility.findMany({
+    where: { categoryId: { in: leagueCategoryIds }, hidden: true },
+  })
+  const hiddenRoundMap = new Map(hiddenRounds.map((h) => [`${h.categoryId}:${h.round}`, true]))
 
   const teams = await db.team.findMany({
     where: categoryId
@@ -204,14 +210,34 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
           {rounds.map((round) => {
             const roundMatches = groupedByRound[round]
             const freeTeams = freeTeamsByRound.get(round) ?? []
+            const catsInRound = Array.from(
+              new Map(roundMatches.map((m) => [m.categoryId, m.category.name])).entries(),
+            )
 
             return (
               <section key={round} className="space-y-3">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-sm font-bold text-foreground">
                     {round}
                   </div>
                   <h2 className="text-sm font-semibold text-muted-foreground">Jornada {round}</h2>
+                  {catsInRound.length === 1 ? (
+                    <RoundVisibilityToggle
+                      categoryId={catsInRound[0][0]}
+                      round={round}
+                      hidden={hiddenRoundMap.get(`${catsInRound[0][0]}:${round}`) ?? false}
+                    />
+                  ) : (
+                    catsInRound.map(([categoryId, name]) => (
+                      <RoundVisibilityToggle
+                        key={categoryId}
+                        categoryId={categoryId}
+                        round={round}
+                        hidden={hiddenRoundMap.get(`${categoryId}:${round}`) ?? false}
+                        label={name}
+                      />
+                    ))
+                  )}
                 </div>
 
                 {roundMatches.map((match) => {
