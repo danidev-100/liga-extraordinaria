@@ -21,12 +21,14 @@ const STATUS_COLORS: Record<string, string> = {
   SCHEDULED: "#3b82f6",
   PLAYING: "#22c55e",
   FINISHED: "#6b7280",
+  POSTPONED: "#f59e0b",
 }
 
 const STATUS_LABELS: Record<string, string> = {
   SCHEDULED: "Programado",
   PLAYING: "Jugando",
   FINISHED: "Finalizado",
+  POSTPONED: "Postergado",
 }
 
 function StatusTooltip({ active, payload }: any) {

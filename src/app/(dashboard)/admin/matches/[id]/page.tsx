@@ -3,15 +3,18 @@ import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { MatchForm } from "@/components/forms/match-form"
 import { MatchResultForm } from "@/components/forms/match-result-form"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, Clock, Play } from "lucide-react"
+import { CheckCircle2, Clock, Play, CalendarClock, CalendarPlus } from "lucide-react"
 import { TeamLogo } from "@/components/ui/team-logo"
+import { Button } from "@/components/ui/button"
+import { rescheduleMatch } from "@/actions/matches"
 
 const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const, icon: Clock },
   PLAYING: { label: "Jugando", variant: "default" as const, icon: Play },
   FINISHED: { label: "Finalizado", variant: "outline" as const, icon: CheckCircle2 },
+  POSTPONED: { label: "Postergado", variant: "outline" as const, icon: CalendarClock },
 }
 
 export default async function MatchDetailPage({
@@ -28,7 +31,7 @@ export default async function MatchDetailPage({
     where: { id },
     include: {
       category: { select: { id: true, name: true } },
-      court: { select: { id: true, name: true } },
+      court: { select: { id: true, name: true, venue: { select: { name: true } } } },
       localTeam: {
         select: {
           id: true,
@@ -96,6 +99,34 @@ export default async function MatchDetailPage({
         </p>
       </div>
 
+      {/* Postponed banner */}
+      {match.status === "POSTPONED" && (
+        <Card className="border-amber-500/40 bg-amber-500/10">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+              <CalendarClock className="h-5 w-5" />
+              Partido postergado
+            </CardTitle>
+            <CardDescription className="text-amber-700/70 dark:text-amber-400/70">
+              Este partido está postergado. Reprogramalo o volvelo a la programación cuando quieras.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form
+              action={async () => {
+                "use server"
+                await rescheduleMatch(match.id)
+              }}
+            >
+              <Button variant="outline" type="submit">
+                <CalendarPlus className="mr-1.5 h-4 w-4" />
+                Reprogramar
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Match info card */}
       <Card>
         <CardHeader>
@@ -116,7 +147,7 @@ export default async function MatchDetailPage({
             </div>
             <div>
               <span className="text-sm text-muted-foreground">Cancha:</span>{" "}
-              <span>{match.court.name}</span>
+              <span>{match.court.venue.name} · {match.court.name}</span>
             </div>
             <div>
               <span className="text-sm text-muted-foreground">Categoría:</span>{" "}
@@ -216,7 +247,7 @@ export default async function MatchDetailPage({
       )}
 
       {/* Edit / Result form */}
-      {isScheduled && (
+      {(isScheduled || match.status === "POSTPONED") && (
         <Card>
           <CardHeader>
             <CardTitle>Editar Partido</CardTitle>

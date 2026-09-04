@@ -14,7 +14,7 @@ interface Match {
   round: number
   date: Date
   time: string
-  court: { id: string; name: string }
+  court: { id: string; name: string; venue: { name: string } }
   localTeam: { id: string; name: string; shortName: string }
   visitorTeam: { id: string; name: string; shortName: string }
 }
@@ -189,7 +189,7 @@ export function MatchScheduleEditor({ rounds }: Props) {
                             <span>{match.visitorTeam.shortName}</span>
                           </p>
                           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <span>{match.court.name}</span>
+                            <span>{match.court.venue.name} · {match.court.name}</span>
                             {dirty && (
                               <>
                                 <span>·</span>

@@ -126,12 +126,21 @@ async function seed() {
   await prisma.player.deleteMany()
   await prisma.team.deleteMany()
   await prisma.court.deleteMany()
+  await prisma.venue.deleteMany()
   await prisma.category.deleteMany()
   await prisma.league.deleteMany()
   await prisma.admin.updateMany({ data: { leagueId: null } })
 
-  // Courts
-  await prisma.court.createMany({ data: CANCHAS.slice(0, 5) })
+  // Venues + Courts (5 venues, 1-2 canchas each)
+  await prisma.venue.createMany({
+    data: CANCHAS.slice(0, 5).map((c) => ({ name: c.name, address: c.address, city: c.city, googleMapsLink: null })),
+  })
+  const venues = await prisma.venue.findMany()
+  await prisma.court.createMany({
+    data: venues.flatMap((v, i) =>
+      (i % 2 === 0 ? [1, 2] : [1]).map((n) => ({ name: `Cancha ${n}`, venueId: v.id, capacity: 100 })),
+    ),
+  })
   const courts = await prisma.court.findMany()
 
   // Super admin check

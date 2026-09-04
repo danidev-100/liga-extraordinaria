@@ -22,6 +22,7 @@ const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const },
   PLAYING: { label: "Jugando", variant: "default" as const },
   FINISHED: { label: "Finalizado", variant: "outline" as const },
+  POSTPONED: { label: "Postergado", variant: "outline" as const },
 }
 
 async function MatchesContent({
@@ -40,21 +41,20 @@ async function MatchesContent({
     orderBy: { name: "asc" },
   })
 
+  const leagueCategoryIds = categories.map((c) => c.id)
+
   const where: Record<string, unknown> = {}
   if (categoryId) {
     where.categoryId = categoryId
-  } else {
-    const leagueCategoryIds = categories.map((c) => c.id)
-    if (leagueCategoryIds.length > 0) {
-      where.categoryId = { in: leagueCategoryIds }
-    }
+  } else if (leagueCategoryIds.length > 0) {
+    where.categoryId = { in: leagueCategoryIds }
   }
 
   const matches = await db.match.findMany({
     where,
     include: {
       category: { select: { name: true } },
-      court: { select: { name: true, address: true, city: true, googleMapsLink: true } },
+      court: { select: { name: true, venue: { select: { name: true, address: true, city: true, googleMapsLink: true } } } },
       localTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       visitorTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       goals: {
@@ -75,6 +75,29 @@ async function MatchesContent({
     orderBy: [{ round: "asc" }, { date: "asc" }, { time: "asc" }],
   })
 
+  const teams = await db.team.findMany({
+    where: categoryId
+      ? { categoryId }
+      : { categoryId: { in: leagueCategoryIds } },
+    select: { id: true, name: true, shortName: true, color: true, logoUrl: true, categoryId: true },
+    orderBy: { name: "asc" },
+  })
+
+  const categoryNameById = new Map(categories.map((c) => [c.id, c.name]))
+
+  const playedByCategoryRound = new Map<string, Map<number, Set<string>>>()
+  for (const match of matches) {
+    if (!playedByCategoryRound.has(match.categoryId)) {
+      playedByCategoryRound.set(match.categoryId, new Map())
+    }
+    const roundMap = playedByCategoryRound.get(match.categoryId)!
+    if (!roundMap.has(match.round)) {
+      roundMap.set(match.round, new Set())
+    }
+    roundMap.get(match.round)!.add(match.localTeamId)
+    roundMap.get(match.round)!.add(match.visitorTeamId)
+  }
+
   const groupedByRound = matches.reduce(
     (acc, match) => {
       const round = match.round
@@ -88,6 +111,22 @@ async function MatchesContent({
   const rounds = Object.keys(groupedByRound)
     .map(Number)
     .sort((a, b) => a - b)
+
+  const freeTeamsByRound = new Map<number, typeof teams>()
+  for (const round of rounds) {
+    const roundMatches = groupedByRound[round]
+    const categoriesWithMatches = new Set(roundMatches.map((m) => m.categoryId))
+    const freeTeams = teams
+      .filter(
+        (team) =>
+          categoriesWithMatches.has(team.categoryId) &&
+          !playedByCategoryRound.get(team.categoryId)?.get(round)?.has(team.id),
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))
+    if (freeTeams.length > 0) {
+      freeTeamsByRound.set(round, freeTeams)
+    }
+  }
 
   const selectedCategory = categoryId
     ? categories.find((c) => c.id === categoryId)
@@ -155,6 +194,7 @@ async function MatchesContent({
         <div className="space-y-10">
           {rounds.map((round) => {
             const roundMatches = groupedByRound[round]
+            const freeTeams = freeTeamsByRound.get(round) ?? []
             return (
               <section key={round}>
                 <div className="mb-5 flex items-center gap-3">
@@ -165,6 +205,8 @@ async function MatchesContent({
                     <h2 className="font-heading text-xl font-semibold leading-none">Jornada {round}</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {roundMatches.length} partido{roundMatches.length !== 1 ? "s" : ""}
+                      {freeTeams.length > 0 &&
+                        ` · ${freeTeams.length} equipo${freeTeams.length !== 1 ? "s" : ""} libre${freeTeams.length !== 1 ? "s" : ""}`}
                     </p>
                   </div>
                 </div>
@@ -191,7 +233,14 @@ async function MatchesContent({
                         {isPlaying && <span className="absolute inset-x-0 top-0 h-1 bg-accent" />}
 
                         <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-2">
-                          <Badge variant={status.variant} className="gap-1">
+                          <Badge
+                            variant={status.variant}
+                            className={
+                              match.status === "POSTPONED"
+                                ? "gap-1 border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                                : "gap-1"
+                            }
+                          >
                             {isPlaying && <Sparkles className="h-3 w-3 animate-pulse" />}
                             {status.label}
                           </Badge>
@@ -243,13 +292,13 @@ async function MatchesContent({
 
                           <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
                             {(() => {
-                              const mapsHref = match.court.googleMapsLink || (match.court.address
-                                ? `https://www.google.com/maps/search/${encodeURIComponent([match.court.address, match.court.city, "Argentina"].filter(Boolean).join(", "))}`
+                              const mapsHref = match.court.venue.googleMapsLink || (match.court.venue.address
+                                ? `https://www.google.com/maps/search/${encodeURIComponent([match.court.venue.address, match.court.venue.city, "Argentina"].filter(Boolean).join(", "))}`
                                 : null)
                               return mapsHref ? (
-                                <CourtMapLink href={mapsHref} name={match.court.name} />
+                                <CourtMapLink href={mapsHref} name={`${match.court.venue.name} · ${match.court.name}`} />
                               ) : (
-                                <span>{match.court.name}</span>
+                                <span>{match.court.venue.name} · {match.court.name}</span>
                               )
                             })()}
                             <span>&middot;</span>
@@ -301,6 +350,25 @@ async function MatchesContent({
                       </Link>
                     )
                   })}
+
+                  {freeTeams.map((team) => (
+                    <div
+                      key={team.id}
+                      className="flex flex-col items-center justify-center gap-1.5 rounded-xl border border-dashed border-muted-foreground/30 bg-muted/30 p-4 text-center"
+                    >
+                      <Badge
+                        variant="outline"
+                        className="border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                      >
+                        Libre
+                      </Badge>
+                      <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="md" />
+                      <span className="text-sm font-semibold leading-tight">{team.shortName}</span>
+                      <span className="text-xs text-muted-foreground">
+                        Sin partido esta jornada · {categoryNameById.get(team.categoryId)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </section>
             )

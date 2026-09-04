@@ -85,7 +85,7 @@ export async function getMatchById(id: string) {
 export async function getMatchFormData(leagueId?: string) {
   await ensureAuth()
 
-  const [categories, courts] = await Promise.all([
+  const [categories, venues] = await Promise.all([
     db.category.findMany({
       where: leagueId ? { leagueId } : undefined,
       include: {
@@ -97,10 +97,10 @@ export async function getMatchFormData(leagueId?: string) {
       },
       orderBy: { name: "asc" },
     }),
-    db.court.findMany({ orderBy: { name: "asc" } }),
+    db.venue.findMany({ include: { courts: { orderBy: { name: "asc" } } }, orderBy: { name: "asc" } }),
   ])
 
-  return { categories, courts }
+  return { categories, venues }
 }
 
 export async function createMatch(data: MatchFormData, slug?: string) {
@@ -268,13 +268,59 @@ export async function deleteMatch(id: string, slug?: string) {
   })
 
   if (!match) throw new Error("Partido no encontrado")
-  if (match.status !== "SCHEDULED") {
-    throw new Error("Solo se pueden eliminar partidos programados")
+  if (match.status !== "SCHEDULED" && match.status !== "POSTPONED") {
+    throw new Error("Solo se pueden eliminar partidos programados o postergados")
   }
 
   await db.match.delete({ where: { id } })
 
   revalidatePath("/admin/matches")
+}
+
+export async function postponeMatch(matchId: string, slug?: string) {
+  await ensureAuth()
+  if (slug) await ensureScope(slug)
+
+  const match = await db.match.findUnique({
+    where: { id: matchId },
+    select: { status: true },
+  })
+
+  if (!match) throw new Error("Partido no encontrado")
+  if (match.status !== "SCHEDULED") {
+    throw new Error("Solo se pueden postergar partidos programados")
+  }
+
+  await db.match.update({
+    where: { id: matchId },
+    data: { status: "POSTPONED" },
+  })
+
+  revalidatePath("/admin/matches")
+  if (slug) revalidatePath(`/admin/ligas/${slug}/matches`)
+}
+
+export async function rescheduleMatch(matchId: string, slug?: string) {
+  await ensureAuth()
+  if (slug) await ensureScope(slug)
+
+  const match = await db.match.findUnique({
+    where: { id: matchId },
+    select: { status: true },
+  })
+
+  if (!match) throw new Error("Partido no encontrado")
+  if (match.status !== "POSTPONED") {
+    throw new Error("El partido no está postergado")
+  }
+
+  await db.match.update({
+    where: { id: matchId },
+    data: { status: "SCHEDULED" },
+  })
+
+  revalidatePath("/admin/matches")
+  if (slug) revalidatePath(`/admin/ligas/${slug}/matches`)
 }
 
 /**
@@ -392,7 +438,7 @@ export async function generateRoundRobin(data: {
     const pairs = allRounds[r]
 
     for (let m = 0; m < pairs.length; m++) {
-      const court = courts[m % courts.length]
+      const court = courts[(r * matchesPerRound + m) % courts.length]
 
       // Calculate staggered time
       const [baseH, baseM] = baseTime.split(":").map(Number)

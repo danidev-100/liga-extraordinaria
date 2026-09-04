@@ -16,7 +16,7 @@ export async function getFixtureData(categoryId: string) {
   const matches = await db.match.findMany({
     where: { categoryId },
     include: {
-      court: { select: { name: true } },
+      court: { select: { name: true, venue: { select: { name: true } } } },
       localTeam: { select: { name: true, shortName: true } },
       visitorTeam: { select: { name: true, shortName: true } },
     },
@@ -48,10 +48,11 @@ export async function getFixtureData(categoryId: string) {
         visitor: m.visitorTeam.shortName,
         date: m.date.toLocaleDateString("es-AR"),
         time: m.time,
-        court: m.court.name,
+        court: `${m.court.venue.name} · ${m.court.name}`,
         status: m.status === "FINISHED" && m.localScore != null
           ? `${m.localScore} – ${m.visitorScore}`
-          : m.status === "PLAYING" ? "Jugando" : "",
+          : m.status === "PLAYING" ? "Jugando"
+          : m.status === "POSTPONED" ? "Postergado" : "",
       })),
     })),
     totalMatches: matches.length,

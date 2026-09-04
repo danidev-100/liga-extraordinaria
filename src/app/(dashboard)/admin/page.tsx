@@ -39,6 +39,7 @@ const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const, icon: Clock },
   PLAYING: { label: "Jugando", variant: "default" as const, icon: Play },
   FINISHED: { label: "Finalizado", variant: "outline" as const, icon: CheckCircle2 },
+  POSTPONED: { label: "Postergado", variant: "outline" as const, icon: CalendarClock },
 }
 
 export default async function AdminDashboard() {

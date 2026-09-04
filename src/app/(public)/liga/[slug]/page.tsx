@@ -19,6 +19,7 @@ const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const },
   PLAYING: { label: "En Vivo", variant: "default" as const },
   FINISHED: { label: "Finalizado", variant: "outline" as const },
+  POSTPONED: { label: "Postergado", variant: "outline" as const },
 }
 
 export default async function LeagueHomePage({ params }: Props) {
@@ -51,7 +52,7 @@ export default async function LeagueHomePage({ params }: Props) {
       orderBy: [{ date: "asc" }, { time: "asc" }],
       include: {
         category: { select: { name: true } },
-        court: { select: { name: true } },
+        court: { select: { name: true, venue: { select: { name: true } } } },
         localTeam: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true } },
         visitorTeam: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true } },
       },

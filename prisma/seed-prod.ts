@@ -398,16 +398,23 @@ async function main() {
   await prisma.player.deleteMany()
   await prisma.team.deleteMany()
   await prisma.court.deleteMany()
+  await prisma.venue.deleteMany()
   await prisma.category.deleteMany()
   await prisma.league.deleteMany()
   // Reset leagueId on admins so they can be reassigned
   await prisma.admin.updateMany({ where: { role: "ADMIN" }, data: { leagueId: null } })
   console.log("  Done (admins preserved)\n")
 
-  // Create courts (shared across all leagues)
-  await prisma.court.createMany({ data: CANCHAS })
+  // Create venues (shared across all leagues) + courts
+  await prisma.venue.createMany({
+    data: CANCHAS.map((c) => ({ name: c.name, address: c.address, city: c.city, googleMapsLink: null })),
+  })
+  const venues = await prisma.venue.findMany()
+  await prisma.court.createMany({
+    data: venues.flatMap((v) => [1, 2].map((n) => ({ name: `Cancha ${n}`, venueId: v.id, capacity: 100 }))),
+  })
   const courts = await prisma.court.findMany()
-  console.log(`✅ ${courts.length} canchas creadas\n`)
+  console.log(`✅ ${venues.length} lugares, ${courts.length} canchas creadas\n`)
 
   // Create admins
   const { superAdmin, admins } = await createAdmins()

@@ -128,6 +128,7 @@ async function main() {
   await prisma.player.deleteMany()
   await prisma.team.deleteMany()
   await prisma.court.deleteMany()
+  await prisma.venue.deleteMany()
   await prisma.category.deleteMany()
   await prisma.league.deleteMany()
   await prisma.admin.deleteMany()
@@ -161,9 +162,15 @@ async function main() {
   )
   console.log(`✓ Categorías: ${categoryRows.map((c) => c.name).join(', ')}\n`)
 
-  // 4. Courts
-  await prisma.court.createMany({ data: CANCHAS })
-  console.log(`✓ Canchas: ${CANCHAS.length} creadas\n`)
+  // 4. Venues + Courts
+  await prisma.venue.createMany({
+    data: CANCHAS.map((c) => ({ name: c.name, address: c.address, city: c.city, googleMapsLink: null })),
+  })
+  const venues = await prisma.venue.findMany()
+  await prisma.court.createMany({
+    data: venues.flatMap((v) => [1, 2].map((n) => ({ name: `Cancha ${n}`, venueId: v.id, capacity: 100 }))),
+  })
+  console.log(`✓ Lugares: ${venues.length} con ${venues.length * 2} canchas creadas\n`)
 
   // 5. Teams + Players
   const groups = buildAllTeams()

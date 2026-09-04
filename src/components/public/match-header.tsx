@@ -16,9 +16,9 @@ interface MatchHeaderProps {
   visitorTeam: TeamBrief
   localScore: number | null
   visitorScore: number | null
-  status: "SCHEDULED" | "PLAYING" | "FINISHED"
+  status: "SCHEDULED" | "PLAYING" | "FINISHED" | "POSTPONED"
   category: { name: string }
-  court: { name: string }
+  court: { name: string; venue: { name: string } }
   date: Date
   time: string
   leagueSlug: string
@@ -28,6 +28,7 @@ const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const },
   PLAYING: { label: "Jugando", variant: "default" as const },
   FINISHED: { label: "Finalizado", variant: "outline" as const },
+  POSTPONED: { label: "Postergado", variant: "outline" as const },
 }
 
 export function MatchHeader({
@@ -53,7 +54,14 @@ export function MatchHeader({
       {/* Status bar */}
       <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-2.5">
         <div className="flex items-center gap-2">
-          <Badge variant={statusInfo.variant} className="gap-1">
+          <Badge
+            variant={statusInfo.variant}
+            className={
+              status === "POSTPONED"
+                ? "gap-1 border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                : "gap-1"
+            }
+          >
             {isPlaying && <Sparkles className="h-3 w-3 animate-pulse" />}
             {statusInfo.label}
           </Badge>
@@ -86,7 +94,7 @@ export function MatchHeader({
           </span>
           <span className="inline-flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-            {court.name}
+            {court.venue.name} · {court.name}
           </span>
         </div>
       </div>

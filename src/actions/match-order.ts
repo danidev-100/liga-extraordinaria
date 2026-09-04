@@ -89,7 +89,7 @@ export async function getMatchesByRound(categoryId: string) {
   const matches = await db.match.findMany({
     where: { categoryId },
     include: {
-      court: { select: { id: true, name: true } },
+      court: { select: { id: true, name: true, venue: { select: { name: true } } } },
       localTeam: { select: { id: true, name: true, shortName: true } },
       visitorTeam: { select: { id: true, name: true, shortName: true } },
     },

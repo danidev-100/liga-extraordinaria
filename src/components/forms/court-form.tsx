@@ -2,7 +2,6 @@
 
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { useState } from "react"
 import {
@@ -20,18 +19,16 @@ import { courtSchema, type CourtFormData } from "@/lib/validations/court"
 import { createCourt, updateCourt } from "@/actions/court"
 
 interface CourtFormProps {
+  venueId: string
   initialData?: {
     id: string
     name: string
-    address: string | null
-    city: string
     capacity: number | null
-    googleMapsLink: string | null
   }
+  onDone?: () => void
 }
 
-export function CourtForm({ initialData }: CourtFormProps) {
-  const router = useRouter()
+export function CourtForm({ venueId, initialData, onDone }: CourtFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const form = useForm<CourtFormData>({
@@ -39,17 +36,13 @@ export function CourtForm({ initialData }: CourtFormProps) {
     defaultValues: initialData
       ? {
           name: initialData.name,
-          address: initialData.address ?? "",
-          city: initialData.city,
+          venueId,
           capacity: initialData.capacity,
-          googleMapsLink: initialData.googleMapsLink ?? "",
         }
       : {
-          name: "",
-          address: "",
-          city: "",
+          name: "Cancha 1",
+          venueId,
           capacity: null,
-          googleMapsLink: "",
         },
   })
 
@@ -60,11 +53,10 @@ export function CourtForm({ initialData }: CourtFormProps) {
         await updateCourt(initialData.id, data)
         toast.success("Cancha actualizada exitosamente")
       } else {
-        await createCourt(data)
+        await createCourt({ ...data, venueId })
         toast.success("Cancha creada exitosamente")
       }
-      router.push("/admin/courts")
-      router.refresh()
+      onDone?.()
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al guardar la cancha")
     } finally {
@@ -82,61 +74,7 @@ export function CourtForm({ initialData }: CourtFormProps) {
             <FormItem>
               <FormLabel>Nombre *</FormLabel>
               <FormControl>
-                <Input placeholder="Cancha Central" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid gap-4 sm:grid-cols-2">
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Ciudad *</FormLabel>
-                <FormControl>
-                  <Input placeholder="Buenos Aires" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="capacity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Capacidad</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    min={0}
-                    placeholder="500"
-                    value={field.value ?? ""}
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value === "" ? null : Number(e.target.value)
-                      )
-                    }
-                    onBlur={field.onBlur}
-                    ref={field.ref}
-                    name={field.name}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <FormField
-          control={form.control}
-          name="address"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Dirección</FormLabel>
-              <FormControl>
-                <Input placeholder="Av. Libertador 1234" {...field} />
+                <Input placeholder="Cancha 1" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -144,14 +82,24 @@ export function CourtForm({ initialData }: CourtFormProps) {
         />
         <FormField
           control={form.control}
-          name="googleMapsLink"
+          name="capacity"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Google Maps</FormLabel>
+              <FormLabel>Capacidad</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="https://maps.app.goo.gl/..."
-                  {...field}
+                  type="number"
+                  min={0}
+                  placeholder="100"
+                  value={field.value ?? ""}
+                  onChange={(e) =>
+                    field.onChange(
+                      e.target.value === "" ? null : Number(e.target.value)
+                    )
+                  }
+                  onBlur={field.onBlur}
+                  ref={field.ref}
+                  name={field.name}
                 />
               </FormControl>
               <FormMessage />
@@ -160,7 +108,7 @@ export function CourtForm({ initialData }: CourtFormProps) {
         />
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          {initialData ? "Actualizar Cancha" : "Crear Cancha"}
+          {initialData ? "Actualizar Cancha" : "Agregar Cancha"}
         </Button>
       </form>
     </Form>

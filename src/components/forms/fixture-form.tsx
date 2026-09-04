@@ -136,9 +136,13 @@ export function FixtureForm({ categories }: FixtureFormProps) {
             <ul className="mt-2 space-y-1 text-green-700 dark:text-green-400">
               <li>{teamCount} equipos — todos contra todos</li>
               <li>{rounds} fechas de {matchesPerRound} partidos cada una</li>
+              {teamCount % 2 !== 0 && (
+                <li>1 equipo queda <strong>libre</strong> por fecha (fixture impar)</li>
+              )}
               <li><strong>{totalMatches} partidos</strong> en total</li>
               <li>Las fechas se espacian 7 días</li>
               <li>Los partidos de una misma fecha se escalonan cada 2 horas</li>
+              <li>Las canchas se reparten entre las disponibles automáticamente</li>
             </ul>
           </div>
         )}

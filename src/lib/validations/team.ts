@@ -8,7 +8,7 @@ export const teamSchema = z.object({
   shortName: z
     .string()
     .min(1, "El nombre corto es requerido")
-    .max(10, "El nombre corto no puede exceder 10 caracteres"),
+    .max(100, "El nombre corto no puede exceder 100 caracteres"),
   color: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/, "El color debe ser un hex válido (ej: #FF0000)")

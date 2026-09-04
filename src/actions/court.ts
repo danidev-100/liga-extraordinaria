@@ -1,12 +1,12 @@
 "use server"
 
 /**
- * Courts are intentionally GLOBAL — shared across all leagues.
- * They represent physical venues that multiple leagues can use.
- * No league scoping is needed for this module.
+ * Courts belong to a Venue (Lugar) and are GLOBAL — shared across all leagues.
+ * Each court represents one specific cancha (e.g. "Cancha 1") inside a venue.
  */
 
 import { revalidatePath } from "next/cache"
+import { Prisma } from "@prisma/client"
 import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { courtSchema, type CourtFormData } from "@/lib/validations/court"
@@ -23,6 +23,7 @@ export async function getCourts() {
   await ensureAuth()
 
   return db.court.findMany({
+    include: { venue: { select: { name: true } } },
     orderBy: { name: "asc" },
   })
 }
@@ -32,6 +33,7 @@ export async function getCourtById(id: string) {
 
   return db.court.findUnique({
     where: { id },
+    include: { venue: { select: { name: true } } },
   })
 }
 
@@ -43,10 +45,8 @@ export async function createCourt(data: CourtFormData) {
   const court = await db.court.create({
     data: {
       name: parsed.name,
-      address: parsed.address || null,
-      city: parsed.city,
+      venueId: parsed.venueId,
       capacity: parsed.capacity ?? null,
-      googleMapsLink: parsed.googleMapsLink || null,
     },
   })
 
@@ -61,10 +61,8 @@ export async function updateCourt(id: string, data: Partial<CourtFormData>) {
 
   const updateData: Record<string, unknown> = {}
   if (parsed.name !== undefined) updateData.name = parsed.name
-  if (parsed.address !== undefined) updateData.address = parsed.address || null
-  if (parsed.city !== undefined) updateData.city = parsed.city
+  if (parsed.venueId !== undefined) updateData.venueId = parsed.venueId
   if (parsed.capacity !== undefined) updateData.capacity = parsed.capacity ?? null
-  if (parsed.googleMapsLink !== undefined) updateData.googleMapsLink = parsed.googleMapsLink || null
 
   const court = await db.court.update({
     where: { id },
@@ -78,9 +76,16 @@ export async function updateCourt(id: string, data: Partial<CourtFormData>) {
 export async function deleteCourt(id: string) {
   await ensureAuth()
 
-  await db.court.delete({
-    where: { id },
-  })
+  try {
+    await db.court.delete({
+      where: { id },
+    })
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003") {
+      throw new Error("No se puede eliminar una cancha en uso por partidos")
+    }
+    throw error
+  }
 
   revalidatePath("/admin/courts")
 }

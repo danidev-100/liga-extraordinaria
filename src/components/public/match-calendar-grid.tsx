@@ -5,7 +5,7 @@ interface MatchCalendarMatch {
   id: string
   date: Date
   time: string
-  status: "SCHEDULED" | "PLAYING" | "FINISHED"
+  status: "SCHEDULED" | "PLAYING" | "FINISHED" | "POSTPONED"
   localScore: number | null
   visitorScore: number | null
   localTeam: { id: string; name: string; shortName: string; color: string | null }
@@ -36,6 +36,7 @@ const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const },
   PLAYING: { label: "Jugando", variant: "default" as const },
   FINISHED: { label: "Finalizado", variant: "outline" as const },
+  POSTPONED: { label: "Postergado", variant: "outline" as const },
 }
 
 const dayNames = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]

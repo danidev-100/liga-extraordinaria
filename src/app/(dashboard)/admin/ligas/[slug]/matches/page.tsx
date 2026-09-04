@@ -4,9 +4,9 @@ import { redirect } from "next/navigation"
 import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
-import { Plus, Edit, Clock, Play, CheckCircle2, Calendar, ArrowUpDown, FileDown } from "lucide-react"
+import { Plus, Edit, Clock, Play, CheckCircle2, Calendar, ArrowUpDown, CalendarClock, CalendarPlus } from "lucide-react"
 import { DeleteButton } from "@/components/forms/delete-button"
-import { deleteMatch } from "@/actions/matches"
+import { deleteMatch, postponeMatch, rescheduleMatch } from "@/actions/matches"
 import { Badge } from "@/components/ui/badge"
 import { TeamLogo } from "@/components/ui/team-logo"
 
@@ -34,6 +34,12 @@ const statusConfig = {
     icon: CheckCircle2,
     borderClass: "border-l-muted-foreground/30",
   },
+  POSTPONED: {
+    label: "Postergado",
+    variant: "outline" as const,
+    icon: CalendarClock,
+    borderClass: "border-l-amber-500/60",
+  },
 }
 
 export default async function ScopedMatchesPage({ params, searchParams }: Props) {
@@ -50,11 +56,12 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
     orderBy: { name: "asc" },
   })
 
+  const leagueCategoryIds = categories.map((c) => c.id)
+
   const matchWhere: Record<string, unknown> = {}
   if (categoryId) {
     matchWhere.categoryId = categoryId
   } else {
-    const leagueCategoryIds = categories.map((c) => c.id)
     if (leagueCategoryIds.length > 0) {
       matchWhere.categoryId = { in: leagueCategoryIds }
     }
@@ -64,12 +71,63 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
     where: Object.keys(matchWhere).length > 0 ? matchWhere : undefined,
     include: {
       category: { select: { name: true } },
-      court: { select: { name: true } },
+      court: { select: { name: true, venue: { select: { name: true } } } },
       localTeam: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true } },
       visitorTeam: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true } },
     },
     orderBy: [{ round: "asc" }, { date: "asc" }, { time: "asc" }],
   })
+
+  const teams = await db.team.findMany({
+    where: categoryId
+      ? { categoryId }
+      : { categoryId: { in: leagueCategoryIds } },
+    select: { id: true, name: true, shortName: true, color: true, logoUrl: true, categoryId: true },
+    orderBy: { name: "asc" },
+  })
+
+  const playedByCategoryRound = new Map<string, Map<number, Set<string>>>()
+  for (const match of matches) {
+    if (!playedByCategoryRound.has(match.categoryId)) {
+      playedByCategoryRound.set(match.categoryId, new Map())
+    }
+    const roundMap = playedByCategoryRound.get(match.categoryId)!
+    if (!roundMap.has(match.round)) {
+      roundMap.set(match.round, new Set())
+    }
+    roundMap.get(match.round)!.add(match.localTeamId)
+    roundMap.get(match.round)!.add(match.visitorTeamId)
+  }
+
+  const groupedByRound = matches.reduce(
+    (acc, match) => {
+      const round = match.round
+      if (!acc[round]) acc[round] = []
+      acc[round].push(match)
+      return acc
+    },
+    {} as Record<number, typeof matches>,
+  )
+
+  const rounds = Object.keys(groupedByRound)
+    .map(Number)
+    .sort((a, b) => a - b)
+
+  const freeTeamsByRound = new Map<number, typeof teams>()
+  for (const round of rounds) {
+    const roundMatches = groupedByRound[round]
+    const categoriesWithMatches = new Set(roundMatches.map((m) => m.categoryId))
+    const freeTeams = teams
+      .filter(
+        (team) =>
+          categoriesWithMatches.has(team.categoryId) &&
+          !playedByCategoryRound.get(team.categoryId)?.get(round)?.has(team.id),
+      )
+      .sort((a, b) => a.name.localeCompare(b.name))
+    if (freeTeams.length > 0) {
+      freeTeamsByRound.set(round, freeTeams)
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -142,84 +200,137 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
-          {matches.map((match) => {
-            const status = statusConfig[match.status]
-            const StatusIcon = status.icon
+        <div className="space-y-8">
+          {rounds.map((round) => {
+            const roundMatches = groupedByRound[round]
+            const freeTeams = freeTeamsByRound.get(round) ?? []
 
             return (
-              <div
-                key={match.id}
-                className={`rounded-lg border border-border bg-card ${status.borderClass} border-l-4 p-5 transition-shadow hover:shadow-sm`}
-              >
-                <div className="flex items-center justify-between gap-4">
-                  {/* Left: match info */}
-                  <div className="min-w-0 space-y-2">
-                    {/* Status + round */}
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant={status.variant}
-                        className="gap-1.5 px-2.5 py-0.5 text-xs font-semibold"
-                      >
-                        <StatusIcon className="h-3.5 w-3.5" />
-                        {status.label}
-                      </Badge>
-                      <span className="text-xs font-medium text-muted-foreground">
-                        R{match.round}
-                      </span>
-                    </div>
-
-                    {/* Teams */}
-                    <p className="font-heading text-lg font-bold leading-tight flex items-center gap-2">
-                      <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
-                      <span>{match.localTeam.shortName}</span>
-                      <span className="text-muted-foreground">vs</span>
-                      <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
-                      <span>{match.visitorTeam.shortName}</span>
-                    </p>
-
-                    {/* Score for finished matches */}
-                    {match.status === "FINISHED" &&
-                      match.localScore !== null &&
-                      match.visitorScore !== null && (
-                        <p className="font-heading text-xl font-bold text-primary">
-                          {match.localScore} — {match.visitorScore}
-                        </p>
-                      )}
-
-                    {/* Details */}
-                    <p className="text-sm text-muted-foreground">
-                      {new Date(match.date).toLocaleDateString("es-AR")} —{" "}
-                      {match.time}
-                      <span className="mx-1.5">·</span>
-                      {match.court.name}
-                      <span className="mx-1.5">·</span>
-                      {match.category.name}
-                    </p>
+              <section key={round} className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-sm font-bold text-foreground">
+                    {round}
                   </div>
-
-                  {/* Right: actions */}
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Link href={`/admin/matches/${match.id}`}>
-                      <Button
-                        variant={
-                          match.status === "SCHEDULED" ? "default" : "outline"
-                        }
-                        size="sm"
-                      >
-                        <Edit className="mr-1.5 h-4 w-4" />
-                        {match.status === "SCHEDULED" ? "Cargar" : "Ver"}
-                      </Button>
-                    </Link>
-                    {match.status === "SCHEDULED" && (
-                      <DeleteButton
-                        action={deleteMatch.bind(null, match.id, slug)}
-                        confirmMessage="¿Eliminar este partido?"
-                      />
-                    )}
-                  </div>
+                  <h2 className="text-sm font-semibold text-muted-foreground">Jornada {round}</h2>
                 </div>
-              </div>
+
+                {roundMatches.map((match) => {
+                  const status = statusConfig[match.status]
+                  const StatusIcon = status.icon
+
+                  return (
+                    <div
+                      key={match.id}
+                      className={`rounded-lg border border-border bg-card ${status.borderClass} border-l-4 p-5 transition-shadow hover:shadow-sm`}
+                    >
+                      <div className="flex items-center justify-between gap-4">
+                        {/* Left: match info */}
+                        <div className="min-w-0 space-y-2">
+                          {/* Status + round */}
+                          <div className="flex items-center gap-2">
+                            <Badge
+                              variant={status.variant}
+                              className={
+                                match.status === "POSTPONED"
+                                  ? "gap-1.5 px-2.5 py-0.5 text-xs font-semibold border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                                  : "gap-1.5 px-2.5 py-0.5 text-xs font-semibold"
+                              }
+                            >
+                              <StatusIcon className="h-3.5 w-3.5" />
+                              {status.label}
+                            </Badge>
+                            <span className="text-xs font-medium text-muted-foreground">
+                              R{match.round}
+                            </span>
+                          </div>
+
+                          {/* Teams */}
+                          <p className="font-heading text-lg font-bold leading-tight flex items-center gap-2">
+                            <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
+                            <span>{match.localTeam.shortName}</span>
+                            <span className="text-muted-foreground">vs</span>
+                            <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
+                            <span>{match.visitorTeam.shortName}</span>
+                          </p>
+
+                          {/* Score for finished matches */}
+                          {match.status === "FINISHED" &&
+                            match.localScore !== null &&
+                            match.visitorScore !== null && (
+                              <p className="font-heading text-xl font-bold text-primary">
+                                {match.localScore} — {match.visitorScore}
+                              </p>
+                            )}
+
+                          {/* Details */}
+                          <p className="text-sm text-muted-foreground">
+                            {new Date(match.date).toLocaleDateString("es-AR")} —{" "}
+                            {match.time}
+                            <span className="mx-1.5">·</span>
+                            {match.court.venue.name} · {match.court.name}
+                            <span className="mx-1.5">·</span>
+                            {match.category.name}
+                          </p>
+                        </div>
+
+                        {/* Right: actions */}
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Link href={`/admin/matches/${match.id}`}>
+                            <Button
+                              variant={
+                                match.status === "SCHEDULED" ? "default" : "outline"
+                              }
+                              size="sm"
+                            >
+                              <Edit className="mr-1.5 h-4 w-4" />
+                              {match.status === "SCHEDULED" ? "Cargar" : match.status === "POSTPONED" ? "Editar" : "Ver"}
+                            </Button>
+                          </Link>
+                          {match.status === "SCHEDULED" && (
+                            <form action={postponeMatch.bind(null, match.id, slug)}>
+                              <Button type="submit" variant="outline" size="sm">
+                                <CalendarClock className="mr-1.5 h-4 w-4" />
+                                Postergar
+                              </Button>
+                            </form>
+                          )}
+                          {match.status === "POSTPONED" && (
+                            <form action={rescheduleMatch.bind(null, match.id, slug)}>
+                              <Button type="submit" variant="outline" size="sm">
+                                <CalendarPlus className="mr-1.5 h-4 w-4" />
+                                Reprogramar
+                              </Button>
+                            </form>
+                          )}
+                          {(match.status === "SCHEDULED" || match.status === "POSTPONED") && (
+                            <DeleteButton
+                              action={deleteMatch.bind(null, match.id, slug)}
+                              confirmMessage="¿Eliminar este partido?"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+
+                {freeTeams.length > 0 && (
+                  <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 px-4 py-2 flex flex-wrap items-center gap-2 text-sm">
+                    <Badge
+                      variant="outline"
+                      className="border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                    >
+                      Libre
+                    </Badge>
+                    {freeTeams.map((team) => (
+                      <span key={team.id} className="inline-flex items-center gap-1.5">
+                        <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="sm" />
+                        {team.shortName}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </section>
             )
           })}
         </div>

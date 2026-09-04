@@ -50,7 +50,7 @@ export default async function LeagueMatchDetailPage({ params }: Props) {
     where: { id },
     include: {
       category: { select: { name: true } },
-      court: { select: { name: true } },
+      court: { select: { name: true, venue: { select: { name: true } } } },
       localTeam: {
         select: { id: true, name: true, shortName: true, color: true, logoUrl: true },
       },

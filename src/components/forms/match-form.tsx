@@ -33,9 +33,10 @@ interface CategoryOption {
   teams: { id: string; name: string; shortName: string }[]
 }
 
-interface CourtOption {
+interface VenueOption {
   id: string
   name: string
+  courts: { id: string; name: string }[]
 }
 
 interface MatchFormProps {
@@ -55,13 +56,14 @@ export function MatchForm({ initialData }: MatchFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [categories, setCategories] = useState<CategoryOption[]>([])
-  const [courts, setCourts] = useState<CourtOption[]>([])
+  const [venues, setVenues] = useState<VenueOption[]>([])
+  const [selectedVenueId, setSelectedVenueId] = useState<string>("")
 
   useEffect(() => {
     getMatchFormData()
       .then((data) => {
         setCategories(data.categories)
-        setCourts(data.courts)
+        setVenues(data.venues)
       })
       .catch(console.error)
   }, [])
@@ -92,6 +94,15 @@ export function MatchForm({ initialData }: MatchFormProps) {
   const selectedCategoryId = form.watch("categoryId")
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId)
   const teams = selectedCategory?.teams ?? []
+
+  // When editing, resolve the venue of the match's court once venues load
+  useEffect(() => {
+    if (!initialData?.courtId) return
+    const venue = venues.find((v) => v.courts.some((c) => c.id === initialData.courtId))
+    if (venue) {
+      setSelectedVenueId(venue.id)
+    }
+  }, [initialData, venues])
 
   async function onSubmit(data: MatchFormData) {
     setIsSubmitting(true)
@@ -186,35 +197,79 @@ export function MatchForm({ initialData }: MatchFormProps) {
         <FormField
           control={form.control}
           name="courtId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Cancha *</FormLabel>
-              <FormControl>
-                <Select
-                  value={field.value}
-                  onValueChange={field.onChange}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Seleccionar cancha...">
-                      {(value: string | null) => {
-                        if (!value) return "Seleccionar cancha..."
-                        const court = courts.find((c) => c.id === value)
-                        return court ? court.name : null
+          render={({ field }) => {
+            const selectedVenue = venues.find((v) => v.id === selectedVenueId)
+            const venueCourts = selectedVenue?.courts ?? []
+
+            return (
+              <FormItem className="space-y-4">
+                <div className="space-y-2">
+                  <FormLabel>Lugar *</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={selectedVenueId}
+                      onValueChange={(value) => {
+                        setSelectedVenueId(value ?? "")
+                        form.setValue("courtId", "")
                       }}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {courts.map((court) => (
-                      <SelectItem key={court.id} value={court.id}>
-                        {court.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Seleccionar lugar...">
+                          {(value: string | null) => {
+                            if (!value) return "Seleccionar lugar..."
+                            const venue = venues.find((v) => v.id === value)
+                            return venue ? venue.name : null
+                          }}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {venues.map((venue) => (
+                          <SelectItem key={venue.id} value={venue.id}>
+                            {venue.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </div>
+
+                <div className="space-y-2">
+                  <FormLabel>Cancha *</FormLabel>
+                  <FormControl>
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={!selectedVenueId}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue
+                          placeholder={
+                            selectedVenueId
+                              ? "Seleccionar cancha..."
+                              : "Primero seleccioná el lugar"
+                          }
+                        >
+                          {(value: string | null) => {
+                            if (!value) return selectedVenueId ? "Seleccionar cancha..." : "Primero seleccioná el lugar"
+                            const court = venueCourts.find((c) => c.id === value)
+                            return court ? court.name : null
+                          }}
+                        </SelectValue>
+                      </SelectTrigger>
+                      <SelectContent>
+                        {venueCourts.map((court) => (
+                          <SelectItem key={court.id} value={court.id}>
+                            {court.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
 
         <div className="grid gap-4 sm:grid-cols-2">

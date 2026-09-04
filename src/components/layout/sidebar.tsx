@@ -38,7 +38,7 @@ function getNavItems(leagueSlug?: string) {
     { href: `${base}/teams`, label: "Equipos", icon: Users },
     { href: `${base}/players`, label: "Jugadores", icon: UserCircle },
     { href: `${base}/matches`, label: "Partidos", icon: Calendar },
-    { href: `${base}/courts`, label: "Canchas", icon: MapPin },
+    { href: `${base}/courts`, label: "Lugares", icon: MapPin },
     { href: `${base}/leagues`, label: "Torneos", icon: Trophy },
     { href: `${base}/standings`, label: "Posiciones", icon: ListOrdered },
   ]
