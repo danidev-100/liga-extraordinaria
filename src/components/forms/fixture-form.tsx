@@ -16,6 +16,7 @@ import {
   FormDescription,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { TimeInput } from "@/components/ui/time-input"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -30,7 +31,9 @@ import { generateRoundRobin } from "@/actions/matches"
 const fixtureSchema = z.object({
   categoryId: z.string().uuid("Debe seleccionar una categoría"),
   startDate: z.string().min(1, "La fecha de inicio es requerida"),
-  baseTime: z.string().min(1, "El horario base es requerido"),
+  baseTime: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "El horario debe estar en formato 24h (ej: 14:00)"),
 })
 
 type FixtureData = z.infer<typeof fixtureSchema>
@@ -178,7 +181,7 @@ export function FixtureForm({ categories }: FixtureFormProps) {
                 <FormLabel>Horario base *</FormLabel>
                 <FormDescription>Primer partido de cada fecha</FormDescription>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <TimeInput {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

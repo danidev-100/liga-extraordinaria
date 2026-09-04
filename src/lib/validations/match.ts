@@ -4,7 +4,9 @@ const matchBaseSchema = z.object({
   categoryId: z.string().uuid("Debe seleccionar una categoría"),
   courtId: z.string().uuid("Debe seleccionar una cancha"),
   date: z.string().min(1, "La fecha es requerida"),
-  time: z.string().min(1, "La hora es requerida"),
+  time: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "La hora debe estar en formato 24h (ej: 14:00)"),
   localTeamId: z.string().uuid("Debe seleccionar el equipo local"),
   visitorTeamId: z.string().uuid("Debe seleccionar el equipo visitante"),
   round: z.coerce.number().int().min(1, "La ronda debe ser al menos 1"),

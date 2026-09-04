@@ -4,6 +4,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { TimeInput } from "@/components/ui/time-input"
 import { Badge } from "@/components/ui/badge"
 import { Calendar, Clock, Save, ArrowUpDown, RefreshCw, CheckCircle2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -223,12 +224,11 @@ export function MatchScheduleEditor({ rounds }: Props) {
 
                         <div className="flex items-center gap-1.5">
                           <Clock className="h-4 w-4 text-muted-foreground" />
-                          <Input
-                            type="time"
+                          <TimeInput
                             value={edit?.time ?? match.time}
-                            onChange={(e) => {
+                            onChange={(v) => {
                               if (!edit) initEdit(match)
-                              updateEdit(match.id, "time", e.target.value)
+                              updateEdit(match.id, "time", v)
                             }}
                             className="h-9 w-24 text-sm"
                           />

@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { TimeInput } from "@/components/ui/time-input"
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -186,7 +187,7 @@ export function MatchForm({ initialData }: MatchFormProps) {
               <FormItem>
                 <FormLabel>Hora *</FormLabel>
                 <FormControl>
-                  <Input type="time" {...field} />
+                  <TimeInput {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
