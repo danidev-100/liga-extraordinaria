@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils"
+import { resolveTeamShield } from "@/lib/team-shields"
 import Image from "next/image"
 
 interface TeamLogoProps {
@@ -24,8 +25,9 @@ export function TeamLogo({
   className,
 }: TeamLogoProps) {
   const dimension = size === "sm" ? 20 : size === "md" ? 28 : size === "lg" ? 40 : 64
+  const resolvedLogo = logoUrl || resolveTeamShield(name)
 
-  if (logoUrl) {
+  if (resolvedLogo) {
     return (
       <div
         className={cn(
@@ -35,7 +37,7 @@ export function TeamLogo({
         )}
       >
         <Image
-          src={logoUrl}
+          src={resolvedLogo}
           alt={`${name} escudo`}
           fill
           className="object-cover"

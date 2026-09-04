@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select"
 import { Loader2, ImageIcon } from "lucide-react"
 import { TeamLogo } from "@/components/ui/team-logo"
+import { resolveTeamShield } from "@/lib/team-shields"
 import { teamSchema, type TeamFormData } from "@/lib/validations/team"
 import { createTeam, updateTeam } from "@/actions/team"
 import { getCategories } from "@/actions/category"
@@ -160,9 +161,10 @@ export function TeamForm({ initialData }: TeamFormProps) {
                       {...field}
                     />
                   </div>
-                  {field.value && (field.value.startsWith("/") || /^https?:\/\//.test(field.value)) && (
+                  {((field.value && (field.value.startsWith("/") || /^https?:\/\//.test(field.value))) ||
+                    resolveTeamShield(form.watch("name"))) && (
                     <TeamLogo
-                      logoUrl={field.value}
+                      logoUrl={field.value || null}
                       color={form.watch("color") || null}
                       name={form.watch("name") || "Escudo"}
                       size="md"

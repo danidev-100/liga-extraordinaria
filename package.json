@@ -10,6 +10,7 @@
     "lint": "eslint",
     "seed": "tsx prisma/seed.ts",
     "seed:demo": "tsx prisma/seed-demo.ts",
+    "shields": "tsx scripts/load-shields.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
