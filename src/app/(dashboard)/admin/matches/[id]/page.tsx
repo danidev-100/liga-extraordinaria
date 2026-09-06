@@ -286,7 +286,7 @@ export default async function MatchDetailPage({
             <CardTitle>Editar Resultado</CardTitle>
           </CardHeader>
           <CardContent>
-            <MatchResultForm match={match} />
+            <MatchResultForm match={match} editing />
           </CardContent>
         </Card>
       )}

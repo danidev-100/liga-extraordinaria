@@ -54,10 +54,14 @@ interface MatchResultFormProps {
     id: string
     localTeam: TeamOption
     visitorTeam: TeamOption
+    goals?: Array<{ playerId: string; teamId: string; minute: number; isOwnGoal: boolean }>
+    cards?: Array<{ playerId: string; teamId: string; type: "YELLOW" | "RED"; minute: number }>
   }
+  /** When true, pre-fills existing goals/cards and labels the action as an update. */
+  editing?: boolean
 }
 
-export function MatchResultForm({ match }: MatchResultFormProps) {
+export function MatchResultForm({ match, editing = false }: MatchResultFormProps) {
   const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
@@ -67,8 +71,8 @@ export function MatchResultForm({ match }: MatchResultFormProps) {
     defaultValues: {
       localScore: 0,
       visitorScore: 0,
-      goals: [],
-      cards: [],
+      goals: match.goals ?? [],
+      cards: match.cards ?? [],
     },
   })
 
@@ -516,7 +520,7 @@ export function MatchResultForm({ match }: MatchResultFormProps) {
           <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 space-y-3">
             <div className="flex items-center gap-2 text-sm font-semibold text-primary">
               <AlertTriangle className="h-4 w-4" />
-              ¿Confirmar resultado?
+              {editing ? "¿Guardar cambios al resultado?" : "¿Confirmar resultado?"}
             </div>
             <div className="flex items-center justify-center gap-4 text-lg font-bold">
               <span>{match.localTeam.shortName}</span>
@@ -537,7 +541,7 @@ export function MatchResultForm({ match }: MatchResultFormProps) {
                 ) : (
                   <CheckCircle className="h-4 w-4" />
                 )}
-                Confirmar
+                {editing ? "Guardar Cambios" : "Confirmar"}
               </Button>
               <Button
                 type="button"
@@ -557,7 +561,7 @@ export function MatchResultForm({ match }: MatchResultFormProps) {
             onClick={() => setShowConfirm(true)}
           >
             <CheckCircle className="h-4 w-4" />
-            Finalizar Partido
+            {editing ? "Guardar Cambios" : "Finalizar Partido"}
           </Button>
         )}
       </form>

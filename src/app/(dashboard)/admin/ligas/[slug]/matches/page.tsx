@@ -309,7 +309,7 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                               size="sm"
                             >
                               <Edit className="mr-1.5 h-4 w-4" />
-                              {match.status === "SCHEDULED" ? "Cargar" : match.status === "POSTPONED" ? "Editar" : "Ver"}
+                              {match.status === "SCHEDULED" ? "Cargar" : match.status === "POSTPONED" || match.status === "FINISHED" ? "Editar" : "Ver"}
                             </Button>
                           </Link>
                           {match.status === "SCHEDULED" && (
