@@ -25,7 +25,7 @@ export function CourtMapLink({ href, name }: CourtMapLinkProps) {
       }}
       className="inline-flex cursor-pointer items-center gap-1 text-muted-foreground hover:text-primary transition-colors"
     >
-      <MapPin className="h-3 w-3" />
+      <MapPin className="h-4 w-4" />
       {name}
     </span>
   )

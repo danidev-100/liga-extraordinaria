@@ -93,7 +93,7 @@ export function MatchHeader({
             {time}
           </span>
           <span className="inline-flex items-center gap-1">
-            <MapPin className="h-3 w-3" />
+            <MapPin className="h-4 w-4" />
             {court.venue.name} · {court.name}
           </span>
         </div>
