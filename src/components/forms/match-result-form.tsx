@@ -4,7 +4,7 @@ import { useForm, useFieldArray } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Form,
   FormField,
@@ -101,27 +101,31 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
       ((g.teamId === match.visitorTeam.id && !g.isOwnGoal) ||
         (g.teamId === match.localTeam.id && g.isOwnGoal)),
   ).length
+  const localScoreValue = form.watch("localScore")
+  const visitorScoreValue = form.watch("visitorScore")
+
+  const goalsKey = JSON.stringify(goals)
+
+  // Keep the score in sync with the goal list (as before): when goals change,
+  // the score is recomputed from them. If the user types the score directly
+  // without goals, it is preserved until the goal list changes.
+  useEffect(() => {
+    form.setValue("localScore", localGoals)
+    form.setValue("visitorScore", visitorGoals)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goalsKey])
 
   async function onSubmit(data: FinishMatchFormData) {
     setIsSubmitting(true)
     try {
-      const scoredGoals = data.goals ?? []
-      const computedLocal = scoredGoals.filter(
-        (g) =>
-          g.teamId &&
-          ((g.teamId === match.localTeam.id && !g.isOwnGoal) ||
-            (g.teamId === match.visitorTeam.id && g.isOwnGoal)),
-      ).length
-      const computedVisitor = scoredGoals.filter(
-        (g) =>
-          g.teamId &&
-          ((g.teamId === match.visitorTeam.id && !g.isOwnGoal) ||
-            (g.teamId === match.localTeam.id && g.isOwnGoal)),
-      ).length
+      // Goals and cards are optional. Drop rows left incomplete (no team/player)
+      // so a half-filled optional row never blocks saving the result.
+      const goalsToSave = (data.goals ?? []).filter((g) => g.teamId && g.playerId)
+      const cardsToSave = (data.cards ?? []).filter((c) => c.teamId && c.playerId)
       await finishMatch(match.id, {
         ...data,
-        localScore: computedLocal,
-        visitorScore: computedVisitor,
+        goals: goalsToSave,
+        cards: cardsToSave,
       })
       setShowConfirm(false)
       toast.success("Resultado del partido guardado exitosamente")
@@ -141,17 +145,22 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
           <FormField
             control={form.control}
             name="localScore"
-            render={() => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>{match.localTeam.shortName} (Local)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
                     min={0}
-                    readOnly
-                    tabIndex={-1}
-                    value={localGoals}
-                    className="bg-muted/50"
+                    inputMode="numeric"
+                    placeholder="0"
+                    value={field.value as number | string}
+                    onChange={(e) =>
+                      field.onChange(e.target.value === "" ? "" : Number(e.target.value))
+                    }
+                    onBlur={field.onBlur}
+                    ref={field.ref as React.Ref<HTMLInputElement>}
+                    name={field.name}
                   />
                 </FormControl>
                 <FormMessage />
@@ -161,17 +170,22 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
           <FormField
             control={form.control}
             name="visitorScore"
-            render={() => (
+            render={({ field }) => (
               <FormItem>
                 <FormLabel>{match.visitorTeam.shortName} (Visitante)</FormLabel>
                 <FormControl>
                   <Input
                     type="number"
                     min={0}
-                    readOnly
-                    tabIndex={-1}
-                    value={visitorGoals}
-                    className="bg-muted/50"
+                    inputMode="numeric"
+                    placeholder="0"
+                    value={field.value as number | string}
+                    onChange={(e) =>
+                      field.onChange(e.target.value === "" ? "" : Number(e.target.value))
+                    }
+                    onBlur={field.onBlur}
+                    ref={field.ref as React.Ref<HTMLInputElement>}
+                    name={field.name}
                   />
                 </FormControl>
                 <FormMessage />
@@ -179,6 +193,9 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
             )}
           />
         </div>
+        <p className="text-xs text-muted-foreground">
+          Cargá el resultado directamente. Los goles y las tarjetas son opcionales.
+        </p>
 
         {/* Goals */}
         <Card>
@@ -199,7 +216,7 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
           <CardContent className="space-y-3">
             {goalFields.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                No hay goles registrados. Agregá goles usando el botón de arriba.
+                Opcional. Agregá los autores de los goles si los conocés; no hace falta para guardar el resultado.
               </p>
             )}
             {goalFields.map((field, index) => {
@@ -365,7 +382,7 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
           <CardContent className="space-y-3">
             {cardFields.length === 0 && (
               <p className="text-sm text-muted-foreground">
-                No hay tarjetas registradas. Agregá tarjetas usando el botón de arriba.
+                Opcional. Agregá las tarjetas si las hubo; no hace falta para guardar el resultado.
               </p>
             )}
             {cardFields.map((field, index) => {
@@ -524,7 +541,7 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
             </div>
             <div className="flex items-center justify-center gap-4 text-lg font-bold">
               <span>{match.localTeam.shortName}</span>
-              <span className="text-primary">{localGoals} - {visitorGoals}</span>
+              <span className="text-primary">{localScoreValue} - {visitorScoreValue}</span>
               <span>{match.visitorTeam.shortName}</span>
             </div>
             <p className="text-xs text-muted-foreground text-center">
