@@ -213,59 +213,46 @@ export async function updateMatch(id: string, data: MatchUpdateData, slug?: stri
   const teamsChanged = effLocal !== current.localTeamId || effVisitor !== current.visitorTeamId
 
   if (teamsChanged) {
-    if (effRound !== current.round || effCategoryId !== current.categoryId) {
-      // Round/category + team change at once: fall back to the simple duplicate check.
-      const categoryMatches = await db.match.findMany({
-        where: { categoryId: effCategoryId },
-        select: { id: true, round: true, localTeamId: true, visitorTeamId: true },
-      })
-      const duplicate = findDuplicateEncounter(categoryMatches, {
-        id,
-        localTeamId: effLocal,
-        visitorTeamId: effVisitor,
-      })
-      if (duplicate) {
-        const names = await getTeamNames([effLocal, effVisitor])
-        throw new Error(
-          `El cruce ${names[effLocal]} vs ${names[effVisitor]} ya está programado en la Jornada ${duplicate.round}`,
-        )
-      }
-    } else {
-      const categoryMatches = await db.match.findMany({
-        where: { categoryId: effCategoryId },
-        select: { id: true, round: true, localTeamId: true, visitorTeamId: true, status: true },
-      })
-      const teams = await db.team.findMany({
-        where: { categoryId: effCategoryId },
-        select: { id: true },
-      })
+    // The admin edits rounds freely (see "Reordenar jornada"). We only block
+    // crossings that repeat an already-played (frozen) encounter, and leave
+    // scheduling fixes to the explicit reorder action.
+    const categoryMatches = await db.match.findMany({
+      where: { categoryId: effCategoryId },
+      select: { id: true, round: true, localTeamId: true, visitorTeamId: true, status: true },
+    })
 
-      const result = repairFixture({
-        teams: teams.map((t) => t.id),
-        matches: categoryMatches.map((m) => ({
-          id: m.id,
-          round: m.round,
-          localTeamId: m.localTeamId,
-          visitorTeamId: m.visitorTeamId,
-          frozen: m.round < effRound || m.status === "FINISHED" || m.status === "PLAYING",
-        })),
-        editedMatchId: id,
-        newLocalTeamId: effLocal,
-        newVisitorTeamId: effVisitor,
-      })
+    const frozenDup = categoryMatches.find(
+      (m) =>
+        m.id !== id &&
+        (m.status === "FINISHED" || m.status === "PLAYING") &&
+        ((m.localTeamId === effLocal && m.visitorTeamId === effVisitor) ||
+          (m.localTeamId === effVisitor && m.visitorTeamId === effLocal)),
+    )
+    if (frozenDup) {
+      const names = await getTeamNames([effLocal, effVisitor])
+      throw new Error(
+        `El cruce ${names[effLocal]} vs ${names[effVisitor]} ya se jugó en la Jornada ${frozenDup.round}`,
+      )
+    }
 
-      if (!result.ok) {
-        if (result.reason === "frozen-conflict") {
-          const names = await getTeamNames([effLocal, effVisitor])
-          throw new Error(
-            `El cruce ${names[effLocal]} vs ${names[effVisitor]} ya se jugó en la Jornada ${result.round}`,
-          )
-        }
-        throw new Error(
-          "No pudimos reacomodar el fixture sin repetir cruces. Probá moviendo el partido de jornada manualmente.",
-        )
-      }
-      repairChanges.push(...result.changes)
+    // Prevent the same team playing twice in the same round: the reorder
+    // solver freezes the edited round, so it must stay internally consistent.
+    const sameRoundOthers = categoryMatches.filter(
+      (m) => m.id !== id && m.round === effRound,
+    )
+    const conflictTeam = sameRoundOthers.find(
+      (m) =>
+        m.localTeamId === effLocal || m.visitorTeamId === effLocal ||
+        m.localTeamId === effVisitor || m.visitorTeamId === effVisitor,
+    )
+    if (conflictTeam) {
+      const names = await getTeamNames([effLocal, effVisitor])
+      const teamName = conflictTeam.localTeamId === effLocal || conflictTeam.visitorTeamId === effLocal
+        ? names[effLocal]
+        : names[effVisitor]
+      throw new Error(
+        `${teamName} ya juega en la Jornada ${effRound} contra ${conflictTeam.localTeamId === effLocal || conflictTeam.visitorTeamId === effLocal ? names[effVisitor] : names[effLocal]}. Cambiá ese enfrentamiento antes de reordenar.`,
+      )
     }
   }
 

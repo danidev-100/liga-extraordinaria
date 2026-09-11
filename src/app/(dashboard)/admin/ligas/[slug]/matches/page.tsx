@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { TeamLogo } from "@/components/ui/team-logo"
 import { RoundVisibilityToggle } from "@/components/ui/round-visibility-toggle"
 import { SwapRivalsButton } from "@/components/forms/swap-rivals-button"
+import { ReorderRoundButton } from "@/components/forms/reorder-round-button"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -238,6 +239,9 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                         label={name}
                       />
                     ))
+                  )}
+                  {catsInRound.length === 1 && (
+                    <ReorderRoundButton categoryId={catsInRound[0][0]} round={round} leagueSlug={slug} />
                   )}
                 </div>
 

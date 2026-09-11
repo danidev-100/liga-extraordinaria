@@ -13,6 +13,7 @@ import { RoundVisibilityToggle } from "@/components/ui/round-visibility-toggle"
 import { ResetMatchButton } from "@/components/forms/reset-match-button"
 import { RepairCategoryButton } from "@/components/forms/repair-category-button"
 import { SwapRivalsButton } from "@/components/forms/swap-rivals-button"
+import { ReorderRoundButton } from "@/components/forms/reorder-round-button"
 import { findDuplicateEncounters } from "@/lib/matches/encounter"
 
 const statusConfig = {
@@ -313,6 +314,9 @@ export default async function MatchesPage({
                         label={name}
                       />
                     ))
+                  )}
+                  {catsInRound.length === 1 && (
+                    <ReorderRoundButton categoryId={catsInRound[0][0]} round={round} />
                   )}
                 </div>
 

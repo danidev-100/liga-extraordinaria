@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { swapRivals } from "@/lib/matches/swap"
+import { reorderRoundFixture } from "@/lib/matches/reorder-round"
 
 export async function updateMatchDateTime(
   matchId: string,
@@ -203,4 +204,60 @@ export async function swapMatchTeams(matchIdA: string, matchIdB: string, slug?: 
   }
 
   return { applied: true, warnings: null }
+}
+
+/**
+ * Reordena el fixture completo desde una jornada fija hacia adelante.
+ *
+ * La jornada `round` (que el admin acaba de editar) queda tal cual; todas las
+ * jornadas posteriores se recalculan para que ningún cruce se repita y cada
+ * equipo juegue una vez por jornada. Solo se tocan partidos no congelados
+ * (nunca FINISHED/PLAYING, nunca jornadas anteriores).
+ */
+export async function reorderRound(categoryId: string, round: number, slug?: string) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error("No autorizado")
+  if (slug) await ensureScope(slug)
+
+  const matches = await db.match.findMany({
+    where: { categoryId },
+    select: { id: true, round: true, localTeamId: true, visitorTeamId: true, status: true },
+    orderBy: [{ round: "asc" }],
+  })
+  if (matches.length === 0) throw new Error("No hay partidos en esta categoría")
+
+  const teams = await db.team.findMany({ where: { categoryId }, select: { id: true } })
+  if (teams.length === 0) throw new Error("No hay equipos en esta categoría")
+
+  const result = reorderRoundFixture({
+    teams: teams.map((t) => t.id),
+    matches: matches.map((m) => ({
+      id: m.id,
+      round: m.round,
+      localTeamId: m.localTeamId,
+      visitorTeamId: m.visitorTeamId,
+      frozen: m.status === "FINISHED" || m.status === "PLAYING",
+    })),
+    fixedRound: round,
+  })
+
+  if (!result.ok) {
+    throw new Error("No pudimos reacomodar el fixture sin repetir cruces. Corregí los enfrentamientos de la jornada manualmente.")
+  }
+
+  if (result.changes.length > 0) {
+    await db.$transaction(
+      result.changes.map((c) =>
+        db.match.update({
+          where: { id: c.matchId },
+          data: { localTeamId: c.localTeamId, visitorTeamId: c.visitorTeamId },
+        }),
+      ),
+    )
+  }
+
+  revalidatePath("/admin/matches")
+  if (slug) revalidatePath(`/admin/ligas/${slug}/matches`)
+
+  return { moved: result.changes.length }
 }
