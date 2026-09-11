@@ -1,9 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import { ArrowLeftRight, Loader2, Check } from "lucide-react"
+import { ArrowLeftRight, Loader2, Check, AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -21,43 +21,120 @@ export interface SwapCandidate {
   id: string
   localName: string
   visitorName: string
+  /** Team ids, used to compute repeated-crossing warnings. */
+  localTeamId: string
+  visitorTeamId: string
+}
+
+/** An encounter that already exists somewhere in the category. */
+export interface ExistingEncounter {
+  round: number
+  localTeamId: string
+  visitorTeamId: string
 }
 
 interface SwapRivalsButtonProps {
   matchId: string
   localName: string
   visitorName: string
+  /** Team ids of the match being edited. */
+  localTeamId: string
+  visitorTeamId: string
   candidates: SwapCandidate[]
+  /** Existing encounters in the category (used to warn about repeats). */
+  encounters: ExistingEncounter[]
   /** League slug when rendered from a scoped admin page. */
   leagueSlug?: string
+}
+
+interface Warning {
+  round: number
+  localName: string
+  visitorName: string
+}
+
+function pairKey(a: string, b: string): string {
+  return a < b ? `${a}|${b}` : `${b}|${a}`
 }
 
 export function SwapRivalsButton({
   matchId,
   localName,
   visitorName,
+  localTeamId,
+  visitorTeamId,
   candidates,
+  encounters,
   leagueSlug,
 }: SwapRivalsButtonProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [confirmedWarnings, setConfirmedWarnings] = useState(false)
 
   const selected = candidates.find((c) => c.id === selectedId) ?? null
+
+  // Compute warnings for the currently selected candidate.
+  const warnings = useMemo<Warning[]>(() => {
+    if (!selected) return []
+    const newPairs = [
+      { local: localTeamId, visitor: selected.visitorTeamId ?? "" },
+      { local: selected.localTeamId ?? "", visitor: visitorTeamId },
+    ]
+    const out: Warning[] = []
+    for (const pair of newPairs) {
+      if (!pair.local || !pair.visitor) continue
+      const key = pairKey(pair.local, pair.visitor)
+      const existing = encounters.find(
+        (e) => pairKey(e.localTeamId, e.visitorTeamId) === key,
+      )
+      if (existing) {
+        // Resolve names: we only have names for the two matches' teams.
+        const nameOf = (id: string) => {
+          if (id === localTeamId) return localName
+          if (id === visitorTeamId) return visitorName
+          if (id === selected.localTeamId) return selected.localName
+          if (id === selected.visitorTeamId) return selected.visitorName
+          return id
+        }
+        out.push({
+          round: existing.round,
+          localName: nameOf(pair.local),
+          visitorName: nameOf(pair.visitor),
+        })
+      }
+    }
+    return out
+  }, [selected, localTeamId, visitorTeamId, localName, visitorName, encounters])
+
+  // Reset the "confirmed warnings" flag when the selection changes.
+  function selectCandidate(id: string) {
+    setSelectedId(id)
+    setConfirmedWarnings(false)
+  }
 
   function reset() {
     setSelectedId(null)
     setOpen(false)
     setSubmitting(false)
+    setConfirmedWarnings(false)
   }
 
   async function confirm() {
     if (!selected) return
+    if (warnings.length > 0 && !confirmedWarnings) {
+      setConfirmedWarnings(true)
+      return
+    }
     setSubmitting(true)
     try {
-      await swapMatchTeams(matchId, selected.id, leagueSlug)
-      toast.success("Rivales intercambiados")
+      const result = await swapMatchTeams(matchId, selected.id, leagueSlug)
+      if (result && result.warnings) {
+        toast.warning(`Se aplicó el intercambio. Cruces repetidos: ${result.warnings}`)
+      } else {
+        toast.success("Rivales intercambiados")
+      }
       reset()
       router.refresh()
     } catch (error) {
@@ -101,7 +178,7 @@ export function SwapRivalsButton({
               <button
                 key={c.id}
                 type="button"
-                onClick={() => setSelectedId(c.id)}
+                onClick={() => selectCandidate(c.id)}
                 className={cn(
                   "flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm transition-colors",
                   selectedId === c.id
@@ -132,13 +209,41 @@ export function SwapRivalsButton({
           </div>
         )}
 
+        {selected && warnings.length > 0 && (
+          <div
+            className={cn(
+              "rounded-lg border p-3 text-sm",
+              confirmedWarnings
+                ? "border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                : "border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+            )}
+          >
+            <p className="mb-1 flex items-center gap-1.5 font-medium">
+              <AlertTriangle className="h-4 w-4" />
+              {confirmedWarnings ? "Confirmá que querés repetir estos cruces:" : "Este intercambio repetirá cruces:"}
+            </p>
+            <ul className="list-inside list-disc space-y-0.5">
+              {warnings.map((w, i) => (
+                <li key={i}>
+                  {w.localName} vs {w.visitorName} — ya están en la Jornada {w.round}
+                </li>
+              ))}
+            </ul>
+            {!confirmedWarnings && (
+              <p className="mt-1 text-xs opacity-80">
+                Volvé a tocar &quot;Intercambiar&quot; para confirmar.
+              </p>
+            )}
+          </div>
+        )}
+
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>
             Cancelar
           </Button>
           <Button onClick={confirm} disabled={!selected || submitting}>
             {submitting && <Loader2 className="mr-1.5 h-4 w-4 animate-spin" />}
-            Intercambiar
+            {warnings.length > 0 && !confirmedWarnings ? "Intercambiar" : "Intercambiar"}
           </Button>
         </DialogFooter>
       </DialogContent>

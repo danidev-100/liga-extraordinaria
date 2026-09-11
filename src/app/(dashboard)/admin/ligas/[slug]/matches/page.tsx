@@ -340,6 +340,8 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                               matchId={match.id}
                               localName={match.localTeam.shortName}
                               visitorName={match.visitorTeam.shortName}
+                              localTeamId={match.localTeam.id}
+                              visitorTeamId={match.visitorTeam.id}
                               leagueSlug={slug}
                               candidates={roundMatches
                                 .filter(
@@ -352,6 +354,15 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                                   id: m.id,
                                   localName: m.localTeam.shortName,
                                   visitorName: m.visitorTeam.shortName,
+                                  localTeamId: m.localTeam.id,
+                                  visitorTeamId: m.visitorTeam.id,
+                                }))}
+                              encounters={matches
+                                .filter((m) => m.categoryId === match.categoryId)
+                                .map((m) => ({
+                                  round: m.round,
+                                  localTeamId: m.localTeam.id,
+                                  visitorTeamId: m.visitorTeam.id,
                                 }))}
                             />
                           )}

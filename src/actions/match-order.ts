@@ -172,16 +172,6 @@ export async function swapMatchTeams(matchIdA: string, matchIdB: string, slug?: 
   const result = swapRivals(a, b, categoryMatches)
 
   if (!result.ok) {
-    if (result.reason === "duplicate") {
-      const teams = await db.team.findMany({
-        where: { id: { in: [result.localTeamId, result.visitorTeamId] } },
-        select: { id: true, name: true },
-      })
-      const nameMap = Object.fromEntries(teams.map((t) => [t.id, t.name]))
-      throw new Error(
-        `El cruce ${nameMap[result.localTeamId] ?? "?"} vs ${nameMap[result.visitorTeamId] ?? "?"} ya está programado en la Jornada ${result.round}`,
-      )
-    }
     if (result.reason === "different-round") {
       throw new Error("Los partidos deben ser de la misma jornada")
     }
@@ -201,4 +191,16 @@ export async function swapMatchTeams(matchIdA: string, matchIdB: string, slug?: 
 
   revalidatePath("/admin/matches")
   if (slug) revalidatePath(`/admin/ligas/${slug}/matches`)
+
+  if (result.warnings.length > 0) {
+    const teamIds = Array.from(new Set(result.warnings.flatMap((w) => [w.localTeamId, w.visitorTeamId])))
+    const teams = await db.team.findMany({ where: { id: { in: teamIds } }, select: { id: true, name: true } })
+    const nameMap = Object.fromEntries(teams.map((t) => [t.id, t.name]))
+    const warningText = result.warnings
+      .map((w) => `${nameMap[w.localTeamId] ?? "?"} vs ${nameMap[w.visitorTeamId] ?? "?"} (Jornada ${w.round})`)
+      .join(" · ")
+    return { applied: true, warnings: warningText }
+  }
+
+  return { applied: true, warnings: null }
 }
