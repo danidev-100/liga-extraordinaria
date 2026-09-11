@@ -101,8 +101,8 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
       ((g.teamId === match.visitorTeam.id && !g.isOwnGoal) ||
         (g.teamId === match.localTeam.id && g.isOwnGoal)),
   ).length
-  const localScoreValue = form.watch("localScore")
-  const visitorScoreValue = form.watch("visitorScore")
+  const localScoreValue = form.watch("localScore") as number | string
+  const visitorScoreValue = form.watch("visitorScore") as number | string
 
   const goalsKey = JSON.stringify(goals)
 
