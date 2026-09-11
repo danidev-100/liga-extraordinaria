@@ -11,10 +11,10 @@ interface TeamLogoProps {
 }
 
 const sizeMap = {
-  sm: "size-[23px]",
-  md: "size-8",
-  lg: "size-[46px]",
-  xl: "size-[74px]",
+  sm: "size-[25px]",
+  md: "size-[35px]",
+  lg: "size-[51px]",
+  xl: "size-[81px]",
 }
 
 export function TeamLogo({
@@ -24,7 +24,7 @@ export function TeamLogo({
   size = "sm",
   className,
 }: TeamLogoProps) {
-  const dimension = size === "sm" ? 23 : size === "md" ? 32 : size === "lg" ? 46 : 74
+  const dimension = size === "sm" ? 25 : size === "md" ? 35 : size === "lg" ? 51 : 81
   const resolvedLogo = logoUrl || resolveTeamShield(name)
 
   if (resolvedLogo) {
