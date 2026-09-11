@@ -1,5 +1,9 @@
 import { describe, it, expect } from "vitest"
-import { findDuplicateEncounter, type EncounterMatch } from "@/lib/matches/encounter"
+import {
+  findDuplicateEncounter,
+  findDuplicateEncounters,
+  type EncounterMatch,
+} from "@/lib/matches/encounter"
 
 const matches: EncounterMatch[] = [
   { id: "m1", round: 1, localTeamId: "A", visitorTeamId: "B" },
@@ -62,5 +66,47 @@ describe("findDuplicateEncounter", () => {
     expect(findDuplicateEncounter(doubled, { localTeamId: "A", visitorTeamId: "B" })).toEqual({
       round: 2,
     })
+  })
+})
+
+describe("findDuplicateEncounters", () => {
+  it("groups the same pair across rounds regardless of order", () => {
+    const matches: EncounterMatch[] = [
+      { id: "m1", round: 1, localTeamId: "A", visitorTeamId: "B" },
+      { id: "m2", round: 4, localTeamId: "B", visitorTeamId: "A" },
+    ]
+    expect(findDuplicateEncounters(matches)).toEqual([
+      { a: "A", b: "B", matchIds: ["m1", "m2"], rounds: [1, 4] },
+    ])
+  })
+
+  it("returns several groups sorted by earliest round", () => {
+    const matches: EncounterMatch[] = [
+      { id: "m1", round: 2, localTeamId: "A", visitorTeamId: "B" },
+      { id: "m2", round: 5, localTeamId: "A", visitorTeamId: "B" },
+      { id: "m3", round: 3, localTeamId: "C", visitorTeamId: "D" },
+      { id: "m4", round: 6, localTeamId: "D", visitorTeamId: "C" },
+    ]
+    expect(findDuplicateEncounters(matches)).toEqual([
+      { a: "A", b: "B", matchIds: ["m1", "m2"], rounds: [2, 5] },
+      { a: "C", b: "D", matchIds: ["m3", "m4"], rounds: [3, 6] },
+    ])
+  })
+
+  it("returns an empty list when every encounter is unique", () => {
+    const matches: EncounterMatch[] = [
+      { id: "m1", round: 1, localTeamId: "A", visitorTeamId: "B" },
+      { id: "m2", round: 1, localTeamId: "C", visitorTeamId: "D" },
+      { id: "m3", round: 2, localTeamId: "A", visitorTeamId: "C" },
+    ]
+    expect(findDuplicateEncounters(matches)).toEqual([])
+  })
+
+  it("ignores matches with missing or identical teams", () => {
+    const matches: EncounterMatch[] = [
+      { id: "m1", round: 1, localTeamId: "A", visitorTeamId: null },
+      { id: "m2", round: 2, localTeamId: "A", visitorTeamId: "A" },
+    ]
+    expect(findDuplicateEncounters(matches)).toEqual([])
   })
 })

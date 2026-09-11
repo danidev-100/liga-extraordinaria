@@ -2,14 +2,17 @@ import Link from "next/link"
 import { auth } from "@/lib/auth"
 import db from "@/lib/db"
 import { Button } from "@/components/ui/button"
-import { Plus, Edit, Clock, Play, CheckCircle2, Calendar, ArrowUpDown, CalendarClock, CalendarPlus } from "lucide-react"
+import { Plus, Edit, Clock, Play, CheckCircle2, Calendar, ArrowUpDown, CalendarClock, CalendarPlus, AlertTriangle } from "lucide-react"
 import { DeleteButton } from "@/components/forms/delete-button"
 import { deleteMatch, postponeMatch, rescheduleMatch } from "@/actions/matches"
 import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { LeagueSelector } from "@/components/ui/league-selector"
 import { TeamLogo } from "@/components/ui/team-logo"
 import { RoundVisibilityToggle } from "@/components/ui/round-visibility-toggle"
 import { ResetMatchButton } from "@/components/forms/reset-match-button"
+import { RepairCategoryButton } from "@/components/forms/repair-category-button"
+import { findDuplicateEncounters } from "@/lib/matches/encounter"
 
 const statusConfig = {
   SCHEDULED: {
@@ -137,6 +140,43 @@ export default async function MatchesPage({
     }
   }
 
+  // Detect pre-existing duplicate encounters per category.
+  const matchesByCategory = new Map<string, typeof matches>()
+  for (const match of matches) {
+    const list = matchesByCategory.get(match.categoryId) ?? []
+    list.push(match)
+    matchesByCategory.set(match.categoryId, list)
+  }
+
+  const duplicateGroupsByCategory = new Map<
+    string,
+    { aName: string; bName: string; rounds: number[]; matchIds: string[] }[]
+  >()
+  const duplicateMatchIds = new Set<string>()
+
+  for (const [catId, catMatches] of matchesByCategory) {
+    const groups = findDuplicateEncounters(
+      catMatches.map((m) => ({
+        id: m.id,
+        round: m.round,
+        localTeamId: m.localTeam.id,
+        visitorTeamId: m.visitorTeam.id,
+      })),
+    )
+    if (groups.length === 0) continue
+
+    const named = groups.map((g) => {
+      const first = catMatches.find((m) => m.id === g.matchIds[0])!
+      const aName = first.localTeam.id === g.a ? first.localTeam.name : first.visitorTeam.name
+      const bName = first.localTeam.id === g.b ? first.localTeam.name : first.visitorTeam.name
+      return { aName, bName, rounds: g.rounds, matchIds: g.matchIds }
+    })
+    duplicateGroupsByCategory.set(catId, named)
+    for (const group of named) {
+      for (const id of group.matchIds) duplicateMatchIds.add(id)
+    }
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -202,6 +242,36 @@ export default async function MatchesPage({
           </Link>
         ))}
       </div>
+
+      {/* Duplicate encounter warnings */}
+      {duplicateGroupsByCategory.size > 0 && (
+        <div className="space-y-4">
+          {Array.from(duplicateGroupsByCategory.entries()).map(([catId, groups]) => {
+            const cat = categories.find((c) => c.id === catId)
+            return (
+              <Card key={catId} className="border-amber-500/40 bg-amber-500/10">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                    <AlertTriangle className="h-5 w-5" />
+                    Cruces repetidos {cat ? `en ${cat.name}` : ""}
+                  </CardTitle>
+                  <CardDescription className="text-amber-700/70 dark:text-amber-400/70">
+                    {groups
+                      .map(
+                        (g) =>
+                          `${g.aName} vs ${g.bName} (Jornadas ${g.rounds.join(" y ")})`,
+                      )
+                      .join(" · ")}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RepairCategoryButton categoryId={catId} />
+                </CardContent>
+              </Card>
+            )
+          })}
+        </div>
+      )}
 
       {/* Match list */}
       {matches.length === 0 ? (
@@ -273,6 +343,14 @@ export default async function MatchesPage({
                             <span className="text-xs font-medium text-muted-foreground">
                               R{match.round}
                             </span>
+                            {duplicateMatchIds.has(match.id) && (
+                              <Badge
+                                variant="outline"
+                                className="border-amber-500/40 bg-amber-500/10 text-amber-700 dark:text-amber-400"
+                              >
+                                Cruce repetido
+                              </Badge>
+                            )}
                           </div>
 
                           {/* Teams */}
