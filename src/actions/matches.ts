@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth"
 import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import { findDuplicateEncounter } from "@/lib/matches/encounter"
+import { repairFixture, type RepairChange } from "@/lib/matches/fixture-repair"
 import { matchSchema, matchUpdateSchema, type MatchFormData, type MatchUpdateData } from "@/lib/validations/match"
 
 async function ensureAuth() {
@@ -13,6 +14,11 @@ async function ensureAuth() {
     throw new Error("No autorizado")
   }
   return session
+}
+
+async function getTeamNames(ids: string[]): Promise<Record<string, string>> {
+  const rows = await db.team.findMany({ where: { id: { in: ids } }, select: { id: true, name: true } })
+  return Object.fromEntries(rows.map((r) => [r.id, r.name]))
 }
 
 export async function getMatches(params?: { categoryId?: string; leagueId?: string }) {
@@ -178,66 +184,108 @@ export async function updateMatch(id: string, data: MatchUpdateData, slug?: stri
 
   const parsed = matchUpdateSchema.parse(data)
 
-  // If changing teams, validate same-team guard
-  if (parsed.localTeamId && parsed.visitorTeamId && parsed.localTeamId === parsed.visitorTeamId) {
+  const current = await db.match.findUnique({
+    where: { id },
+    select: {
+      categoryId: true,
+      courtId: true,
+      date: true,
+      time: true,
+      round: true,
+      localTeamId: true,
+      visitorTeamId: true,
+      status: true,
+    },
+  })
+  if (!current) throw new Error("Partido no encontrado")
+
+  const effCategoryId = parsed.categoryId ?? current.categoryId
+  const effLocal = parsed.localTeamId ?? current.localTeamId
+  const effVisitor = parsed.visitorTeamId ?? current.visitorTeamId
+  const effRound = parsed.round ?? current.round
+
+  if (effLocal === effVisitor) {
     throw new Error("El equipo local y visitante deben ser diferentes")
   }
 
-  // If teams are changing, reject encounters that already exist elsewhere in the category
-  if (parsed.localTeamId !== undefined || parsed.visitorTeamId !== undefined) {
-    const current = await db.match.findUnique({
-      where: { id },
-      select: { categoryId: true, localTeamId: true, visitorTeamId: true },
-    })
-    if (current) {
-      const effLocal = parsed.localTeamId ?? current.localTeamId
-      const effVisitor = parsed.visitorTeamId ?? current.visitorTeamId
-      const teamsChanged =
-        effLocal !== current.localTeamId || effVisitor !== current.visitorTeamId
+  // Auto-relocate the rest of the fixture when the encounter's teams change.
+  const repairChanges: RepairChange[] = []
+  const teamsChanged = effLocal !== current.localTeamId || effVisitor !== current.visitorTeamId
 
-      if (teamsChanged) {
-        const categoryMatches = await db.match.findMany({
-          where: { categoryId: current.categoryId },
-          select: { id: true, round: true, localTeamId: true, visitorTeamId: true },
-        })
-        const duplicate = findDuplicateEncounter(categoryMatches, {
-          id,
-          localTeamId: effLocal,
-          visitorTeamId: effVisitor,
-        })
-        if (duplicate) {
-          const [localName, visitorName] = await Promise.all([
-            db.team.findUnique({ where: { id: effLocal }, select: { name: true } }),
-            db.team.findUnique({ where: { id: effVisitor }, select: { name: true } }),
-          ])
+  if (teamsChanged) {
+    if (effRound !== current.round || effCategoryId !== current.categoryId) {
+      // Round/category + team change at once: fall back to the simple duplicate check.
+      const categoryMatches = await db.match.findMany({
+        where: { categoryId: effCategoryId },
+        select: { id: true, round: true, localTeamId: true, visitorTeamId: true },
+      })
+      const duplicate = findDuplicateEncounter(categoryMatches, {
+        id,
+        localTeamId: effLocal,
+        visitorTeamId: effVisitor,
+      })
+      if (duplicate) {
+        const names = await getTeamNames([effLocal, effVisitor])
+        throw new Error(
+          `El cruce ${names[effLocal]} vs ${names[effVisitor]} ya está programado en la Jornada ${duplicate.round}`,
+        )
+      }
+    } else {
+      const categoryMatches = await db.match.findMany({
+        where: { categoryId: effCategoryId },
+        select: { id: true, round: true, localTeamId: true, visitorTeamId: true, status: true },
+      })
+      const teams = await db.team.findMany({
+        where: { categoryId: effCategoryId },
+        select: { id: true },
+      })
+
+      const result = repairFixture({
+        teams: teams.map((t) => t.id),
+        matches: categoryMatches.map((m) => ({
+          id: m.id,
+          round: m.round,
+          localTeamId: m.localTeamId,
+          visitorTeamId: m.visitorTeamId,
+          frozen: m.round < effRound || m.status === "FINISHED" || m.status === "PLAYING",
+        })),
+        editedMatchId: id,
+        newLocalTeamId: effLocal,
+        newVisitorTeamId: effVisitor,
+      })
+
+      if (!result.ok) {
+        if (result.reason === "frozen-conflict") {
+          const names = await getTeamNames([effLocal, effVisitor])
           throw new Error(
-            `El cruce ${localName?.name ?? "?"} vs ${visitorName?.name ?? "?"} ya está programado en la Jornada ${duplicate.round}`,
+            `El cruce ${names[effLocal]} vs ${names[effVisitor]} ya se jugó en la Jornada ${result.round}`,
           )
         }
+        throw new Error(
+          "No pudimos reacomodar el fixture sin repetir cruces. Probá moviendo el partido de jornada manualmente.",
+        )
       }
+      repairChanges.push(...result.changes)
     }
   }
 
   // If changing court/date/time, check availability
-  if ((parsed.courtId || parsed.date || parsed.time)) {
-    const current = await db.match.findUnique({ where: { id }, select: { courtId: true, date: true, time: true } })
-    if (current) {
-      const checkCourt = parsed.courtId ?? current.courtId
-      const checkDate = parsed.date ? new Date(parsed.date) : current.date
-      const checkTime = parsed.time ?? current.time
+  if (parsed.courtId || parsed.date || parsed.time) {
+    const checkCourt = parsed.courtId ?? current.courtId
+    const checkDate = parsed.date ? new Date(parsed.date) : current.date
+    const checkTime = parsed.time ?? current.time
 
-      const existing = await db.match.findFirst({
-        where: {
-          courtId: checkCourt,
-          date: checkDate,
-          time: checkTime,
-          id: { not: id },
-        },
-      })
+    const existing = await db.match.findFirst({
+      where: {
+        courtId: checkCourt,
+        date: checkDate,
+        time: checkTime,
+        id: { not: id },
+      },
+    })
 
-      if (existing) {
-        throw new Error("La cancha ya está reservada en esa fecha y hora")
-      }
+    if (existing) {
+      throw new Error("La cancha ya está reservada en esa fecha y hora")
     }
   }
 
@@ -250,13 +298,21 @@ export async function updateMatch(id: string, data: MatchUpdateData, slug?: stri
   if (parsed.visitorTeamId !== undefined) updateData.visitorTeamId = parsed.visitorTeamId
   if (parsed.round !== undefined) updateData.round = parsed.round
 
-  const match = await db.match.update({
-    where: { id },
-    data: updateData,
-  })
+  // Apply the repair and the edited match atomically.
+  await db.$transaction([
+    ...repairChanges.map((c) =>
+      db.match.update({
+        where: { id: c.matchId },
+        data: { localTeamId: c.localTeamId, visitorTeamId: c.visitorTeamId },
+      }),
+    ),
+    db.match.update({ where: { id }, data: updateData }),
+  ])
+
+  const match = await db.match.findUnique({ where: { id } })
 
   revalidatePath("/admin/matches")
-  return match
+  return { match, relocated: repairChanges.length }
 }
 
 export async function clearFinishedMatches(slug?: string, leagueId?: string) {

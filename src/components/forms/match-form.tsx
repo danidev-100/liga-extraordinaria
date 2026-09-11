@@ -109,8 +109,12 @@ export function MatchForm({ initialData }: MatchFormProps) {
     setIsSubmitting(true)
     try {
       if (initialData) {
-        await updateMatch(initialData.id, data)
-        toast.success("Partido actualizado exitosamente")
+        const result = await updateMatch(initialData.id, data)
+        toast.success(
+          result.relocated > 0
+            ? `Partido actualizado · se reacomodaron ${result.relocated} partido${result.relocated !== 1 ? "s" : ""} para evitar cruces repetidos`
+            : "Partido actualizado exitosamente",
+        )
       } else {
         await createMatch(data)
         toast.success("Partido creado exitosamente")
