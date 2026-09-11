@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
+import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
+import { swapRivals } from "@/lib/matches/swap"
 
 export async function updateMatchDateTime(
   matchId: string,
@@ -130,4 +132,73 @@ export async function swapMatchRound(matchId1: string, matchId2: string) {
   ])
 
   revalidatePath("/admin/matches")
+}
+
+/**
+ * Intercambia los rivales (visitantes) entre dos partidos de la misma jornada.
+ * Solo toca esos dos partidos y valida que ningún cruce resultante se repita
+ * en el resto del fixture.
+ */
+export async function swapMatchTeams(matchIdA: string, matchIdB: string, slug?: string) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error("No autorizado")
+  if (slug) await ensureScope(slug)
+
+  const [a, b] = await Promise.all([
+    db.match.findUnique({
+      where: { id: matchIdA },
+      select: { id: true, categoryId: true, round: true, status: true, localTeamId: true, visitorTeamId: true },
+    }),
+    db.match.findUnique({
+      where: { id: matchIdB },
+      select: { id: true, categoryId: true, round: true, status: true, localTeamId: true, visitorTeamId: true },
+    }),
+  ])
+
+  if (!a || !b) throw new Error("Uno o ambos partidos no existen")
+  if (a.categoryId !== b.categoryId) throw new Error("Los partidos deben ser de la misma categoría")
+  if (a.round !== b.round) throw new Error("Los partidos deben ser de la misma jornada")
+
+  const swappable = (status: string) => status === "SCHEDULED" || status === "POSTPONED"
+  if (!swappable(a.status) || !swappable(b.status)) {
+    throw new Error("No se pueden intercambiar rivales de partidos jugados o en juego")
+  }
+
+  const categoryMatches = await db.match.findMany({
+    where: { categoryId: a.categoryId },
+    select: { id: true, round: true, localTeamId: true, visitorTeamId: true },
+  })
+
+  const result = swapRivals(a, b, categoryMatches)
+
+  if (!result.ok) {
+    if (result.reason === "duplicate") {
+      const teams = await db.team.findMany({
+        where: { id: { in: [result.localTeamId, result.visitorTeamId] } },
+        select: { id: true, name: true },
+      })
+      const nameMap = Object.fromEntries(teams.map((t) => [t.id, t.name]))
+      throw new Error(
+        `El cruce ${nameMap[result.localTeamId] ?? "?"} vs ${nameMap[result.visitorTeamId] ?? "?"} ya está programado en la Jornada ${result.round}`,
+      )
+    }
+    if (result.reason === "different-round") {
+      throw new Error("Los partidos deben ser de la misma jornada")
+    }
+    throw new Error("Un equipo quedaría jugando contra sí mismo")
+  }
+
+  await db.$transaction([
+    db.match.update({
+      where: { id: a.id },
+      data: { localTeamId: result.changes[0].localTeamId, visitorTeamId: result.changes[0].visitorTeamId },
+    }),
+    db.match.update({
+      where: { id: b.id },
+      data: { localTeamId: result.changes[1].localTeamId, visitorTeamId: result.changes[1].visitorTeamId },
+    }),
+  ])
+
+  revalidatePath("/admin/matches")
+  if (slug) revalidatePath(`/admin/ligas/${slug}/matches`)
 }

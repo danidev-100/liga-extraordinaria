@@ -12,6 +12,7 @@ import { TeamLogo } from "@/components/ui/team-logo"
 import { RoundVisibilityToggle } from "@/components/ui/round-visibility-toggle"
 import { ResetMatchButton } from "@/components/forms/reset-match-button"
 import { RepairCategoryButton } from "@/components/forms/repair-category-button"
+import { SwapRivalsButton } from "@/components/forms/swap-rivals-button"
 import { findDuplicateEncounters } from "@/lib/matches/encounter"
 
 const statusConfig = {
@@ -428,6 +429,25 @@ export default async function MatchesPage({
                             <DeleteButton
                               action={deleteMatch.bind(null, match.id)}
                               confirmMessage="¿Eliminar este partido?"
+                            />
+                          )}
+                          {(match.status === "SCHEDULED" || match.status === "POSTPONED") && (
+                            <SwapRivalsButton
+                              matchId={match.id}
+                              localName={match.localTeam.shortName}
+                              visitorName={match.visitorTeam.shortName}
+                              candidates={roundMatches
+                                .filter(
+                                  (m) =>
+                                    m.id !== match.id &&
+                                    m.categoryId === match.categoryId &&
+                                    (m.status === "SCHEDULED" || m.status === "POSTPONED"),
+                                )
+                                .map((m) => ({
+                                  id: m.id,
+                                  localName: m.localTeam.shortName,
+                                  visitorName: m.visitorTeam.shortName,
+                                }))}
                             />
                           )}
                         </div>

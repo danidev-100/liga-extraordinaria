@@ -17,9 +17,10 @@ interface Props {
   params: Promise<{ slug: string; id: string }>
 }
 
-function calculateAge(birthDate: Date): number {
-  const today = new Date()
+function calculateAge(birthDate: Date): number | null {
   const birth = new Date(birthDate)
+  if (Number.isNaN(birth.getTime())) return null
+  const today = new Date()
   let age = today.getFullYear() - birth.getFullYear()
   const monthDiff = today.getMonth() - birth.getMonth()
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--
@@ -99,9 +100,10 @@ export default async function LeaguePlayerProfilePage({ params }: Props) {
     return teamId === matchLocalTeamId ? visitorTeam : localTeam
   }
 
-  function formatDate(date: Date): string {
-    return date.toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })
-  }
+function formatDate(date: Date): string {
+  if (Number.isNaN(new Date(date).getTime())) return "—"
+  return date.toLocaleDateString("es-AR", { day: "numeric", month: "short", year: "numeric" })
+}
 
   return (
     <div className="space-y-8">
@@ -162,7 +164,7 @@ export default async function LeaguePlayerProfilePage({ params }: Props) {
           <CardContent className="flex flex-col items-center px-3 py-4 text-center">
             <User className="mb-1.5 h-4 w-4 text-muted-foreground" />
             <div className="text-xs text-muted-foreground">Edad</div>
-            <div className="mt-0.5 text-sm font-medium">{age} años</div>
+            <div className="mt-0.5 text-sm font-medium">{age !== null ? `${age} años` : "—"}</div>
           </CardContent>
         </Card>
         <Card size="sm">

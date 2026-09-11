@@ -23,7 +23,7 @@ export type PlayerRow = {
   name: string
   surname: string
   dni: string
-  birthDate: string
+  birthDate: string | null
   jerseyNumber: number | null
   isActive: boolean
   teamName: string
@@ -40,8 +40,10 @@ interface PlayersTableProps {
   teams?: { id: string; shortName: string; name: string }[]
 }
 
-function formatDate(isoDate: string): string {
+function formatDate(isoDate: string | null): string {
+  if (!isoDate) return "—"
   const date = new Date(isoDate)
+  if (Number.isNaN(date.getTime())) return "—"
   return date.toLocaleDateString("es-AR", {
     day: "numeric",
     month: "short",

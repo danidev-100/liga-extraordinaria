@@ -26,6 +26,7 @@ import { Loader2 } from "lucide-react"
 import { playerSchema, type PlayerFormData } from "@/lib/validations/player"
 import { createPlayer, updatePlayer } from "@/actions/player"
 import { getTeams } from "@/actions/team"
+import { toSafeIsoDate } from "@/lib/dates"
 
 interface TeamOption {
   id: string
@@ -63,7 +64,7 @@ export function PlayerForm({ initialData }: PlayerFormProps) {
           name: initialData.name,
           surname: initialData.surname,
           dni: initialData.dni,
-          birthDate: initialData.birthDate.toISOString().split("T")[0],
+          birthDate: toSafeIsoDate(initialData.birthDate)?.split("T")[0] ?? "",
           jerseyNumber: initialData.jerseyNumber,
           teamId: initialData.teamId,
           isActive: initialData.isActive,

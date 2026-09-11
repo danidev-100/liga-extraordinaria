@@ -110,6 +110,16 @@ export async function importPlayersFromCSV(
         ? new Date(row.fechaNacimiento)
         : new Date("2000-01-01")
 
+      // Reject malformed or out-of-range birth dates instead of storing garbage.
+      if (Number.isNaN(birthDate.getTime()) || birthDate.getFullYear() < 1900 || birthDate.getTime() > Date.now()) {
+        result.errors.push({
+          row: rowNum,
+          message: `Fecha de nacimiento inválida: "${row.fechaNacimiento ?? ""}"`,
+        })
+        result.skipped++
+        continue
+      }
+
       const jerseyNumber = row.camiseta
         ? parseInt(row.camiseta, 10)
         : null

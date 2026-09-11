@@ -8,6 +8,7 @@ import { CategoryFilter } from "@/components/ui/category-filter"
 import { LeagueSelector } from "@/components/ui/league-selector"
 import { PlayersTable } from "@/components/tables/players-table"
 import { ImportPlayersCSV } from "@/components/forms/import-players-csv"
+import { toSafeIsoDate } from "@/lib/dates"
 
 export default async function PlayersPage({
   searchParams,
@@ -99,7 +100,7 @@ export default async function PlayersPage({
               name: p.name,
               surname: p.surname,
               dni: p.dni,
-              birthDate: p.birthDate.toISOString(),
+              birthDate: toSafeIsoDate(p.birthDate),
               jerseyNumber: p.jerseyNumber,
               isActive: p.isActive,
               teamName: p.team.name,

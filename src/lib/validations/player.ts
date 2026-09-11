@@ -1,5 +1,14 @@
 import { z } from "zod"
 
+function isReasonableBirthDate(value: string): boolean {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return false
+  const year = date.getFullYear()
+  if (year < 1900) return false
+  if (date.getTime() > Date.now()) return false
+  return true
+}
+
 export const playerSchema = z.object({
   name: z
     .string()
@@ -13,7 +22,10 @@ export const playerSchema = z.object({
     .string()
     .min(5, "El DNI debe tener al menos 5 caracteres")
     .max(20, "El DNI no puede exceder 20 caracteres"),
-  birthDate: z.string().min(1, "La fecha de nacimiento es requerida"),
+  birthDate: z
+    .string()
+    .min(1, "La fecha de nacimiento es requerida")
+    .refine(isReasonableBirthDate, "La fecha de nacimiento es inválida (debe estar entre 1900 y hoy)"),
   jerseyNumber: z
     .number()
     .int("Debe ser un número entero")

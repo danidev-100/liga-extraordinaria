@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus } from "lucide-react"
 import { PlayersTable } from "@/components/tables/players-table"
 import { ImportPlayersCSV } from "@/components/forms/import-players-csv"
+import { toSafeIsoDate } from "@/lib/dates"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -119,7 +120,7 @@ export default async function ScopedPlayersPage({ params, searchParams }: Props)
               name: p.name,
               surname: p.surname,
               dni: p.dni,
-              birthDate: p.birthDate.toISOString(),
+              birthDate: toSafeIsoDate(p.birthDate),
               jerseyNumber: p.jerseyNumber,
               isActive: p.isActive,
               teamName: p.team.name,

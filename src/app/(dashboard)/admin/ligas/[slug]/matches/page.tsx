@@ -10,6 +10,7 @@ import { deleteMatch, postponeMatch, rescheduleMatch } from "@/actions/matches"
 import { Badge } from "@/components/ui/badge"
 import { TeamLogo } from "@/components/ui/team-logo"
 import { RoundVisibilityToggle } from "@/components/ui/round-visibility-toggle"
+import { SwapRivalsButton } from "@/components/forms/swap-rivals-button"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -332,6 +333,26 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                             <DeleteButton
                               action={deleteMatch.bind(null, match.id, slug)}
                               confirmMessage="¿Eliminar este partido?"
+                            />
+                          )}
+                          {(match.status === "SCHEDULED" || match.status === "POSTPONED") && (
+                            <SwapRivalsButton
+                              matchId={match.id}
+                              localName={match.localTeam.shortName}
+                              visitorName={match.visitorTeam.shortName}
+                              leagueSlug={slug}
+                              candidates={roundMatches
+                                .filter(
+                                  (m) =>
+                                    m.id !== match.id &&
+                                    m.categoryId === match.categoryId &&
+                                    (m.status === "SCHEDULED" || m.status === "POSTPONED"),
+                                )
+                                .map((m) => ({
+                                  id: m.id,
+                                  localName: m.localTeam.shortName,
+                                  visitorName: m.visitorTeam.shortName,
+                                }))}
                             />
                           )}
                         </div>
