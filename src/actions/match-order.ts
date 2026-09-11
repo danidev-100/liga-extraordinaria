@@ -261,3 +261,124 @@ export async function reorderRound(categoryId: string, round: number, slug?: str
 
   return { moved: result.changes.length }
 }
+
+/**
+ * Crea un partido entre dos equipos que están libres en una jornada.
+ *
+ * Toma fecha/hora/cancha de los otros partidos de la misma jornada. No bloquea
+ * cruces que ya existan en jornadas futuras (el "Reordenar jornada" se encarga
+ * después); solo valida que ambos equipos estén libres en esa fecha y que el
+ * cruce no se haya jugado.
+ */
+export async function createFreeMatch(
+  categoryId: string,
+  round: number,
+  localTeamId: string,
+  visitorTeamId: string,
+  slug?: string,
+) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error("No autorizado")
+  if (slug) await ensureScope(slug)
+
+  if (localTeamId === visitorTeamId) {
+    throw new Error("Los equipos deben ser diferentes")
+  }
+
+  const [teams, roundMatches] = await Promise.all([
+    db.team.findMany({
+      where: { id: { in: [localTeamId, visitorTeamId] } },
+      select: { id: true, categoryId: true, name: true },
+    }),
+    db.match.findMany({
+      where: { categoryId, round },
+      select: { id: true, localTeamId: true, visitorTeamId: true, courtId: true, date: true, time: true },
+    }),
+  ])
+
+  if (teams.length !== 2) throw new Error("Uno o ambos equipos no existen")
+  if (teams[0].categoryId !== teams[1].categoryId) {
+    throw new Error("Los equipos deben pertenecer a la misma categoría")
+  }
+  if (teams[0].categoryId !== categoryId) {
+    throw new Error("Los equipos no pertenecen a esta categoría")
+  }
+
+  // Both teams must be free in this round.
+  const busy = new Set<string>()
+  for (const m of roundMatches) {
+    busy.add(m.localTeamId)
+    busy.add(m.visitorTeamId)
+  }
+  if (busy.has(localTeamId) || busy.has(visitorTeamId)) {
+    throw new Error("Uno de los equipos ya tiene partido en esta jornada")
+  }
+
+  // The crossing must not have been played already.
+  const played = await db.match.findFirst({
+    where: {
+      categoryId,
+      status: { in: ["FINISHED", "PLAYING"] },
+      OR: [
+        { localTeamId, visitorTeamId },
+        { localTeamId: visitorTeamId, visitorTeamId: localTeamId },
+      ],
+    },
+    select: { round: true },
+  })
+  if (played) {
+    const names = await db.team.findMany({
+      where: { id: { in: [localTeamId, visitorTeamId] } },
+      select: { id: true, name: true },
+    })
+    const nameMap = Object.fromEntries(names.map((t) => [t.id, t.name]))
+    throw new Error(
+      `El cruce ${nameMap[localTeamId]} vs ${nameMap[visitorTeamId]} ya se jugó en la Jornada ${played.round}`,
+    )
+  }
+
+  // Reuse date/time/court from the round when available; fall back to the
+  // league period otherwise.
+  let date = new Date()
+  let time = "20:00"
+  let courtId: string | null = null
+
+  const template = roundMatches[0]
+  if (template) {
+    date = template.date
+    time = template.time
+    courtId = template.courtId
+  } else {
+    const category = await db.category.findUnique({
+      where: { id: categoryId },
+      select: { league: { select: { startDate: true } } },
+    })
+    if (category?.league.startDate) {
+      const base = new Date(category.league.startDate)
+      base.setDate(base.getDate() + (round - 1) * 7)
+      date = base
+    }
+    const courts = await db.court.findFirst({ select: { id: true }, orderBy: { name: "asc" } })
+    courtId = courts?.id ?? null
+  }
+
+  if (!courtId) throw new Error("No hay canchas registradas")
+
+  const match = await db.match.create({
+    data: {
+      categoryId,
+      courtId,
+      date,
+      time,
+      localTeamId,
+      visitorTeamId,
+      round,
+      status: "SCHEDULED",
+    },
+  })
+
+  revalidatePath("/admin/matches")
+  if (slug) revalidatePath(`/admin/ligas/${slug}/matches`)
+
+  return { created: match.id }
+}

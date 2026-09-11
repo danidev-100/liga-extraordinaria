@@ -14,6 +14,8 @@ import { ResetMatchButton } from "@/components/forms/reset-match-button"
 import { RepairCategoryButton } from "@/components/forms/repair-category-button"
 import { SwapRivalsButton } from "@/components/forms/swap-rivals-button"
 import { ReorderRoundButton } from "@/components/forms/reorder-round-button"
+import { FreeMatchButton } from "@/components/forms/free-match-button"
+import { MakeFreeButton } from "@/components/forms/make-free-button"
 import { findDuplicateEncounters } from "@/lib/matches/encounter"
 
 const statusConfig = {
@@ -436,6 +438,13 @@ export default async function MatchesPage({
                             />
                           )}
                           {(match.status === "SCHEDULED" || match.status === "POSTPONED") && (
+                            <MakeFreeButton
+                              matchId={match.id}
+                              localName={match.localTeam.shortName}
+                              visitorName={match.visitorTeam.shortName}
+                            />
+                          )}
+                          {(match.status === "SCHEDULED" || match.status === "POSTPONED") && (
                             <SwapRivalsButton
                               matchId={match.id}
                               localName={match.localTeam.shortName}
@@ -486,6 +495,14 @@ export default async function MatchesPage({
                         {team.shortName}
                       </span>
                     ))}
+                    <span className="mx-1" />
+                    {catsInRound.length === 1 && (
+                      <FreeMatchButton
+                        categoryId={catsInRound[0][0]}
+                        round={round}
+                        freeTeams={freeTeams.map((t) => ({ id: t.id, name: t.name, shortName: t.shortName }))}
+                      />
+                    )}
                   </div>
                 )}
               </section>
