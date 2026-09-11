@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
+import type { Prisma } from "@prisma/client"
 import { finishMatchSchema, type FinishMatchFormData } from "@/lib/validations/match-result"
 import { calculateStandings, type TeamInfo, type MatchResultData, type CardData } from "@/lib/standings"
 
@@ -13,6 +14,60 @@ async function ensureAuth() {
     throw new Error("No autorizado")
   }
   return session
+}
+
+/**
+ * Recompute the standings table for a category from its finished matches.
+ * Runs inside a transaction so callers can combine it with other writes.
+ */
+async function recalculateStandings(categoryId: string, tx: Prisma.TransactionClient) {
+  const [teams, matches, cards] = await Promise.all([
+    tx.team.findMany({
+      where: { categoryId },
+      select: { id: true, name: true, shortName: true },
+    }),
+    tx.match.findMany({
+      where: { categoryId, status: "FINISHED" },
+      select: {
+        localTeamId: true,
+        visitorTeamId: true,
+        localScore: true,
+        visitorScore: true,
+      },
+    }),
+    tx.card.findMany({
+      where: { match: { categoryId, status: "FINISHED" } },
+      select: { teamId: true, type: true },
+    }),
+  ])
+
+  const result = calculateStandings(
+    teams as TeamInfo[],
+    matches as MatchResultData[],
+    cards as CardData[],
+  )
+
+  await tx.standing.deleteMany({ where: { categoryId } })
+
+  if (result.length > 0) {
+    await tx.standing.createMany({
+      data: result.map((s) => ({
+        categoryId,
+        teamId: s.teamId,
+        pts: s.pts,
+        pj: s.pj,
+        pg: s.pg,
+        pe: s.pe,
+        pp: s.pp,
+        gf: s.gf,
+        gc: s.gc,
+        dg: s.dg,
+        ta: s.ta,
+        tr: s.tr,
+        position: s.position,
+      })),
+    })
+  }
 }
 
 /**
@@ -117,57 +172,42 @@ export async function finishMatch(matchId: string, data: FinishMatchFormData, sl
     }
 
     // 5. Recalculate standings for the category
-    const categoryId = match.categoryId
-
-    const [teams, matches, cards] = await Promise.all([
-      tx.team.findMany({
-        where: { categoryId },
-        select: { id: true, name: true, shortName: true },
-      }),
-      tx.match.findMany({
-        where: { categoryId, status: "FINISHED" },
-        select: {
-          localTeamId: true,
-          visitorTeamId: true,
-          localScore: true,
-          visitorScore: true,
-        },
-      }),
-      tx.card.findMany({
-        where: { match: { categoryId, status: "FINISHED" } },
-        select: { teamId: true, type: true },
-      }),
-    ])
-
-    const result = calculateStandings(
-      teams as TeamInfo[],
-      matches as MatchResultData[],
-      cards as CardData[],
-    )
-
-    await tx.standing.deleteMany({ where: { categoryId } })
-
-    if (result.length > 0) {
-      await tx.standing.createMany({
-        data: result.map((s) => ({
-          categoryId,
-          teamId: s.teamId,
-          pts: s.pts,
-          pj: s.pj,
-          pg: s.pg,
-          pe: s.pe,
-          pp: s.pp,
-          gf: s.gf,
-          gc: s.gc,
-          dg: s.dg,
-          ta: s.ta,
-          tr: s.tr,
-          position: s.position,
-        })),
-      })
-    }
+    await recalculateStandings(match.categoryId, tx)
   })
 
   revalidatePath("/admin/matches")
   revalidatePath("/admin/standings")
+}
+
+export async function resetMatch(matchId: string, slug?: string) {
+  await ensureAuth()
+  if (slug) await ensureScope(slug)
+
+  const match = await db.match.findUnique({
+    where: { id: matchId },
+    select: { id: true, status: true, categoryId: true },
+  })
+
+  if (!match) throw new Error("Partido no encontrado")
+  if (match.status !== "FINISHED") {
+    throw new Error("Solo se pueden resetear partidos finalizados")
+  }
+
+  // Clear goals/cards/score, return the match to SCHEDULED and drop it from standings
+  await db.$transaction(async (tx: Prisma.TransactionClient) => {
+    await tx.goal.deleteMany({ where: { matchId } })
+    await tx.card.deleteMany({ where: { matchId } })
+    await tx.match.update({
+      where: { id: matchId },
+      data: { localScore: null, visitorScore: null, status: "SCHEDULED" },
+    })
+    await recalculateStandings(match.categoryId, tx)
+  })
+
+  revalidatePath("/admin/matches")
+  revalidatePath("/admin/standings")
+  if (slug) {
+    revalidatePath(`/admin/ligas/${slug}/matches`)
+    revalidatePath(`/admin/ligas/${slug}/standings`)
+  }
 }

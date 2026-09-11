@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { auth } from "@/lib/auth"
 import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
+import { findDuplicateEncounter } from "@/lib/matches/encounter"
 import { matchSchema, matchUpdateSchema, type MatchFormData, type MatchUpdateData } from "@/lib/validations/match"
 
 async function ensureAuth() {
@@ -111,8 +112,8 @@ export async function createMatch(data: MatchFormData, slug?: string) {
 
   // Validate both teams belong to the same category
   const [localTeam, visitorTeam] = await Promise.all([
-    db.team.findUnique({ where: { id: parsed.localTeamId }, select: { categoryId: true } }),
-    db.team.findUnique({ where: { id: parsed.visitorTeamId }, select: { categoryId: true } }),
+    db.team.findUnique({ where: { id: parsed.localTeamId }, select: { categoryId: true, name: true } }),
+    db.team.findUnique({ where: { id: parsed.visitorTeamId }, select: { categoryId: true, name: true } }),
   ])
 
   if (!localTeam || !visitorTeam) {
@@ -125,6 +126,21 @@ export async function createMatch(data: MatchFormData, slug?: string) {
 
   if (visitorTeam.categoryId !== parsed.categoryId) {
     throw new Error("El equipo visitante no pertenece a la categoría seleccionada")
+  }
+
+  // Reject encounters that already exist elsewhere in the category
+  const categoryMatches = await db.match.findMany({
+    where: { categoryId: parsed.categoryId },
+    select: { id: true, round: true, localTeamId: true, visitorTeamId: true },
+  })
+  const duplicate = findDuplicateEncounter(categoryMatches, {
+    localTeamId: parsed.localTeamId,
+    visitorTeamId: parsed.visitorTeamId,
+  })
+  if (duplicate) {
+    throw new Error(
+      `El cruce ${localTeam.name} vs ${visitorTeam.name} ya está programado en la Jornada ${duplicate.round}`,
+    )
   }
 
   // Validate court availability
@@ -165,6 +181,41 @@ export async function updateMatch(id: string, data: MatchUpdateData, slug?: stri
   // If changing teams, validate same-team guard
   if (parsed.localTeamId && parsed.visitorTeamId && parsed.localTeamId === parsed.visitorTeamId) {
     throw new Error("El equipo local y visitante deben ser diferentes")
+  }
+
+  // If teams are changing, reject encounters that already exist elsewhere in the category
+  if (parsed.localTeamId !== undefined || parsed.visitorTeamId !== undefined) {
+    const current = await db.match.findUnique({
+      where: { id },
+      select: { categoryId: true, localTeamId: true, visitorTeamId: true },
+    })
+    if (current) {
+      const effLocal = parsed.localTeamId ?? current.localTeamId
+      const effVisitor = parsed.visitorTeamId ?? current.visitorTeamId
+      const teamsChanged =
+        effLocal !== current.localTeamId || effVisitor !== current.visitorTeamId
+
+      if (teamsChanged) {
+        const categoryMatches = await db.match.findMany({
+          where: { categoryId: current.categoryId },
+          select: { id: true, round: true, localTeamId: true, visitorTeamId: true },
+        })
+        const duplicate = findDuplicateEncounter(categoryMatches, {
+          id,
+          localTeamId: effLocal,
+          visitorTeamId: effVisitor,
+        })
+        if (duplicate) {
+          const [localName, visitorName] = await Promise.all([
+            db.team.findUnique({ where: { id: effLocal }, select: { name: true } }),
+            db.team.findUnique({ where: { id: effVisitor }, select: { name: true } }),
+          ])
+          throw new Error(
+            `El cruce ${localName?.name ?? "?"} vs ${visitorName?.name ?? "?"} ya está programado en la Jornada ${duplicate.round}`,
+          )
+        }
+      }
+    }
   }
 
   // If changing court/date/time, check availability

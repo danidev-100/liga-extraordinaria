@@ -5,10 +5,11 @@ import { MatchForm } from "@/components/forms/match-form"
 import { MatchResultForm } from "@/components/forms/match-result-form"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { CheckCircle2, Clock, Play, CalendarClock, CalendarPlus } from "lucide-react"
+import { CheckCircle2, Clock, Play, CalendarClock, CalendarPlus, RotateCcw } from "lucide-react"
 import { TeamLogo } from "@/components/ui/team-logo"
 import { Button } from "@/components/ui/button"
 import { rescheduleMatch } from "@/actions/matches"
+import { ResetMatchButton } from "@/components/forms/reset-match-button"
 
 const statusConfig = {
   SCHEDULED: { label: "Programado", variant: "secondary" as const, icon: Clock },
@@ -287,6 +288,24 @@ export default async function MatchDetailPage({
           </CardHeader>
           <CardContent>
             <MatchResultForm match={match} editing />
+          </CardContent>
+        </Card>
+      )}
+
+      {isFinished && (
+        <Card className="border-destructive/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-destructive">
+              <RotateCcw className="h-5 w-5" />
+              Resetear partido
+            </CardTitle>
+            <CardDescription>
+              Devuelve el partido a &quot;Programado&quot; y lo saca de la tabla de posiciones. Se
+              borran goles, tarjetas y el resultado.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResetMatchButton matchId={match.id} />
           </CardContent>
         </Card>
       )}

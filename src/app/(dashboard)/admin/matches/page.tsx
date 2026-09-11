@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { LeagueSelector } from "@/components/ui/league-selector"
 import { TeamLogo } from "@/components/ui/team-logo"
 import { RoundVisibilityToggle } from "@/components/ui/round-visibility-toggle"
+import { ResetMatchButton } from "@/components/forms/reset-match-button"
 
 const statusConfig = {
   SCHEDULED: {
@@ -341,6 +342,9 @@ export default async function MatchesPage({
                                 Reprogramar
                               </Button>
                             </form>
+                          )}
+                          {match.status === "FINISHED" && (
+                            <ResetMatchButton matchId={match.id} label="Resetear" />
                           )}
                           {(match.status === "SCHEDULED" || match.status === "POSTPONED") && (
                             <DeleteButton
