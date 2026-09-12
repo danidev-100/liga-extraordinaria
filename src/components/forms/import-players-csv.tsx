@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge"
 import { Upload, FileSpreadsheet, Loader2, AlertTriangle, CheckCircle2, Download } from "lucide-react"
 import { importPlayersFromCSV, type ImportResult } from "@/actions/csv-import"
 import Papa from "papaparse"
+import * as XLSX from "xlsx"
 
 interface TeamOption {
   id: string
@@ -35,12 +36,29 @@ interface PreviewRow {
   apellido: string
   dni: string
   fechaNacimiento?: string
-  fecha_nacimiento?: string
   camiseta?: string
-  numero?: string
 }
 
-export function ImportPlayersCSV({ teams: initialTeams }: { teams?: TeamOption[] }) {
+/** Normaliza celdas de fecha de Excel (Date real) y texto a AAAA-MM-DD o texto plano. */
+function formatDateCell(v: unknown): string {
+  if (v instanceof Date && !isNaN(v.getTime())) {
+    return v.toISOString().slice(0, 10)
+  }
+  return String(v ?? "")
+}
+
+function isExcelFile(name: string): boolean {
+  return /\.(xlsx|xls)$/i.test(name)
+}
+
+export function ImportPlayersCSV({
+  teams: initialTeams,
+  leagueSlug,
+}: {
+  teams?: TeamOption[]
+  /** League slug when rendered from a scoped admin page (refreshes that list). */
+  leagueSlug?: string
+}) {
   const [open, setOpen] = useState(false)
   const [teams, setTeams] = useState<TeamOption[]>(initialTeams ?? [])
   const [selectedTeamId, setSelectedTeamId] = useState("")
@@ -57,25 +75,47 @@ export function ImportPlayersCSV({ teams: initialTeams }: { teams?: TeamOption[]
     setFile(f)
     setResult(null)
 
-    // Parse preview (first 5 rows)
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const text = ev.target?.result as string
-      Papa.parse<PreviewRow>(text, {
+    const parsePreview = async (): Promise<PreviewRow[]> => {
+      if (isExcelFile(f.name)) {
+        const buf = await f.arrayBuffer()
+        const workbook = XLSX.read(buf, { type: "array", cellDates: true })
+        const sheetName = workbook.SheetNames[0]
+        if (!sheetName) return []
+        const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[sheetName], {
+          defval: "",
+        })
+        return raw.slice(0, 5).map((r) => ({
+          nombre: String(r.nombre ?? r.Nombre ?? ""),
+          apellido: String(r.apellido ?? r.Apellido ?? ""),
+          dni: String(r.dni ?? r.DNI ?? r.documento ?? ""),
+          fechaNacimiento: formatDateCell(r.fechaNacimiento ?? r.fecha_nacimiento ?? r.FechaNacimiento ?? ""),
+          camiseta: String(r.camiseta ?? r.numero ?? r.Camiseta ?? r.Numero ?? ""),
+        }))
+      }
+
+      const text = await f.text()
+      const parsed = Papa.parse<Record<string, string>>(text, {
         header: true,
         skipEmptyLines: true,
         preview: 5,
-        complete: (results) => {
-          setPreview(results.data)
-        },
       })
+      return parsed.data.map((r) => ({
+        nombre: r.nombre ?? r.Nombre ?? "",
+        apellido: r.apellido ?? r.Apellido ?? "",
+        dni: r.dni ?? r.DNI ?? r.documento ?? "",
+        fechaNacimiento: r.fechaNacimiento ?? r.fecha_nacimiento ?? r.FechaNacimiento ?? "",
+        camiseta: r.camiseta ?? r.numero ?? r.Camiseta ?? r.Numero ?? "",
+      }))
     }
-    reader.readAsText(f)
+
+    parsePreview()
+      .then((rows) => setPreview(rows))
+      .catch(() => setPreview([]))
   }
 
   async function handleImport() {
     if (!file || !selectedTeamId) {
-      toast.error("Seleccioná un equipo y un archivo CSV")
+      toast.error("Seleccioná un equipo y un archivo Excel o CSV")
       return
     }
 
@@ -87,7 +127,7 @@ export function ImportPlayersCSV({ teams: initialTeams }: { teams?: TeamOption[]
       formData.append("file", file)
       formData.append("teamId", selectedTeamId)
 
-      const res = await importPlayersFromCSV(formData)
+      const res = await importPlayersFromCSV(formData, leagueSlug)
       setResult(res)
 
       if (res.created > 0) {
@@ -111,18 +151,40 @@ export function ImportPlayersCSV({ teams: initialTeams }: { teams?: TeamOption[]
     if (fileRef.current) fileRef.current.value = ""
   }
 
+  function downloadXlsxTemplate() {
+    const wb = XLSX.utils.book_new()
+    const ws = XLSX.utils.aoa_to_sheet([
+      ["nombre", "apellido", "dni", "fechaNacimiento", "camiseta"],
+      ["Juan", "Pérez", "12345678", "2005-06-15", "10"],
+      ["María", "García", "87654321", "2006-03-22", "7"],
+    ])
+    XLSX.utils.book_append_sheet(wb, ws, "Jugadores")
+    XLSX.writeFile(wb, "plantilla-jugadores.xlsx")
+  }
+
+  function downloadCsvTemplate() {
+    const csv = "nombre,apellido,dni,fechaNacimiento,camiseta\nJuan,Pérez,12345678,2005-06-15,10\nMaría,García,87654321,2006-03-22,7"
+    const blob = new Blob([csv], { type: "text/csv" })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = "plantilla-jugadores.csv"
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset() }}>
       <DialogTrigger className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors hover:bg-muted">
         <Upload className="h-4 w-4" />
-        Importar CSV
+        Importar Excel / CSV
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Importar jugadores desde CSV</DialogTitle>
+          <DialogTitle>Importar jugadores desde Excel o CSV</DialogTitle>
           <DialogDescription>
-            Subí un archivo CSV con las columnas: <strong>nombre, apellido, dni</strong>.
-            Opcional: <strong>fechaNacimiento</strong> (AAAA-MM-DD), <strong>camiseta</strong>.
+            Subí un archivo <strong>Excel (.xlsx)</strong> o CSV con las columnas en este orden:{" "}
+            <strong>nombre, apellido, dni, fechaNacimiento (AAAA-MM-DD), camiseta</strong>.
           </DialogDescription>
         </DialogHeader>
 
@@ -146,15 +208,15 @@ export function ImportPlayersCSV({ teams: initialTeams }: { teams?: TeamOption[]
 
           {/* File upload */}
           <div className="space-y-1.5">
-            <label className="text-sm font-medium">Archivo CSV *</label>
+            <label className="text-sm font-medium">Archivo Excel o CSV *</label>
             <div className="flex items-center gap-2">
               <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-6 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/50 flex-1 justify-center">
                 <FileSpreadsheet className="h-6 w-6" />
-                <span>{file ? file.name : "Hacé clic para seleccionar CSV"}</span>
+                <span>{file ? file.name : "Hacé clic para seleccionar Excel o CSV"}</span>
                 <input
                   ref={fileRef}
                   type="file"
-                  accept=".csv"
+                  accept=".csv,.xlsx,.xls"
                   onChange={handleFile}
                   className="hidden"
                 />
@@ -183,8 +245,8 @@ export function ImportPlayersCSV({ teams: initialTeams }: { teams?: TeamOption[]
                         <td className="px-3 py-2">{row.nombre}</td>
                         <td className="px-3 py-2">{row.apellido}</td>
                         <td className="px-3 py-2">{row.dni}</td>
-                        <td className="px-3 py-2">{row.fechaNacimiento || row.fecha_nacimiento || ""}</td>
-                        <td className="px-3 py-2">{row.camiseta || row.numero || ""}</td>
+                        <td className="px-3 py-2">{row.fechaNacimiento || ""}</td>
+                        <td className="px-3 py-2">{row.camiseta || ""}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -228,6 +290,11 @@ export function ImportPlayersCSV({ teams: initialTeams }: { teams?: TeamOption[]
                 <Badge variant="default" className="bg-green-600">
                   {result.created} creados
                 </Badge>
+                {result.updated > 0 && (
+                  <Badge variant="secondary">
+                    {result.updated} actualizados
+                  </Badge>
+                )}
                 {result.skipped > 0 && (
                   <Badge variant="destructive">
                     {result.skipped} omitidos
@@ -246,20 +313,19 @@ export function ImportPlayersCSV({ teams: initialTeams }: { teams?: TeamOption[]
             </div>
           )}
 
-          {/* Template download */}
-          <div className="text-center text-xs text-muted-foreground">
+          {/* Template downloads */}
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
             <button
               type="button"
-              onClick={() => {
-                const csv = "nombre,apellido,dni,fechaNacimiento,camiseta\nJuan,Pérez,12345678,2005-06-15,10\nMaría,García,87654321,2006-03-22,7"
-                const blob = new Blob([csv], { type: "text/csv" })
-                const url = URL.createObjectURL(blob)
-                const a = document.createElement("a")
-                a.href = url
-                a.download = "plantilla-jugadores.csv"
-                a.click()
-                URL.revokeObjectURL(url)
-              }}
+              onClick={downloadXlsxTemplate}
+              className="inline-flex items-center gap-1 text-primary hover:underline"
+            >
+              <Download className="h-3 w-3" />
+              Descargar plantilla Excel
+            </button>
+            <button
+              type="button"
+              onClick={downloadCsvTemplate}
               className="inline-flex items-center gap-1 text-primary hover:underline"
             >
               <Download className="h-3 w-3" />

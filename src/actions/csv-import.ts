@@ -44,20 +44,25 @@ export async function importPlayersFromCSV(
 
   if (isExcel) {
     const buffer = Buffer.from(await file.arrayBuffer())
-    const workbook = XLSX.read(buffer, { type: "buffer" })
+    const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true })
     const sheetName = workbook.SheetNames[0]
     if (!sheetName) throw new Error("El archivo Excel no contiene hojas")
 
-    const raw = XLSX.utils.sheet_to_json<Record<string, string>>(workbook.Sheets[sheetName], {
+    const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[sheetName], {
       defval: "",
     })
 
+    const dateOf = (v: unknown): string => {
+      if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString().slice(0, 10)
+      return String(v ?? "").trim()
+    }
+
     rows = raw.map((r) => ({
-      nombre: (r.nombre ?? r.Nombre ?? "").toString().trim(),
-      apellido: (r.apellido ?? r.Apellido ?? "").toString().trim(),
-      dni: (r.dni ?? r.DNI ?? r.documento ?? "").toString().trim(),
-      fechaNacimiento: (r.fechaNacimiento ?? r.fecha_nacimiento ?? r.FechaNacimiento ?? "").toString().trim(),
-      camiseta: (r.camiseta ?? r.numero ?? r.Camiseta ?? r.Numero ?? "").toString().trim(),
+      nombre: String(r.nombre ?? r.Nombre ?? "").trim(),
+      apellido: String(r.apellido ?? r.Apellido ?? "").trim(),
+      dni: String(r.dni ?? r.DNI ?? r.documento ?? "").trim(),
+      fechaNacimiento: dateOf(r.fechaNacimiento ?? r.fecha_nacimiento ?? r.FechaNacimiento ?? ""),
+      camiseta: String(r.camiseta ?? r.numero ?? r.Camiseta ?? r.Numero ?? "").trim(),
     }))
   } else {
     const text = await file.text()
@@ -171,6 +176,7 @@ export async function importPlayersFromCSV(
   }
 
   revalidatePath("/admin/players")
+  if (slug) revalidatePath(`/admin/ligas/${slug}/players`)
   return result
 }
 

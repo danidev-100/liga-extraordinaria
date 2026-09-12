@@ -26,6 +26,7 @@ export default async function EditTeamPage({
       name: true,
       surname: true,
       dni: true,
+      birthDate: true,
       jerseyNumber: true,
       isActive: true,
     },

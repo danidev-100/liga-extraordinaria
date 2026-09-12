@@ -24,6 +24,7 @@ interface Player {
   name: string
   surname: string
   dni: string
+  birthDate: string | Date | null
   jerseyNumber: number | null
   isActive: boolean
 }
@@ -32,6 +33,17 @@ interface Props {
   teamId: string
   teamName: string
   players: Player[]
+}
+
+function formatDate(value: string | Date | null): string {
+  if (!value) return "—"
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return "—"
+  return date.toLocaleDateString("es-AR", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  })
 }
 
 export function TeamPlayerSection({ teamId, teamName, players }: Props) {
@@ -327,6 +339,7 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
                 <th className="px-3 py-2.5 text-left">Nombre</th>
                 <th className="px-3 py-2.5 text-left">Apellido</th>
                 <th className="px-3 py-2.5 text-left">DNI</th>
+                <th className="px-3 py-2.5 text-left">Nacimiento</th>
                 <th className="px-3 py-2.5 text-center">Camiseta</th>
                 <th className="px-3 py-2.5 text-center">Estado</th>
               </tr>
@@ -337,6 +350,7 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
                   <td className="px-3 py-2.5 font-medium">{p.name}</td>
                   <td className="px-3 py-2.5">{p.surname}</td>
                   <td className="px-3 py-2.5 font-mono text-xs">{p.dni}</td>
+                  <td className="px-3 py-2.5 text-muted-foreground">{formatDate(p.birthDate)}</td>
                   <td className="px-3 py-2.5 text-center">
                     {p.jerseyNumber ? (
                       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">

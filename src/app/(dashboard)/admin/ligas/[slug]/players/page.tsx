@@ -66,7 +66,7 @@ export default async function ScopedPlayersPage({ params, searchParams }: Props)
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <ImportPlayersCSV teams={teams.map(t => ({ id: t.id, name: t.name, shortName: t.shortName, category: t.category }))} />
+          <ImportPlayersCSV teams={teams.map(t => ({ id: t.id, name: t.name, shortName: t.shortName, category: t.category }))} leagueSlug={slug} />
           <Link href={`/admin/players/new`}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
