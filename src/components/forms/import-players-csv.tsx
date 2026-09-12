@@ -21,6 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Upload, FileSpreadsheet, Loader2, AlertTriangle, CheckCircle2, Download } from "lucide-react"
 import { importPlayersFromCSV, type ImportResult } from "@/actions/csv-import"
+import { parsePlayersExcel } from "@/lib/excel-players"
 import Papa from "papaparse"
 import * as XLSX from "xlsx"
 
@@ -37,14 +38,6 @@ interface PreviewRow {
   dni: string
   fechaNacimiento?: string
   camiseta?: string
-}
-
-/** Normaliza celdas de fecha de Excel (Date real) y texto a AAAA-MM-DD o texto plano. */
-function formatDateCell(v: unknown): string {
-  if (v instanceof Date && !isNaN(v.getTime())) {
-    return v.toISOString().slice(0, 10)
-  }
-  return String(v ?? "")
 }
 
 function isExcelFile(name: string): boolean {
@@ -77,20 +70,8 @@ export function ImportPlayersCSV({
 
     const parsePreview = async (): Promise<PreviewRow[]> => {
       if (isExcelFile(f.name)) {
-        const buf = await f.arrayBuffer()
-        const workbook = XLSX.read(buf, { type: "array", cellDates: true })
-        const sheetName = workbook.SheetNames[0]
-        if (!sheetName) return []
-        const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[sheetName], {
-          defval: "",
-        })
-        return raw.slice(0, 5).map((r) => ({
-          nombre: String(r.nombre ?? r.Nombre ?? ""),
-          apellido: String(r.apellido ?? r.Apellido ?? ""),
-          dni: String(r.dni ?? r.DNI ?? r.documento ?? ""),
-          fechaNacimiento: formatDateCell(r.fechaNacimiento ?? r.fecha_nacimiento ?? r.FechaNacimiento ?? ""),
-          camiseta: String(r.camiseta ?? r.numero ?? r.Camiseta ?? r.Numero ?? ""),
-        }))
+        const rows = parsePlayersExcel(await f.arrayBuffer())
+        return rows.slice(0, 5)
       }
 
       const text = await f.text()

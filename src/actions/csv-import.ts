@@ -5,7 +5,7 @@ import { auth } from "@/lib/auth"
 import { ensureScope } from "@/lib/ensure-scope"
 import db from "@/lib/db"
 import Papa from "papaparse"
-import * as XLSX from "xlsx"
+import { parsePlayersExcel } from "@/lib/excel-players"
 
 interface PlayerRow {
   nombre: string
@@ -44,26 +44,7 @@ export async function importPlayersFromCSV(
 
   if (isExcel) {
     const buffer = Buffer.from(await file.arrayBuffer())
-    const workbook = XLSX.read(buffer, { type: "buffer", cellDates: true })
-    const sheetName = workbook.SheetNames[0]
-    if (!sheetName) throw new Error("El archivo Excel no contiene hojas")
-
-    const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(workbook.Sheets[sheetName], {
-      defval: "",
-    })
-
-    const dateOf = (v: unknown): string => {
-      if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString().slice(0, 10)
-      return String(v ?? "").trim()
-    }
-
-    rows = raw.map((r) => ({
-      nombre: String(r.nombre ?? r.Nombre ?? "").trim(),
-      apellido: String(r.apellido ?? r.Apellido ?? "").trim(),
-      dni: String(r.dni ?? r.DNI ?? r.documento ?? "").trim(),
-      fechaNacimiento: dateOf(r.fechaNacimiento ?? r.fecha_nacimiento ?? r.FechaNacimiento ?? ""),
-      camiseta: String(r.camiseta ?? r.numero ?? r.Camiseta ?? r.Numero ?? "").trim(),
-    }))
+    rows = parsePlayersExcel(buffer)
   } else {
     const text = await file.text()
     const parsed = Papa.parse<PlayerRow>(text, {

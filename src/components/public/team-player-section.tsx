@@ -17,6 +17,7 @@ import {
   Upload, Download, FileSpreadsheet, Loader2, AlertTriangle, CheckCircle2,
 } from "lucide-react"
 import { importPlayersFromCSV, type ImportResult } from "@/actions/csv-import"
+import { parsePlayersExcel } from "@/lib/excel-players"
 import * as XLSX from "xlsx"
 
 interface Player {
@@ -66,15 +67,9 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
     const isExcel = f.name.toLowerCase().endsWith(".xlsx") || f.name.toLowerCase().endsWith(".xls")
 
     if (isExcel) {
-      const reader = new FileReader()
-      reader.onload = (ev) => {
-        const data = new Uint8Array(ev.target?.result as ArrayBuffer)
-        const workbook = XLSX.read(data, { type: "array" })
-        const sheet = workbook.Sheets[workbook.SheetNames[0]]
-        const json = XLSX.utils.sheet_to_json<Record<string, string>>(sheet, { defval: "" })
-        setPreview(json.slice(0, 5))
-      }
-      reader.readAsArrayBuffer(f)
+      f.arrayBuffer().then((buf) => {
+        setPreview(parsePlayersExcel(buf).slice(0, 5) as unknown as Record<string, string>[])
+      })
     } else {
       const reader = new FileReader()
       reader.onload = (ev) => {
