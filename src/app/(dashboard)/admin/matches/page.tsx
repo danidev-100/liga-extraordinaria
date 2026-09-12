@@ -14,6 +14,7 @@ import { ResetMatchButton } from "@/components/forms/reset-match-button"
 import { RepairCategoryButton } from "@/components/forms/repair-category-button"
 import { SwapRivalsButton } from "@/components/forms/swap-rivals-button"
 import { ReorderRoundButton } from "@/components/forms/reorder-round-button"
+import { RoundNotificationButton } from "@/components/forms/round-notification-button"
 import { FreeMatchButton } from "@/components/forms/free-match-button"
 import { MakeFreeButton } from "@/components/forms/make-free-button"
 import { findDuplicateEncounters } from "@/lib/matches/encounter"
@@ -92,6 +93,14 @@ export default async function MatchesPage({
     where: { categoryId: { in: leagueCategoryIds }, hidden: true },
   })
   const hiddenRoundMap = new Map(hiddenRounds.map((h) => [`${h.categoryId}:${h.round}`, true]))
+
+  const roundNotifications = await db.roundNotification.findMany({
+    where: { categoryId: { in: leagueCategoryIds } },
+    select: { categoryId: true, round: true, message: true },
+  })
+  const roundNotificationMap = new Map(
+    roundNotifications.map((n) => [`${n.categoryId}:${n.round}`, n.message]),
+  )
 
   const teams = await db.team.findMany({
     where: categoryId
@@ -319,6 +328,23 @@ export default async function MatchesPage({
                   )}
                   {catsInRound.length === 1 && (
                     <ReorderRoundButton categoryId={catsInRound[0][0]} round={round} />
+                  )}
+                  {catsInRound.length === 1 ? (
+                    <RoundNotificationButton
+                      categoryId={catsInRound[0][0]}
+                      round={round}
+                      message={roundNotificationMap.get(`${catsInRound[0][0]}:${round}`)}
+                    />
+                  ) : (
+                    catsInRound.map(([categoryId, name]) => (
+                      <RoundNotificationButton
+                        key={categoryId}
+                        categoryId={categoryId}
+                        round={round}
+                        message={roundNotificationMap.get(`${categoryId}:${round}`)}
+                        label={name}
+                      />
+                    ))
                   )}
                 </div>
 

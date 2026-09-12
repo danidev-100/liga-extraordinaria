@@ -4,7 +4,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { getLeagueBySlug } from "@/lib/get-league"
-import { Calendar, Sparkles, List } from "lucide-react"
+import { Calendar, Sparkles, List, Megaphone } from "lucide-react"
 import { PrintButton } from "@/components/ui/print-button"
 import { Badge } from "@/components/ui/badge"
 import { MatchScheduleFilter } from "@/components/public/match-schedule-filter"
@@ -88,6 +88,14 @@ async function MatchesContent({
     select: { categoryId: true, round: true },
   })
   const hiddenRoundKeys = new Set(hiddenRounds.map((h) => `${h.categoryId}:${h.round}`))
+
+  const roundNotifications = await db.roundNotification.findMany({
+    where: Object.keys(where).length > 0 ? where : undefined,
+    select: { categoryId: true, round: true, message: true },
+  })
+  const roundNotificationMap = new Map(
+    roundNotifications.map((n) => [`${n.categoryId}:${n.round}`, n.message]),
+  )
 
   const visibleMatches = matches.filter(
     (match) => !hiddenRoundKeys.has(`${match.categoryId}:${match.round}`),
@@ -205,6 +213,16 @@ async function MatchesContent({
           {rounds.map((round) => {
             const roundMatches = groupedByRound[round]
             const freeTeams = freeTeamsByRound.get(round) ?? []
+            const catsInRound = Array.from(
+              new Map(roundMatches.map((m) => [m.categoryId, m.category.name])).entries(),
+            )
+            const roundNotifications = catsInRound
+              .map(([categoryId, name]) => ({
+                categoryId,
+                name,
+                message: roundNotificationMap.get(`${categoryId}:${round}`),
+              }))
+              .filter((n) => Boolean(n.message))
             return (
               <section key={round}>
                 <div className="mb-5 flex items-center gap-3">
@@ -220,6 +238,27 @@ async function MatchesContent({
                     </p>
                   </div>
                 </div>
+
+                {roundNotifications.length > 0 && (
+                  <div className="mb-4 space-y-2">
+                    {roundNotifications.map((notification) => (
+                      <div
+                        key={notification.categoryId}
+                        className="flex items-start gap-3 rounded-xl border border-l-[3px] border-l-amber-500/70 bg-card p-4 shadow-sm"
+                      >
+                        <Megaphone className="mt-0.5 h-4 w-4 shrink-0 animate-pulse text-destructive" />
+                        <div className="animate-pulse text-base">
+                          {catsInRound.length > 1 && (
+                            <p className="mb-0.5 text-xs font-semibold text-muted-foreground">
+                              {categoryNameById.get(notification.categoryId)}
+                            </p>
+                          )}
+                          <p className="whitespace-pre-line">{notification.message}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
 
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-1">
                   {roundMatches.map((match) => {

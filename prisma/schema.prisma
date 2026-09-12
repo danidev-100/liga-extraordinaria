@@ -65,6 +65,7 @@ model Category {
   matches          Match[]
   standings        Standing[]
   roundVisibilities RoundVisibility[]
+  roundNotifications RoundNotification[]
 
   @@unique([name, leagueId])
   @@map("categories")
@@ -224,4 +225,17 @@ model RoundVisibility {
 
   @@unique([categoryId, round])
   @@map("round_visibilities")
+}
+
+model RoundNotification {
+  id         String   @id @default(uuid()) @db.Uuid
+  categoryId String   @map("category_id") @db.Uuid
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  round      Int
+  message    String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([categoryId, round])
+  @@map("round_notifications")
 }
