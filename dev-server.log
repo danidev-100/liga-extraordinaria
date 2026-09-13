@@ -1,0 +1,105 @@
+
+> liga@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.10 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://169.254.83.107:3000
+- Environments: .env
+✓ Ready in 5.3s
+
+ GET / 200 in 3.8s (next.js: 2.9s, application-code: 983ms)
+ GET / 200 in 90ms (next.js: 4ms, application-code: 87ms)
+ GET /manifest.webmanifest 200 in 227ms (next.js: 215ms, application-code: 12ms)
+ GET /manifest.webmanifest 200 in 5ms (next.js: 2ms, application-code: 3ms)
+ GET /api/auth/session 200 in 963ms (next.js: 940ms, application-code: 23ms)
+ GET /api/auth/session 200 in 18ms (next.js: 9ms, application-code: 9ms)
+ GET /login 200 in 121ms (next.js: 38ms, application-code: 83ms)
+ GET /manifest.webmanifest 200 in 9ms (next.js: 4ms, application-code: 4ms)
+ GET /api/auth/session 200 in 21ms (next.js: 13ms, application-code: 9ms)
+ GET /api/auth/session 200 in 19ms (next.js: 2ms, application-code: 17ms)
+ GET /admin 200 in 605ms (next.js: 67ms, proxy.ts: 88ms, application-code: 450ms)
+ GET /admin 200 in 377ms (next.js: 43ms, proxy.ts: 96ms, application-code: 238ms)
+ GET /manifest.webmanifest 200 in 6ms (next.js: 2ms, application-code: 4ms)
+ GET /admin/players 200 in 399ms (next.js: 92ms, proxy.ts: 8ms, application-code: 299ms)
+ GET /manifest.webmanifest 200 in 16ms (next.js: 11ms, application-code: 6ms)
+ GET /api/auth/session 200 in 23ms (next.js: 15ms, application-code: 9ms)
+ GET /api/auth/session 200 in 7ms (next.js: 1603µs, application-code: 6ms)
+ GET /admin/teams 200 in 340ms (next.js: 46ms, proxy.ts: 9ms, application-code: 285ms)
+ GET /manifest.webmanifest 200 in 7ms (next.js: 1985µs, application-code: 5ms)
+ GET /api/auth/session 200 in 21ms (next.js: 13ms, application-code: 8ms)
+ GET /api/auth/session 200 in 8ms (next.js: 1953µs, application-code: 6ms)
+ GET /admin/players 200 in 151ms (next.js: 3ms, proxy.ts: 8ms, application-code: 140ms)
+ GET /manifest.webmanifest 200 in 10ms (next.js: 4ms, application-code: 6ms)
+ GET /api/auth/session 200 in 19ms (next.js: 10ms, application-code: 9ms)
+ GET /api/auth/session 200 in 8ms (next.js: 1773µs, application-code: 6ms)
+ POST /admin/players 200 in 248ms (next.js: 3ms, proxy.ts: 8ms, application-code: 236ms)
+  └─ ƒ importPlayersFromCSV({}, undefined) in 111ms src/actions/csv-import.ts
+ GET /manifest.webmanifest 200 in 6ms (next.js: 2ms, application-code: 4ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 826ms (next.js: 570ms, proxy.ts: 8ms, application-code: 248ms)
+ GET /manifest.webmanifest 200 in 12ms (next.js: 6ms, application-code: 5ms)
+ GET /api/auth/session 200 in 21ms (next.js: 13ms, application-code: 8ms)
+ GET /api/auth/session 200 in 11ms (next.js: 1940µs, application-code: 9ms)
+ POST /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 56ms (next.js: 18ms, proxy.ts: 10ms, application-code: 29ms)
+  └─ ƒ getCategories() in 18ms src/actions/category.ts
+✓ Compiled in 225ms
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 480ms (next.js: 165ms, proxy.ts: 82ms, application-code: 233ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 257ms (next.js: 5ms, proxy.ts: 21ms, application-code: 231ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 193ms (next.js: 11ms, proxy.ts: 43ms, application-code: 139ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 192ms (next.js: 49ms, proxy.ts: 42ms, application-code: 101ms)
+ GET /manifest.webmanifest 200 in 36ms (next.js: 28ms, application-code: 8ms)
+✓ Compiled in 151ms
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 415ms (next.js: 205ms, proxy.ts: 73ms, application-code: 137ms)
+ GET /manifest.webmanifest 200 in 42ms (next.js: 33ms, application-code: 9ms)
+✓ Compiled in 199ms
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 382ms (next.js: 172ms, proxy.ts: 65ms, application-code: 144ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 99ms (next.js: 15ms, proxy.ts: 26ms, application-code: 57ms)
+ GET /manifest.webmanifest 200 in 30ms (next.js: 25ms, application-code: 5ms)
+✓ Compiled in 144ms
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 439ms (next.js: 188ms, proxy.ts: 83ms, application-code: 168ms)
+ GET /manifest.webmanifest 200 in 29ms (next.js: 23ms, application-code: 6ms)
+✓ Finished filesystem cache database compaction in 13.1s
+✓ Compiled in 7.2s
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 503ms (next.js: 186ms, proxy.ts: 74ms, application-code: 242ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 162ms (next.js: 8ms, proxy.ts: 22ms, application-code: 132ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 362ms (next.js: 27ms, proxy.ts: 57ms, application-code: 279ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 399ms (next.js: 58ms, proxy.ts: 56ms, application-code: 285ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 399ms (next.js: 87ms, proxy.ts: 56ms, application-code: 256ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 454ms (next.js: 118ms, proxy.ts: 56ms, application-code: 280ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 410ms (next.js: 46ms, proxy.ts: 207ms, application-code: 156ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 311ms (next.js: 51ms, proxy.ts: 88ms, application-code: 172ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 351ms (next.js: 26ms, proxy.ts: 57ms, application-code: 268ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 379ms (next.js: 66ms, proxy.ts: 51ms, application-code: 263ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 395ms (next.js: 93ms, proxy.ts: 51ms, application-code: 251ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 389ms (next.js: 18ms, proxy.ts: 163ms, application-code: 208ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 393ms (next.js: 44ms, proxy.ts: 196ms, application-code: 152ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 317ms (next.js: 54ms, proxy.ts: 118ms, application-code: 145ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 337ms (next.js: 17ms, proxy.ts: 53ms, application-code: 267ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 374ms (next.js: 52ms, proxy.ts: 45ms, application-code: 276ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 374ms (next.js: 85ms, proxy.ts: 44ms, application-code: 246ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 359ms (next.js: 23ms, proxy.ts: 147ms, application-code: 189ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 353ms (next.js: 47ms, proxy.ts: 185ms, application-code: 121ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 276ms (next.js: 61ms, proxy.ts: 140ms, application-code: 75ms)
+ GET /manifest.webmanifest 200 in 33ms (next.js: 27ms, application-code: 6ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 424ms (next.js: 146ms, proxy.ts: 95ms, application-code: 182ms)
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 99ms (next.js: 7ms, proxy.ts: 31ms, application-code: 61ms)
+ GET /manifest.webmanifest 200 in 29ms (next.js: 24ms, application-code: 5ms)
+✓ Finished writing to filesystem cache in 11.1s
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 399ms (next.js: 15ms, proxy.ts: 8ms, application-code: 376ms)
+ GET /manifest.webmanifest 200 in 9ms (next.js: 3ms, application-code: 6ms)
+ GET /api/auth/session 200 in 69ms (next.js: 44ms, application-code: 26ms)
+ GET /api/auth/session 200 in 12ms (next.js: 2ms, application-code: 10ms)
+ POST /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 132ms (next.js: 18ms, proxy.ts: 73ms, application-code: 42ms)
+  └─ ƒ getCategories() in 18ms src/actions/category.ts
+✓ Finished filesystem cache database compaction in 18.0s
+ GET /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 190ms (next.js: 16ms, proxy.ts: 11ms, application-code: 164ms)
+ GET /manifest.webmanifest 200 in 8ms (next.js: 3ms, application-code: 5ms)
+ GET /api/auth/session 200 in 21ms (next.js: 11ms, application-code: 10ms)
+ POST /admin/teams/0dab2d9b-e243-49d0-8d06-890854c10a7a 200 in 39ms (next.js: 7ms, proxy.ts: 12ms, application-code: 20ms)
+  └─ ƒ getCategories() in 11ms src/actions/category.ts
+ GET /api/auth/session 200 in 10ms (next.js: 3ms, application-code: 7ms)
+ GET /admin/players 200 in 635ms (next.js: 184ms, proxy.ts: 9ms, application-code: 441ms)
+ GET /manifest.webmanifest 200 in 7ms (next.js: 1821µs, application-code: 6ms)
+ GET /api/auth/session 200 in 26ms (next.js: 15ms, application-code: 10ms)
+ GET /api/auth/session 200 in 11ms (next.js: 3ms, application-code: 8ms)
+[?25h

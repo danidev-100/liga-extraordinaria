@@ -18,6 +18,7 @@ import {
 } from "lucide-react"
 import { importPlayersFromCSV, type ImportResult } from "@/actions/csv-import"
 import { parsePlayersExcel } from "@/lib/excel-players"
+import { datePartsOf, formatDateDDMMYYYY } from "@/lib/dates"
 import * as XLSX from "xlsx"
 
 interface Player {
@@ -37,10 +38,9 @@ interface Props {
 }
 
 function formatDate(value: string | Date | null): string {
-  if (!value) return "—"
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return "—"
-  return date.toLocaleDateString("es-AR", {
+  const p = datePartsOf(value)
+  if (!p) return "—"
+  return new Date(p.y, p.m - 1, p.d).toLocaleDateString("es-AR", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -124,18 +124,19 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
     try {
       const wb = XLSX.utils.book_new()
       const wsData = [
-        ["Nombre", "Apellido", "DNI", "Camiseta", "Activo"],
+        ["Nombre", "Apellido", "DNI", "Nacimiento", "Camiseta", "Activo"],
         ...players.map((p) => [
           p.name,
           p.surname,
           p.dni,
+          formatDateDDMMYYYY(p.birthDate),
           p.jerseyNumber ?? "",
           p.isActive ? "Sí" : "No",
         ]),
       ]
       const ws = XLSX.utils.aoa_to_sheet(wsData)
       ws["!cols"] = [
-        { wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 10 },
+        { wch: 20 }, { wch: 20 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 10 },
       ]
       XLSX.utils.book_append_sheet(wb, ws, "Jugadores")
       XLSX.writeFile(wb, `jugadores-${teamName.toLowerCase().replace(/\s+/g, "-")}.xlsx`)

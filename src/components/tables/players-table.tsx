@@ -17,6 +17,7 @@ import { DeleteButton } from "@/components/forms/delete-button"
 import { Edit, Filter } from "lucide-react"
 import { deletePlayer } from "@/actions/player"
 import { TeamLogo } from "@/components/ui/team-logo"
+import { datePartsOf } from "@/lib/dates"
 
 export type PlayerRow = {
   id: string
@@ -41,10 +42,9 @@ interface PlayersTableProps {
 }
 
 function formatDate(isoDate: string | null): string {
-  if (!isoDate) return "—"
-  const date = new Date(isoDate)
-  if (Number.isNaN(date.getTime())) return "—"
-  return date.toLocaleDateString("es-AR", {
+  const p = datePartsOf(isoDate)
+  if (!p) return "—"
+  return new Date(p.y, p.m - 1, p.d).toLocaleDateString("es-AR", {
     day: "numeric",
     month: "short",
     year: "numeric",
