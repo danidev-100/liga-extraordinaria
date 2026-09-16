@@ -14,6 +14,8 @@ import {
   ShieldAlert,
 } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+// WhatsApp contact — disabled from public view (footer link + floating button kept as comments)
+// import { WhatsAppButton } from "@/components/public/whatsapp-button"
 import { cn } from "@/lib/utils"
 
 const navLinkDefs = [
@@ -182,6 +184,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Torneo Pro. Todos los derechos reservados.
             </p>
+            {/* WhatsApp contact — disabled from public view
             <a
               href="https://wa.me/542616095070"
               target="_blank"
@@ -193,9 +196,18 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               </svg>
               Para información por WhatsApp
             </a>
+            */}
+          </div>
+          <div className="mt-4 text-center">
+            <p className="text-2xs text-muted-foreground/80">
+              Hecha con pasión por Daniel Fernández ⚽⚽⚽
+            </p>
           </div>
         </div>
       </footer>
+
+      {/* Floating WhatsApp button — disabled from public view */}
+      {/* <WhatsAppButton /> */}
     </div>
   )
 }

@@ -5,6 +5,8 @@ export const dynamic = "force-dynamic"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { FadeInView } from "@/components/public/fade-in-view"
+// WhatsApp contact — disabled from public view (footer link + floating button kept as comments)
+// import { WhatsAppButton } from "@/components/public/whatsapp-button"
 import db from "@/lib/db"
 import { auth } from "@/lib/auth"
 
@@ -289,6 +291,7 @@ export default async function Home() {
             <p className="text-center text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Torneo Pro. Todos los derechos reservados.
             </p>
+            {/* WhatsApp contact — disabled from public view
             <a
               href="https://wa.me/542616095070"
               target="_blank"
@@ -300,9 +303,16 @@ export default async function Home() {
               </svg>
               Para información por WhatsApp
             </a>
+            */}
+            <p className="text-center text-3xs text-muted-foreground/80">
+              Hecha con pasión por Daniel Fernández ⚽⚽
+            </p>
           </div>
         </div>
       </footer>
+
+      {/* Floating WhatsApp button — disabled from public view */}
+      {/* <WhatsAppButton /> */}
     </div>
   )
 }
