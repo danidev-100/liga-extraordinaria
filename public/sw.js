@@ -1,7 +1,7 @@
 // Service Worker — Liga Extraordinaria
 // Only caches static assets, no navigation interception
 
-const CACHE = "liga-extra-v1"
+const CACHE = "liga-extra-v2"
 
 self.addEventListener("install", (event) => {
   self.skipWaiting()

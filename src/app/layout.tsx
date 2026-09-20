@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   description: "Gestión de torneos de fútbol, equipos, partidos y posiciones",
   manifest: "/manifest",
   icons: [
-    { rel: "icon", url: "/icon.svg", type: "image/svg+xml" },
+    { rel: "icon", url: "/icon.jpg", type: "image/jpeg" },
     { rel: "icon", url: "/icon-192.png", type: "image/png", sizes: "192x192" },
     { rel: "apple-touch-icon", url: "/apple-touch-icon.png", sizes: "180x180" },
   ],
