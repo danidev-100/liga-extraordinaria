@@ -136,7 +136,7 @@ export async function swapMatchRound(matchId1: string, matchId2: string) {
 }
 
 /**
- * Intercambia los rivales (visitantes) entre dos partidos de la misma jornada.
+ * Intercambia los rivales (visitantes) entre dos partidos de la misma fecha.
  * Solo toca esos dos partidos y valida que ningún cruce resultante se repita
  * en el resto del fixture.
  */
@@ -158,7 +158,7 @@ export async function swapMatchTeams(matchIdA: string, matchIdB: string, slug?: 
 
   if (!a || !b) throw new Error("Uno o ambos partidos no existen")
   if (a.categoryId !== b.categoryId) throw new Error("Los partidos deben ser de la misma categoría")
-  if (a.round !== b.round) throw new Error("Los partidos deben ser de la misma jornada")
+  if (a.round !== b.round) throw new Error("Los partidos deben ser de la misma fecha")
 
   const swappable = (status: string) => status === "SCHEDULED" || status === "POSTPONED"
   if (!swappable(a.status) || !swappable(b.status)) {
@@ -174,7 +174,7 @@ export async function swapMatchTeams(matchIdA: string, matchIdB: string, slug?: 
 
   if (!result.ok) {
     if (result.reason === "different-round") {
-      throw new Error("Los partidos deben ser de la misma jornada")
+      throw new Error("Los partidos deben ser de la misma fecha")
     }
     throw new Error("Un equipo quedaría jugando contra sí mismo")
   }
@@ -198,7 +198,7 @@ export async function swapMatchTeams(matchIdA: string, matchIdB: string, slug?: 
     const teams = await db.team.findMany({ where: { id: { in: teamIds } }, select: { id: true, name: true } })
     const nameMap = Object.fromEntries(teams.map((t) => [t.id, t.name]))
     const warningText = result.warnings
-      .map((w) => `${nameMap[w.localTeamId] ?? "?"} vs ${nameMap[w.visitorTeamId] ?? "?"} (Jornada ${w.round})`)
+      .map((w) => `${nameMap[w.localTeamId] ?? "?"} vs ${nameMap[w.visitorTeamId] ?? "?"} (Fecha ${w.round})`)
       .join(" · ")
     return { applied: true, warnings: warningText }
   }
@@ -207,12 +207,12 @@ export async function swapMatchTeams(matchIdA: string, matchIdB: string, slug?: 
 }
 
 /**
- * Reordena el fixture completo desde una jornada fija hacia adelante.
+ * Reordena el fixture completo desde una fecha fija hacia adelante.
  *
- * La jornada `round` (que el admin acaba de editar) queda tal cual; todas las
- * jornadas posteriores se recalculan para que ningún cruce se repita y cada
- * equipo juegue una vez por jornada. Solo se tocan partidos no congelados
- * (nunca FINISHED/PLAYING, nunca jornadas anteriores).
+ * La fecha `round` (que el admin acaba de editar) queda tal cual; todas las
+ * fechas posteriores se recalculan para que ningún cruce se repita y cada
+ * equipo juegue una vez por fecha. Solo se tocan partidos no congelados
+ * (nunca FINISHED/PLAYING, nunca fechas anteriores).
  */
 export async function reorderRound(categoryId: string, round: number, slug?: string) {
   const session = await auth()
@@ -242,7 +242,7 @@ export async function reorderRound(categoryId: string, round: number, slug?: str
   })
 
   if (!result.ok) {
-    throw new Error("No pudimos reacomodar el fixture sin repetir cruces. Corregí los enfrentamientos de la jornada manualmente.")
+    throw new Error("No pudimos reacomodar el fixture sin repetir cruces. Corregí los enfrentamientos de la fecha manualmente.")
   }
 
   if (result.changes.length > 0) {
@@ -263,10 +263,10 @@ export async function reorderRound(categoryId: string, round: number, slug?: str
 }
 
 /**
- * Crea un partido entre dos equipos que están libres en una jornada.
+ * Crea un partido entre dos equipos que están libres en una fecha.
  *
- * Toma fecha/hora/cancha de los otros partidos de la misma jornada. No bloquea
- * cruces que ya existan en jornadas futuras (el "Reordenar jornada" se encarga
+ * Toma fecha/hora/cancha de los otros partidos de la misma fecha. No bloquea
+ * cruces que ya existan en fechas futuras (el "Reordenar fecha" se encarga
  * después); solo valida que ambos equipos estén libres en esa fecha y que el
  * cruce no se haya jugado.
  */
@@ -311,7 +311,7 @@ export async function createFreeMatch(
     busy.add(m.visitorTeamId)
   }
   if (busy.has(localTeamId) || busy.has(visitorTeamId)) {
-    throw new Error("Uno de los equipos ya tiene partido en esta jornada")
+    throw new Error("Uno de los equipos ya tiene partido en esta fecha")
   }
 
   // The crossing must not have been played already.
@@ -333,7 +333,7 @@ export async function createFreeMatch(
     })
     const nameMap = Object.fromEntries(names.map((t) => [t.id, t.name]))
     throw new Error(
-      `El cruce ${nameMap[localTeamId]} vs ${nameMap[visitorTeamId]} ya se jugó en la Jornada ${played.round}`,
+      `El cruce ${nameMap[localTeamId]} vs ${nameMap[visitorTeamId]} ya se jugó en la Fecha ${played.round}`,
     )
   }
 

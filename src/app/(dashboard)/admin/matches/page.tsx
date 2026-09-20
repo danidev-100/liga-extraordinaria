@@ -272,7 +272,7 @@ export default async function MatchesPage({
                     {groups
                       .map(
                         (g) =>
-                          `${g.aName} vs ${g.bName} (Jornadas ${g.rounds.join(" y ")})`,
+                          `${g.aName} vs ${g.bName} (Fechas ${g.rounds.join(" y ")})`,
                       )
                       .join(" · ")}
                   </CardDescription>
@@ -308,7 +308,7 @@ export default async function MatchesPage({
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-sm font-bold text-foreground">
                     {round}
                   </div>
-                  <h2 className="text-sm font-semibold text-muted-foreground">Jornada {round}</h2>
+                  <h2 className="text-sm font-semibold text-muted-foreground">Fecha {round}</h2>
                   {catsInRound.length === 1 ? (
                     <RoundVisibilityToggle
                       categoryId={catsInRound[0][0]}

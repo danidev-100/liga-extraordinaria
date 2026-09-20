@@ -230,7 +230,7 @@ async function MatchesContent({
                     {round}
                   </div>
                   <div>
-                    <h2 className="font-heading text-xl font-semibold leading-none">Jornada {round}</h2>
+                    <h2 className="font-heading text-xl font-semibold leading-none">Fecha {round}</h2>
                     <p className="mt-1 text-sm text-muted-foreground">
                       {roundMatches.length} partido{roundMatches.length !== 1 ? "s" : ""}
                       {freeTeams.length > 0 &&
@@ -414,7 +414,7 @@ async function MatchesContent({
                       <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="md" />
                       <span className="text-sm font-semibold leading-tight">{team.shortName}</span>
                       <span className="text-xs text-muted-foreground">
-                        Sin partido esta jornada · {categoryNameById.get(team.categoryId)}
+                        Sin partido esta fecha · {categoryNameById.get(team.categoryId)}
                       </span>
                     </div>
                   ))}

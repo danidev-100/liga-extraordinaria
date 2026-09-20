@@ -12,25 +12,25 @@ interface ReorderRoundButtonProps {
   round: number
   /** League slug when rendered from a scoped admin page. */
   leagueSlug?: string
-  /** Label for the round (e.g. "Reordenar jornada"). */
+  /** Label for the round (e.g. "Reordenar fecha"). */
   label?: string
 }
 
 /**
- * Recalcula el fixture desde la jornada `round` hacia adelante, fijando la
- * jornada editada tal cual y reordenando las posteriores sin repetir cruces.
+ * Recalcula el fixture desde la fecha `round` hacia adelante, fijando la
+ * fecha editada tal cual y reordenando las posteriores sin repetir cruces.
  */
 export function ReorderRoundButton({
   categoryId,
   round,
   leagueSlug,
-  label = "Reordenar jornada",
+  label = "Reordenar fecha",
 }: ReorderRoundButtonProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
   async function handleClick() {
-    if (!confirm(`¿Reordenar el fixture desde la Jornada ${round}?\n\nLa Jornada ${round} queda como está y las siguientes se recalculan sin repetir cruces.`)) return
+    if (!confirm(`¿Reordenar el fixture desde la Fecha ${round}?\n\nLa Fecha ${round} queda como está y las siguientes se recalculan sin repetir cruces.`)) return
     setLoading(true)
     try {
       const result = await reorderRound(categoryId, round, leagueSlug)
@@ -54,7 +54,7 @@ export function ReorderRoundButton({
       onClick={handleClick}
       disabled={loading}
       className="gap-1.5"
-      title={`Recalcula las jornadas posteriores a la ${round} sin repetir cruces`}
+      title={`Recalcula las fechas posteriores a la ${round} sin repetir cruces`}
     >
       {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <RefreshCw className="h-3.5 w-3.5" />}
       {label}

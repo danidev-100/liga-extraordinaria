@@ -2,7 +2,7 @@
  * Whole-round reordering for round-robin categories.
  *
  * Invoked explicitly by the admin AFTER they finish editing every encounter
- * they want inside a round (see "Reordenar jornada").
+ * they want inside a round (see "Reordenar fecha").
  *
  * The solver re-pairs the edited round AND every later round so that:
  *  - rounds strictly before the edited one are frozen (already played/decided),

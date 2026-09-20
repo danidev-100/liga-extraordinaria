@@ -44,7 +44,7 @@ export function DownloadFixturePDF({ categoryId, variant = "outline" }: Props) {
         doc.setFontSize(10)
         doc.setFont("helvetica", "bold")
         doc.setTextColor(22, 163, 74)
-        doc.text(`Jornada ${round.round}`, 14, yOffset)
+        doc.text(`Fecha ${round.round}`, 14, yOffset)
         doc.setTextColor(0, 0, 0)
         yOffset += 5
 

@@ -33,7 +33,7 @@ function FormTooltip({ active, payload, label }: any) {
   if (active && payload && payload.length) {
     return (
       <div className="rounded-lg border bg-background px-3 py-2 text-sm shadow-sm">
-        <p className="mb-1 font-medium">Jornada {label}</p>
+        <p className="mb-1 font-medium">Fecha {label}</p>
         {payload.map((entry: any) => (
           <p
             key={entry.dataKey}
@@ -114,7 +114,7 @@ export function FormTrendChart({ data: initialData, categories }: FormTrendChart
             <XAxis
               dataKey="round"
               label={{
-                value: "Jornada",
+                value: "Fecha",
                 position: "insideBottomRight",
                 offset: -5,
               }}

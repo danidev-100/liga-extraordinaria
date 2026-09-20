@@ -23,7 +23,7 @@ export function RoundVisibilityToggle({ categoryId, round, hidden, label }: Roun
     const next = !isHidden
     try {
       await setRoundVisibility(categoryId, round, next)
-      toast.success(next ? "Jornada oculta" : "Jornada visible")
+      toast.success(next ? "Fecha oculta" : "Fecha visible")
       setIsHidden(next)
       router.refresh()
     } catch (error) {
@@ -38,17 +38,17 @@ export function RoundVisibilityToggle({ categoryId, round, hidden, label }: Roun
         <>
           <Badge variant="secondary" className="gap-1">
             <EyeOff className="h-3 w-3" />
-            Jornada oculta
+            Fecha oculta
           </Badge>
           <Button type="button" size="xs" variant="default" className="gap-1" onClick={handleToggle}>
             <EyeOff className="h-3 w-3" />
-            Mostrar jornada
+            Mostrar fecha
           </Button>
         </>
       ) : (
         <Button type="button" size="xs" variant="outline" className="gap-1" onClick={handleToggle}>
           <EyeOff className="h-3 w-3" />
-          Ocultar jornada
+          Ocultar fecha
         </Button>
       )}
     </>

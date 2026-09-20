@@ -20,7 +20,7 @@ export function RepairCategoryButton({
   async function handleRepair() {
     if (
       !confirm(
-        "¿Reacomodar el fixture para eliminar los cruces repetidos? Se pueden modificar varios partidos de las jornadas siguientes.",
+        "¿Reacomodar el fixture para eliminar los cruces repetidos? Se pueden modificar varios partidos de las fechas siguientes.",
       )
     ) {
       return

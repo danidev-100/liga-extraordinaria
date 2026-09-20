@@ -154,7 +154,7 @@ export function SwapRivalsButton({
     >
       <DialogTrigger
         className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
-        title="Intercambiar rivales con otro partido de la jornada"
+        title="Intercambiar rivales con otro partido de la fecha"
       >
         <ArrowLeftRight className="h-3.5 w-3.5" />
         Intercambiar
@@ -163,7 +163,7 @@ export function SwapRivalsButton({
         <DialogHeader>
           <DialogTitle>Intercambiar rivales</DialogTitle>
           <DialogDescription>
-            {localName} vs {visitorName} — elegí el partido de la jornada con el que querés
+            {localName} vs {visitorName} — elegí el partido de la fecha con el que querés
             intercambiar los rivales.
           </DialogDescription>
         </DialogHeader>
@@ -171,7 +171,7 @@ export function SwapRivalsButton({
         <div className="space-y-2">
           {candidates.length === 0 ? (
             <p className="py-4 text-center text-sm text-muted-foreground">
-              No hay otros partidos intercambiables en esta jornada.
+              No hay otros partidos intercambiables en esta fecha.
             </p>
           ) : (
             candidates.map((c) => (
@@ -225,7 +225,7 @@ export function SwapRivalsButton({
             <ul className="list-inside list-disc space-y-0.5">
               {warnings.map((w, i) => (
                 <li key={i}>
-                  {w.localName} vs {w.visitorName} — ya están en la Jornada {w.round}
+                  {w.localName} vs {w.visitorName} — ya están en la Fecha {w.round}
                 </li>
               ))}
             </ul>

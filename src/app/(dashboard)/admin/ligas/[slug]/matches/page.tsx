@@ -233,7 +233,7 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-muted text-sm font-bold text-foreground">
                     {round}
                   </div>
-                  <h2 className="text-sm font-semibold text-muted-foreground">Jornada {round}</h2>
+                  <h2 className="text-sm font-semibold text-muted-foreground">Fecha {round}</h2>
                   {catsInRound.length === 1 ? (
                     <RoundVisibilityToggle
                       categoryId={catsInRound[0][0]}

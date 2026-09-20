@@ -14,13 +14,13 @@ interface MakeFreeButtonProps {
 }
 
 /**
- * Quita un partido de la jornada: ambos equipos pasan a "libres".
+ * Quita un partido de la fecha: ambos equipos pasan a "libres".
  */
 export function MakeFreeButton({ matchId, localName, visitorName, leagueSlug }: MakeFreeButtonProps) {
   const [loading, setLoading] = useState(false)
 
   async function handleClick() {
-    if (!confirm(`¿Poner libre a ${localName} y ${visitorName}?\n\nSe elimina este partido de la jornada y ambos equipos quedan libres.`)) return
+    if (!confirm(`¿Poner libre a ${localName} y ${visitorName}?\n\nSe elimina este partido de la fecha y ambos equipos quedan libres.`)) return
     setLoading(true)
     try {
       await deleteMatch(matchId, leagueSlug)
@@ -39,7 +39,7 @@ export function MakeFreeButton({ matchId, localName, visitorName, leagueSlug }: 
       onClick={handleClick}
       disabled={loading}
       className="gap-1.5"
-      title={`Quitar de la jornada (${localName} y ${visitorName} quedan libres)`}
+      title={`Quitar de la fecha (${localName} y ${visitorName} quedan libres)`}
     >
       {loading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <UserX className="h-3.5 w-3.5" />}
       Poner libre

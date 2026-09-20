@@ -145,7 +145,7 @@ export async function createMatch(data: MatchFormData, slug?: string) {
   })
   if (duplicate) {
     throw new Error(
-      `El cruce ${localTeam.name} vs ${visitorTeam.name} ya está programado en la Jornada ${duplicate.round}`,
+      `El cruce ${localTeam.name} vs ${visitorTeam.name} ya está programado en la Fecha ${duplicate.round}`,
     )
   }
 
@@ -213,7 +213,7 @@ export async function updateMatch(id: string, data: MatchUpdateData, slug?: stri
   const teamsChanged = effLocal !== current.localTeamId || effVisitor !== current.visitorTeamId
 
   if (teamsChanged) {
-    // The admin edits rounds freely (see "Reordenar jornada"). We only block
+    // The admin edits rounds freely (see "Reordenar fecha"). We only block
     // crossings that repeat an already-played (frozen) encounter, and leave
     // scheduling fixes to the explicit reorder action.
     const categoryMatches = await db.match.findMany({
@@ -231,7 +231,7 @@ export async function updateMatch(id: string, data: MatchUpdateData, slug?: stri
     if (frozenDup) {
       const names = await getTeamNames([effLocal, effVisitor])
       throw new Error(
-        `El cruce ${names[effLocal]} vs ${names[effVisitor]} ya se jugó en la Jornada ${frozenDup.round}`,
+        `El cruce ${names[effLocal]} vs ${names[effVisitor]} ya se jugó en la Fecha ${frozenDup.round}`,
       )
     }
 
@@ -251,7 +251,7 @@ export async function updateMatch(id: string, data: MatchUpdateData, slug?: stri
         ? names[effLocal]
         : names[effVisitor]
       throw new Error(
-        `${teamName} ya juega en la Jornada ${effRound} contra ${conflictTeam.localTeamId === effLocal || conflictTeam.visitorTeamId === effLocal ? names[effVisitor] : names[effLocal]}. Cambiá ese enfrentamiento antes de reordenar.`,
+        `${teamName} ya juega en la Fecha ${effRound} contra ${conflictTeam.localTeamId === effLocal || conflictTeam.visitorTeamId === effLocal ? names[effVisitor] : names[effLocal]}. Cambiá ese enfrentamiento antes de reordenar.`,
       )
     }
   }

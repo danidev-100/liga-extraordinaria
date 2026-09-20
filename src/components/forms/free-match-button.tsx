@@ -32,7 +32,7 @@ interface FreeMatchButtonProps {
 }
 
 /**
- * Arma un partido entre dos equipos que quedaron libres en una jornada.
+ * Arma un partido entre dos equipos que quedaron libres en una fecha.
  */
 export function FreeMatchButton({ categoryId, round, freeTeams, leagueSlug }: FreeMatchButtonProps) {
   const router = useRouter()
@@ -96,14 +96,14 @@ export function FreeMatchButton({ categoryId, round, freeTeams, leagueSlug }: Fr
         <DialogHeader>
           <DialogTitle>Armar partido entre libres</DialogTitle>
           <DialogDescription>
-            Elegí los dos equipos libres de la Jornada {round} para crear el partido.
+            Elegí los dos equipos libres de la Fecha {round} para crear el partido.
           </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-wrap gap-2">
           {ordered.length === 0 ? (
             <p className="py-4 text-center text-sm text-muted-foreground">
-              No hay equipos libres en esta jornada.
+              No hay equipos libres en esta fecha.
             </p>
           ) : (
             ordered.map((t) => {

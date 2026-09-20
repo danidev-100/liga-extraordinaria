@@ -160,7 +160,7 @@ export function MatchScheduleEditor({ rounds, categoryId, hiddenRounds = {} }: P
               <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
                 {round}
               </span>
-              Jornada {round}
+              Fecha {round}
               <span className="text-sm font-normal text-muted-foreground">
                 {roundMatches.length} partido{roundMatches.length !== 1 ? "s" : ""}
               </span>

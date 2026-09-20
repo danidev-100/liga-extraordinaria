@@ -89,14 +89,14 @@ export function RoundNotificationButton({
               {hasNotification ? "Editar notificación" : "Nueva notificación"}
             </DialogTitle>
             <DialogDescription>
-              Este aviso se muestra al inicio de la jornada en la página pública de partidos.
+              Este aviso se muestra al inicio de la fecha en la página pública de partidos.
             </DialogDescription>
           </DialogHeader>
 
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Escribí el aviso para esta jornada..."
+            placeholder="Escribí el aviso para esta fecha..."
             className="flex min-h-20 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 md:text-sm dark:bg-input/30"
           />
 
