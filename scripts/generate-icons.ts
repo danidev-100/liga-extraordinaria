@@ -8,9 +8,10 @@
  *   public/apple-touch-icon.png  — 180x180 (iOS, 80% safe-zone)
  *   src/app/favicon.ico          — 32x32 legacy favicon
  *
- * Maskable and iOS icons get a transparent safe-zone margin so the logo is
- * not cropped by launcher masks (Google recommends content inside the inner
- * 72%; Apple masks with rounded corners).
+ * Maskable and iOS icons get a white safe-zone margin so the logo is
+ * not cropped by launcher masks and no dark/transparent corners show
+ * (Google recommends content inside the inner 72%; Apple masks with
+ * rounded corners).
  *
  * Usage: pnpm icons:generate
  */
@@ -24,13 +25,13 @@ const OUT_DIR = path.join(process.cwd(), "public")
 const APP_DIR = path.join(process.cwd(), "src", "app")
 
 const TARGETS = [
-  { file: "icon-192.png", size: 192, scale: 1 },
-  { file: "icon-512.png", size: 512, scale: 1 },
+  { file: "icon-192.png", size: 192, scale: 0.8 },
+  { file: "icon-512.png", size: 512, scale: 0.8 },
   { file: "icon-maskable-512.png", size: 512, scale: 0.8 },
   { file: "apple-touch-icon.png", size: 180, scale: 0.91 },
 ]
 
-/** Resize to `size`, keeping the logo inside a transparent safe-zone when scale < 1. */
+/** Resize to `size`, keeping the logo inside a white safe-zone when scale < 1. */
 async function buildIcon(source: Buffer, size: number, scale: number): Promise<Buffer> {
   if (scale >= 1) {
     return sharp(source).resize(size, size).ensureAlpha().png().toBuffer()
@@ -39,7 +40,7 @@ async function buildIcon(source: Buffer, size: number, scale: number): Promise<B
   const logo = await sharp(source).resize(inner, inner).ensureAlpha().png().toBuffer()
   const offset = Math.round((size - inner) / 2)
   return sharp({
-    create: { width: size, height: size, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } },
+    create: { width: size, height: size, channels: 4, background: { r: 255, g: 255, b: 255, alpha: 1 } },
   })
     .composite([{ input: logo, left: offset, top: offset }])
     .png()
