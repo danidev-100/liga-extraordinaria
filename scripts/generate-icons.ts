@@ -48,12 +48,12 @@ async function main() {
   const source = await readFile(ICON_SOURCE)
 
   for (const { file, size } of TARGETS) {
-    const png = await sharp(source).resize(size, size).png().toBuffer()
+    const png = await sharp(source).resize(size, size).ensureAlpha().png().toBuffer()
     await writeFile(path.join(OUT_DIR, file), png)
     console.log(`  ✓ ${file} (${size}x${size})`)
   }
 
-  const favicon = await sharp(source).resize(32, 32).png().toBuffer()
+  const favicon = await sharp(source).resize(32, 32).ensureAlpha().png().toBuffer()
   await writeFile(path.join(APP_DIR, "favicon.ico"), toIco(favicon, 32))
   console.log("  ✓ src/app/favicon.ico (32x32)")
 
