@@ -31,7 +31,7 @@ export default async function Home() {
   const leagues = await db.league.findMany({
     where: { isActive: true, slug: { not: null } },
     orderBy: { name: "asc" },
-    select: { id: true, name: true, slug: true, season: true },
+    select: { id: true, name: true, slug: true, season: true, logoUrl: true },
   })
 
   return (
@@ -230,9 +230,15 @@ export default async function Home() {
                   <Link key={l.id} href={`/liga/${l.slug}/posiciones`} className="group">
                     <Card className="h-full bg-card/70 backdrop-blur-xl shadow-xl transition-all duration-300 hover:-rotate-1 hover:scale-[1.05] hover:shadow-2xl hover:ring-2 hover:ring-primary/30">
                       <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                          <Trophy className="h-7 w-7" />
-                        </div>
+                        {l.logoUrl ? (
+                          <div className="relative h-14 w-14 overflow-hidden rounded-2xl ring-1 ring-black/10 transition-transform duration-300 group-hover:scale-105">
+                            <img src={l.logoUrl} alt={`${l.name} escudo`} className="h-full w-full object-cover" />
+                          </div>
+                        ) : (
+                          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                            <Trophy className="h-7 w-7" />
+                          </div>
+                        )}
                         <div>
                           <h3 className="font-heading text-lg font-semibold">{l.name}</h3>
                           <p className="mt-0.5 text-sm text-muted-foreground">

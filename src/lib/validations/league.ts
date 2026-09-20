@@ -12,6 +12,13 @@ export const leagueSchema = z.object({
   startDate: z.string().min(1, "La fecha de inicio es requerida"),
   endDate: z.string().min(1, "La fecha de fin es requerida"),
   isActive: z.boolean().default(true),
+  logoUrl: z
+    .string()
+    .optional()
+    .refine(
+      (v) => !v || v.startsWith("/") || z.string().url().safeParse(v).success,
+      { message: "Debe ser una URL válida o una ruta local (ej: /escudos/escudo.png)" },
+    ),
 })
 
 export type LeagueFormData = z.input<typeof leagueSchema>

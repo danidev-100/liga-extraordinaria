@@ -74,6 +74,7 @@ export async function createLeague(data: LeagueFormData) {
       name: parsed.name,
       season: parsed.season,
       slug,
+      logoUrl: parsed.logoUrl || null,
       startDate: new Date(parsed.startDate),
       endDate: new Date(parsed.endDate),
       isActive: parsed.isActive ?? true,
@@ -115,6 +116,7 @@ export async function updateLeague(id: string, data: Partial<LeagueFormData>, sl
   if (parsed.startDate !== undefined) updateData.startDate = new Date(parsed.startDate)
   if (parsed.endDate !== undefined) updateData.endDate = new Date(parsed.endDate)
   if (parsed.isActive !== undefined) updateData.isActive = parsed.isActive
+  if (parsed.logoUrl !== undefined) updateData.logoUrl = parsed.logoUrl || null
 
   const league = await db.league.update({
     where: { id },

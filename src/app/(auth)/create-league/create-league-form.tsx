@@ -48,6 +48,7 @@ export function CreateLeagueForm({ userName }: Props) {
         startDate,
         endDate,
         isActive: true,
+        logoUrl: (data.get("logoUrl") as string) || undefined,
       })
 
       router.push(`/admin/ligas/${league.slug}`)
@@ -126,6 +127,17 @@ export function CreateLeagueForm({ userName }: Props) {
                   maxLength={20}
                   disabled={loading}
                   defaultValue={new Date().getFullYear().toString()}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="logoUrl">URL del escudo del torneo</Label>
+                <Input
+                  id="logoUrl"
+                  name="logoUrl"
+                  type="text"
+                  placeholder="https://ejemplo.com/escudo.png"
+                  disabled={loading}
                 />
               </div>
 

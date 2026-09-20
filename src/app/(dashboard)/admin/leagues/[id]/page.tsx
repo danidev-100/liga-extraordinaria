@@ -38,6 +38,7 @@ export default async function EditLeaguePage({
               startDate: league.startDate,
               endDate: league.endDate,
               isActive: league.isActive,
+              logoUrl: league.logoUrl,
             }}
           />
         </CardContent>

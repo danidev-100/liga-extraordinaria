@@ -114,6 +114,11 @@ export default async function LeagueHomePage({ params }: Props) {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-3">
+            {league.logoUrl && (
+              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-black/10">
+                <img src={league.logoUrl} alt={`${league.name} escudo`} className="h-full w-full object-cover" />
+              </div>
+            )}
             <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
               {league.name}
             </h1>

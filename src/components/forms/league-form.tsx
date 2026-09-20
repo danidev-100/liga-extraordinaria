@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Loader2 } from "lucide-react"
+import { Loader2, ImageIcon } from "lucide-react"
 import { leagueSchema, type LeagueFormData } from "@/lib/validations/league"
 import { createLeague, updateLeague } from "@/actions/league"
 import { useState } from "react"
@@ -27,6 +27,7 @@ interface LeagueFormProps {
     startDate: Date
     endDate: Date
     isActive: boolean
+    logoUrl: string | null
   }
 }
 
@@ -43,6 +44,7 @@ export function LeagueForm({ initialData }: LeagueFormProps) {
           startDate: initialData.startDate.toISOString().split("T")[0],
           endDate: initialData.endDate.toISOString().split("T")[0],
           isActive: initialData.isActive,
+          logoUrl: initialData.logoUrl ?? "",
         }
       : {
           name: "",
@@ -50,6 +52,7 @@ export function LeagueForm({ initialData }: LeagueFormProps) {
           startDate: "",
           endDate: "",
           isActive: true,
+          logoUrl: "",
         },
   })
 
@@ -129,6 +132,35 @@ export function LeagueForm({ initialData }: LeagueFormProps) {
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="logoUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>URL del escudo</FormLabel>
+              <FormControl>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <ImageIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="https://ejemplo.com/escudo.png"
+                      className="pl-8"
+                      {...field}
+                    />
+                  </div>
+                  {field.value && (field.value.startsWith("/") || /^https?:\/\//.test(field.value)) && (
+                    <img
+                      src={field.value}
+                      alt="Escudo del torneo"
+                      className="h-9 w-9 shrink-0 rounded-full object-cover ring-1 ring-black/10"
+                    />
+                  )}
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           {initialData ? "Actualizar Torneo" : "Crear Torneo"}
