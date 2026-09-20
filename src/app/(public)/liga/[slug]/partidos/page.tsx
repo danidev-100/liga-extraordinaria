@@ -5,7 +5,6 @@ import { notFound } from "next/navigation"
 import db from "@/lib/db"
 import { getLeagueBySlug } from "@/lib/get-league"
 import { Calendar, Sparkles, List, Megaphone } from "lucide-react"
-import { PrintButton } from "@/components/ui/print-button"
 import { Badge } from "@/components/ui/badge"
 import { MatchScheduleFilter } from "@/components/public/match-schedule-filter"
 import { cn } from "@/lib/utils"
@@ -171,7 +170,6 @@ async function MatchesContent({
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <PrintButton />
           <MatchScheduleFilter categories={categories} currentCategoryId={categoryId} leagueSlug={slug} />
         </div>
       </div>

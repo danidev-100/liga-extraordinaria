@@ -6,7 +6,6 @@ import { getLeagueBySlug } from "@/lib/get-league"
 import { CategorySelector } from "@/components/public/category-selector"
 import { StandingsTable } from "@/components/public/standings-table"
 import { Trophy } from "lucide-react"
-import { PrintButton } from "@/components/ui/print-button"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -91,7 +90,6 @@ async function StandingsContent({
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <PrintButton />
           <CategorySelector categories={categories} basePath={`/liga/${slug}/posiciones`} />
         </div>
       </div>

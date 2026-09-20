@@ -26,8 +26,8 @@ const APP_DIR = path.join(process.cwd(), "src", "app")
 const TARGETS = [
   { file: "icon-192.png", size: 192, scale: 1 },
   { file: "icon-512.png", size: 512, scale: 1 },
-  { file: "icon-maskable-512.png", size: 512, scale: 0.73 },
-  { file: "apple-touch-icon.png", size: 180, scale: 0.83 },
+  { file: "icon-maskable-512.png", size: 512, scale: 0.8 },
+  { file: "apple-touch-icon.png", size: 180, scale: 0.91 },
 ]
 
 /** Resize to `size`, keeping the logo inside a transparent safe-zone when scale < 1. */
