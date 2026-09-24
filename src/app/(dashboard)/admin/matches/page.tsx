@@ -133,20 +133,51 @@ export default async function MatchesPage({
     {} as Record<number, typeof matches>,
   )
 
-  const rounds = Object.keys(groupedByRound)
-    .map(Number)
-    .sort((a, b) => a - b)
+  // ── Round domain ──
+  // Una categoría juega las fechas 1..N (round-robin: N-1 fechas si N es par,
+  // N si es impar) una vez que tiene algún partido. Las fechas dentro de ese
+  // rango siguen visibles aunque se hayan vaciado con "Poner libre", para que
+  // el admin pueda reconstruirlas con "Hacer partido".
+  const teamCountByCategory = new Map<string, number>()
+  for (const team of teams) {
+    teamCountByCategory.set(team.categoryId, (teamCountByCategory.get(team.categoryId) ?? 0) + 1)
+  }
+
+  const categoryRoundSpan = new Map<string, { min: number; max: number }>()
+  for (const match of matches) {
+    const span = categoryRoundSpan.get(match.categoryId)
+    if (!span) {
+      categoryRoundSpan.set(match.categoryId, { min: match.round, max: match.round })
+    } else {
+      if (match.round < span.min) span.min = match.round
+      if (match.round > span.max) span.max = match.round
+    }
+  }
+
+  const expectedRoundsByCategory = new Map<string, number>()
+  for (const [categoryId, count] of teamCountByCategory) {
+    expectedRoundsByCategory.set(categoryId, count % 2 === 0 ? count - 1 : count)
+  }
+
+  const categoryRounds = new Set<number>()
+  for (const [categoryId, span] of categoryRoundSpan) {
+    const expected = expectedRoundsByCategory.get(categoryId) ?? 0
+    const maxRound = Math.max(span.max, expected)
+    for (let r = 1; r <= maxRound; r++) categoryRounds.add(r)
+  }
+
+  const rounds = Array.from(categoryRounds).sort((a, b) => a - b)
 
   const freeTeamsByRound = new Map<number, typeof teams>()
   for (const round of rounds) {
-    const roundMatches = groupedByRound[round]
-    const categoriesWithMatches = new Set(roundMatches.map((m) => m.categoryId))
     const freeTeams = teams
-      .filter(
-        (team) =>
-          categoriesWithMatches.has(team.categoryId) &&
-          !playedByCategoryRound.get(team.categoryId)?.get(round)?.has(team.id),
-      )
+      .filter((team) => {
+        const span = categoryRoundSpan.get(team.categoryId)
+        if (!span) return false
+        const expected = expectedRoundsByCategory.get(team.categoryId) ?? 0
+        if (round < 1 || round > Math.max(span.max, expected)) return false
+        return !playedByCategoryRound.get(team.categoryId)?.get(round)?.has(team.id)
+      })
       .sort((a, b) => a.name.localeCompare(b.name))
     if (freeTeams.length > 0) {
       freeTeamsByRound.set(round, freeTeams)
@@ -296,11 +327,26 @@ export default async function MatchesPage({
       ) : (
         <div className="space-y-8">
           {rounds.map((round) => {
-            const roundMatches = groupedByRound[round]
+            const roundMatches = groupedByRound[round] ?? []
             const freeTeams = freeTeamsByRound.get(round) ?? []
-            const catsInRound = Array.from(
-              new Map(roundMatches.map((m) => [m.categoryId, m.category.name])).entries(),
-            )
+            const catsInRound = (() => {
+              const fromMatches = Array.from(
+                new Map(roundMatches.map((m) => [m.categoryId, m.category.name])).entries(),
+              )
+              if (fromMatches.length > 0) return fromMatches
+              // Fecha vacía ("Poner libre" en todos los partidos): volvemos a
+              // las categorías cuyo torneo cubre esta fecha para que el header
+              // y el botón "Hacer partido" sigan disponibles.
+              return Array.from(categoryRoundSpan.entries())
+                .filter(([categoryId, span]) => {
+                  const expected = expectedRoundsByCategory.get(categoryId) ?? 0
+                  return round <= Math.max(span.max, expected)
+                })
+                .map(([categoryId]) => [
+                  categoryId,
+                  categories.find((c) => c.id === categoryId)?.name ?? "",
+                ] as [string, string])
+            })()
 
             return (
               <section key={round} className="space-y-3">
