@@ -7,6 +7,8 @@ import { getLeagueBySlug } from "@/lib/get-league"
 import { Calendar, Sparkles, List, Megaphone } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { MatchScheduleFilter } from "@/components/public/match-schedule-filter"
+import { MatchRoundFilter } from "@/components/public/match-round-filter"
+import { buildScheduleHref, parseFechaParam } from "@/lib/schedule-params"
 import { cn } from "@/lib/utils"
 import { TeamLogo } from "@/components/ui/team-logo"
 import { GoalBall, CardIcon } from "@/components/ui/card-icons"
@@ -14,7 +16,7 @@ import { CourtMapLink } from "@/components/ui/court-map-link"
 
 interface Props {
   params: Promise<{ slug: string }>
-  searchParams: Promise<{ categoryId?: string }>
+  searchParams: Promise<{ categoryId?: string; fecha?: string }>
 }
 
 const statusConfig = {
@@ -27,9 +29,11 @@ const statusConfig = {
 async function MatchesContent({
   slug,
   categoryId,
+  fecha,
 }: {
   slug: string
   categoryId?: string
+  fecha?: number
 }) {
   const league = await getLeagueBySlug(slug)
   if (!league) notFound()
@@ -42,11 +46,16 @@ async function MatchesContent({
 
   const leagueCategoryIds = categories.map((c) => c.id)
 
-  const where: Record<string, unknown> = {}
+  const categoryWhere: Record<string, unknown> = {}
   if (categoryId) {
-    where.categoryId = categoryId
+    categoryWhere.categoryId = categoryId
   } else if (leagueCategoryIds.length > 0) {
-    where.categoryId = { in: leagueCategoryIds }
+    categoryWhere.categoryId = { in: leagueCategoryIds }
+  }
+
+  const where: Record<string, unknown> = { ...categoryWhere }
+  if (fecha !== undefined) {
+    where.round = fecha
   }
 
   const matches = await db.match.findMany({
@@ -99,6 +108,21 @@ async function MatchesContent({
   const visibleMatches = matches.filter(
     (match) => !hiddenRoundKeys.has(`${match.categoryId}:${match.round}`),
   )
+
+  const roundRows = await db.match.findMany({
+    where: categoryWhere,
+    distinct: ["round", "categoryId"],
+    select: { round: true, categoryId: true },
+    orderBy: { round: "asc" },
+  })
+
+  const availableFechas = Array.from(
+    new Set(
+      roundRows
+        .filter((row) => !hiddenRoundKeys.has(`${row.categoryId}:${row.round}`))
+        .map((row) => row.round),
+    ),
+  ).sort((a, b) => a - b)
 
   const categoryNameById = new Map(categories.map((c) => [c.id, c.name]))
 
@@ -170,13 +194,24 @@ async function MatchesContent({
           </p>
         </div>
         <div className="flex flex-col items-end gap-2">
-          <MatchScheduleFilter categories={categories} currentCategoryId={categoryId} leagueSlug={slug} />
+          <MatchScheduleFilter
+            categories={categories}
+            currentCategoryId={categoryId}
+            leagueSlug={slug}
+            fecha={fecha}
+          />
+          <MatchRoundFilter
+            leagueSlug={slug}
+            fechas={availableFechas}
+            currentFecha={fecha}
+            categoryId={categoryId}
+          />
         </div>
       </div>
 
       <div className="flex items-center gap-1 rounded-lg border bg-muted/30 p-0.5 w-fit print:hidden">
         <Link
-          href={`/liga/${slug}/partidos${categoryId ? `?categoryId=${categoryId}` : ""}`}
+          href={buildScheduleHref(`/liga/${slug}/partidos`, { categoryId, fecha })}
           className={cn(
             "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
             "bg-background text-foreground shadow-sm",
@@ -186,7 +221,7 @@ async function MatchesContent({
           Lista
         </Link>
         <Link
-          href={`/liga/${slug}/calendario${categoryId ? `?categoryId=${categoryId}` : ""}`}
+          href={buildScheduleHref(`/liga/${slug}/calendario`, { categoryId, fecha })}
           className="inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
         >
           <Calendar className="h-4 w-4" />
@@ -197,7 +232,9 @@ async function MatchesContent({
       {visibleMatches.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
           <Calendar className="mb-4 h-12 w-12 text-muted-foreground/40" />
-          <p className="text-lg font-medium text-muted-foreground">No hay partidos programados</p>
+          <p className="text-lg font-medium text-muted-foreground">
+            {fecha !== undefined ? `No hay partidos en la Fecha ${fecha}` : "No hay partidos programados"}
+          </p>
           <p className="mt-1 text-sm text-muted-foreground/60">
             {selectedCategory
               ? `No hay partidos en ${selectedCategory.name}.`
@@ -435,7 +472,8 @@ async function MatchesContent({
 
 export default async function LeagueMatchesPage({ params, searchParams }: Props) {
   const { slug } = await params
-  const { categoryId } = await searchParams
+  const { categoryId, fecha: rawFecha } = await searchParams
+  const fecha = parseFechaParam(rawFecha)
 
-  return <MatchesContent slug={slug} categoryId={categoryId} />
+  return <MatchesContent slug={slug} categoryId={categoryId} fecha={fecha} />
 }
