@@ -69,17 +69,26 @@ export async function getGoalsDistribution(leagueId?: string): Promise<GoalsDist
 /**
  * Teams with fewest goals conceded (best defense).
  * Uses match scores: sum of opponent's score in each finished match.
- * When leagueId is provided, results are scoped to that league.
+ * Scopes to a league via leagueId, or to a single category via categoryId.
  */
-export async function getLeastConceded(leagueId?: string): Promise<GoalsDistribution[]> {
+export async function getLeastConceded(
+  leagueId?: string,
+  categoryId?: string,
+): Promise<GoalsDistribution[]> {
   try {
+    const categoryFilter = categoryId
+      ? Prisma.sql`AND m.category_id = ${categoryId}::uuid`
+      : Prisma.empty
+
     return await db.$queryRaw<GoalsDistribution[]>`
       WITH conceded AS (
         SELECT m.local_team_id AS team_id, m.visitor_score::int AS goals
         FROM matches m WHERE m.status = 'FINISHED'
+          ${!categoryId && leagueId ? Prisma.empty : categoryFilter}
         UNION ALL
         SELECT m.visitor_team_id AS team_id, m.local_score::int AS goals
         FROM matches m WHERE m.status = 'FINISHED'
+          ${!categoryId && leagueId ? Prisma.empty : categoryFilter}
       )
       SELECT t.short_name AS "teamShortName",
              t.color AS "teamColor",
@@ -88,7 +97,7 @@ export async function getLeastConceded(leagueId?: string): Promise<GoalsDistribu
       FROM conceded c
       JOIN teams t ON t.id = c.team_id
       JOIN categories cat ON cat.id = t.category_id
-      ${leagueId ? Prisma.sql`WHERE cat.league_id = ${leagueId}::uuid` : Prisma.empty}
+      ${!categoryId && leagueId ? Prisma.sql`WHERE cat.league_id = ${leagueId}::uuid` : Prisma.empty}
       GROUP BY t.id, t.short_name, t.color
       ORDER BY goals ASC
       LIMIT 10

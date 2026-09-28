@@ -4,12 +4,13 @@ import db from "@/lib/db"
 import { getLeagueBySlug } from "@/lib/get-league"
 import {
   Trophy, Users, Calendar, Goal, ShieldAlert, ListOrdered,
-  MapPin, Clock, CheckCircle2, ArrowRight, UserRound,
+  MapPin, Clock, CheckCircle2, ArrowRight, UserRound, Shield,
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { TeamLogo } from "@/components/ui/team-logo"
 import { cn } from "@/lib/utils"
+import { getLeastConceded } from "@/lib/analytics"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -40,6 +41,7 @@ export default async function LeagueHomePage({ params }: Props) {
     upcomingMatches,
     recentResults,
     standingsData,
+    leastConcededData,
   ] = await Promise.all([
     db.category.count({ where: { leagueId: league.id, isActive: true } }),
     db.team.count({ where: { category: { leagueId: league.id } } }),
@@ -75,6 +77,7 @@ export default async function LeagueHomePage({ params }: Props) {
         team: { select: { id: true, name: true, shortName: true, logoUrl: true, color: true, categoryId: true } },
       },
     }),
+    getLeastConceded(league.id),
   ])
 
   const hiddenRounds = await db.roundVisibility.findMany({
@@ -93,6 +96,7 @@ export default async function LeagueHomePage({ params }: Props) {
     { label: "Posiciones", href: `/liga/${slug}/posiciones`, icon: ListOrdered, color: "text-amber-600 bg-amber-100 dark:text-amber-400 dark:bg-amber-950/40" },
     { label: "Goleadores", href: `/liga/${slug}/goleadores`, icon: Goal, color: "text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-950/40" },
     { label: "Tarjetas", href: `/liga/${slug}/tarjetas`, icon: ShieldAlert, color: "text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-950/40" },
+    { label: "Vallas", href: `/liga/${slug}/vallas`, icon: Shield, color: "text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-950/40" },
   ]
 
   function formatDate(d: Date) {
@@ -338,6 +342,58 @@ export default async function LeagueHomePage({ params }: Props) {
                         {s.dg > 0 ? `+${s.dg}` : s.dg}
                       </td>
                       <td className="px-3 py-2 text-right font-bold tabular-nums">{s.pts}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Least conceded */}
+      {leastConcededData.length > 0 && (
+        <Card className="bg-card shadow-xl transition-transform duration-200 hover:scale-[1.01]">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              Valla menos vencida
+            </CardTitle>
+            <span className="text-xs text-muted-foreground">Menos goles recibidos</span>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-hidden rounded-lg border">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-muted/50 text-xs font-medium text-muted-foreground">
+                    <th className="px-3 py-2 text-left">#</th>
+                    <th className="px-3 py-2 text-left">Equipo</th>
+                    <th className="px-3 py-2 text-right">Goles recibidos</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {leastConcededData.slice(0, 5).map((team, i) => (
+                    <tr key={team.teamShortName} className="border-t transition-colors hover:bg-muted/30">
+                      <td className="px-3 py-2">
+                        <span className={cn(
+                          "inline-flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold",
+                          i === 0 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" :
+                          "bg-muted text-muted-foreground",
+                        )}>
+                          {i + 1}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="flex items-center gap-2">
+                          <TeamLogo logoUrl={team.teamLogoUrl} color={team.teamColor} name={team.teamShortName} size="sm" />
+                          <span className="font-medium">{team.teamShortName}</span>
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 text-right">
+                        <span className="inline-flex min-w-9 items-center justify-center rounded-full bg-emerald-100 px-2.5 py-0.5 text-sm font-bold tabular-nums text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                          {team.goals}
+                        </span>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
