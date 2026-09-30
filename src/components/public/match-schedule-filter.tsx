@@ -15,16 +15,22 @@ export function MatchScheduleFilter({
   currentCategoryId,
   leagueSlug,
   fecha,
+  onSelect,
 }: {
   categories: CategoryOption[]
   currentCategoryId?: string
   leagueSlug?: string
   fecha?: number
+  onSelect?: (categoryId: string | null) => void
 }) {
   const router = useRouter()
   const basePath = leagueSlug ? `/liga/${leagueSlug}/partidos` : "/matches"
 
   function handleSelect(categoryId: string | null) {
+    if (onSelect) {
+      onSelect(categoryId)
+      return
+    }
     router.push(buildScheduleHref(basePath, { categoryId, fecha }))
   }
 

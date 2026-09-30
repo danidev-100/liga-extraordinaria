@@ -9,16 +9,22 @@ export function MatchRoundFilter({
   fechas,
   currentFecha,
   categoryId,
+  onSelect,
 }: {
   leagueSlug: string
   fechas: number[]
   currentFecha?: number
   categoryId?: string
+  onSelect?: (fecha: number | null) => void
 }) {
   const router = useRouter()
   const basePath = `/liga/${leagueSlug}/partidos`
 
   function handleSelect(fecha: number | null) {
+    if (onSelect) {
+      onSelect(fecha)
+      return
+    }
     router.push(buildScheduleHref(basePath, { categoryId, fecha }))
   }
 
