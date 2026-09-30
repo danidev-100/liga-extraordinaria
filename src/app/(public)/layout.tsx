@@ -11,6 +11,7 @@ import {
   Users,
   ListOrdered,
   Goal,
+  Shield,
   ShieldAlert,
 } from "lucide-react"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
@@ -25,6 +26,7 @@ const navLinkDefs = [
   { scopedPath: "posiciones", oldPath: "/standings", label: "Posiciones", icon: ListOrdered },
   { scopedPath: "goleadores", oldPath: "/goleadores", label: "Goleadores", icon: Goal },
   { scopedPath: "tarjetas", oldPath: "/tarjetas", label: "Tarjetas", icon: ShieldAlert },
+  { scopedPath: "vallas", oldPath: "/vallas", label: "Vallas", icon: Shield },
   { scopedPath: "ligas", oldPath: "/#ligas", label: "Torneos", icon: Trophy },
 ]
 

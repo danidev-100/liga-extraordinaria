@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
+import { buildScheduleHref } from "@/lib/schedule-params"
 
 interface CategoryOption {
   id: string
@@ -13,20 +14,18 @@ export function MatchScheduleFilter({
   categories,
   currentCategoryId,
   leagueSlug,
+  fecha,
 }: {
   categories: CategoryOption[]
   currentCategoryId?: string
   leagueSlug?: string
+  fecha?: number
 }) {
   const router = useRouter()
   const basePath = leagueSlug ? `/liga/${leagueSlug}/partidos` : "/matches"
 
   function handleSelect(categoryId: string | null) {
-    if (!categoryId) {
-      router.push(basePath)
-      return
-    }
-    router.push(`${basePath}?categoryId=${categoryId}`)
+    router.push(buildScheduleHref(basePath, { categoryId, fecha }))
   }
 
   return (
