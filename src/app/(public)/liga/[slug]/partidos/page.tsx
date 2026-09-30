@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic"
 
 import Link from "next/link"
 import { notFound } from "next/navigation"
+import type { Prisma } from "@prisma/client"
 import db from "@/lib/db"
 import { getLeagueBySlug } from "@/lib/get-league"
 import { Calendar, Sparkles, List, Megaphone } from "lucide-react"
@@ -56,23 +57,62 @@ async function MatchesContent({
       court: { select: { name: true, venue: { select: { name: true, address: true, city: true, googleMapsLink: true } } } },
       localTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
       visitorTeam: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
-      goals: {
-        include: {
-          player: { select: { name: true, surname: true } },
-          team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
-        },
-        orderBy: { minute: "asc" },
-      },
-      cards: {
-        include: {
-          player: { select: { name: true, surname: true } },
-          team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
-        },
-        orderBy: { minute: "asc" },
-      },
     },
     orderBy: [{ round: "asc" }, { date: "asc" }, { time: "asc" }],
   })
+
+  // Cargar goles y tarjetas solo de partidos finalizados (único lugar donde el
+  // listado los muestra) y en dos queries planas en vez de includes anidados:
+  // muchos menos round-trips y nada de payload para partidos no jugados.
+  type GoalWithRefs = Prisma.GoalGetPayload<{
+    include: {
+      player: { select: { name: true; surname: true } }
+      team: { select: { id: true; name: true; shortName: true; color: true; logoUrl: true } }
+    }
+  }>
+  type CardWithRefs = Prisma.CardGetPayload<{
+    include: {
+      player: { select: { name: true; surname: true } }
+      team: { select: { id: true; name: true; shortName: true; color: true; logoUrl: true } }
+    }
+  }>
+
+  const goalsByMatch = new Map<string, GoalWithRefs[]>()
+  const cardsByMatch = new Map<string, CardWithRefs[]>()
+
+  const finishedMatchIds = matches
+    .filter((match) => match.status === "FINISHED")
+    .map((match) => match.id)
+
+  if (finishedMatchIds.length > 0) {
+    const goals = await db.goal.findMany({
+      where: { matchId: { in: finishedMatchIds } },
+      include: {
+        player: { select: { name: true, surname: true } },
+        team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
+      },
+      orderBy: { minute: "asc" },
+    })
+    for (const goal of goals) {
+      const list = goalsByMatch.get(goal.matchId)
+      if (list) list.push(goal)
+      else goalsByMatch.set(goal.matchId, [goal])
+    }
+
+    const cards = await db.card.findMany({
+      where: { matchId: { in: finishedMatchIds } },
+      include: {
+        player: { select: { name: true, surname: true } },
+        team: { select: { id: true, name: true, shortName: true, color: true, logoUrl: true } },
+      },
+      orderBy: { minute: "asc" },
+    })
+    for (const card of cards) {
+      const list = cardsByMatch.get(card.matchId)
+      if (list) list.push(card)
+      else cardsByMatch.set(card.matchId, [card])
+    }
+  }
 
   const teams = await db.team.findMany({
     where: categoryId
@@ -267,6 +307,8 @@ async function MatchesContent({
                     const today = new Date()
                     today.setHours(0, 0, 0, 0)
                     const isToday = matchDate.toDateString() === today.toDateString()
+                    const matchGoals = goalsByMatch.get(match.id) ?? []
+                    const matchCards = cardsByMatch.get(match.id) ?? []
 
                     return (
                       <Link
@@ -352,12 +394,12 @@ async function MatchesContent({
                             <span>{match.category.name}</span>
                           </div>
 
-                          {isFinished && (match.goals.length > 0 || match.cards.length > 0) && (
+                          {isFinished && (matchGoals.length > 0 || matchCards.length > 0) && (
                             <div className="mt-3 space-y-1.5 border-t pt-3">
-                              {match.goals.length > 0 && (
+                              {matchGoals.length > 0 && (
                                 <div className="space-y-1">
                                   <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">Goles</p>
-                                  {match.goals.map((goal) => {
+                                  {matchGoals.map((goal) => {
                                     const isLocal = goal.teamId === match.localTeam.id
                                     return (
                                       <div key={goal.id} className="flex items-center gap-1.5 text-xs">
@@ -372,10 +414,10 @@ async function MatchesContent({
                                   })}
                                 </div>
                               )}
-                              {match.cards.length > 0 && (
+                              {matchCards.length > 0 && (
                                 <div className="space-y-1">
                                   <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/70">Tarjetas</p>
-                                  {match.cards.map((card) => {
+                                  {matchCards.map((card) => {
                                     const isLocal = card.teamId === match.localTeam.id
                                     const isDoubleYellowRed = card.type === "RED" && card.isSecondYellow
                                     return (

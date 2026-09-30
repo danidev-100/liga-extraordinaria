@@ -90,6 +90,7 @@ model Team {
   standing     Standing?
 
   @@unique([name, categoryId])
+  @@index([categoryId])
   @@map("teams")
 }
 
@@ -160,6 +161,8 @@ model Match {
   goals         Goal[]
   cards         Card[]
 
+  @@index([categoryId, round])
+  @@index([date])
   @@map("matches")
 }
 
@@ -175,6 +178,7 @@ model Goal {
   isOwnGoal Boolean @default(false) @map("is_own_goal")
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@index([matchId])
   @@map("goals")
 }
 
@@ -191,6 +195,7 @@ model Card {
   isSecondYellow Boolean  @default(false) @map("is_second_yellow")
   createdAt      DateTime @default(now()) @map("created_at")
 
+  @@index([matchId])
   @@map("cards")
 }
 
