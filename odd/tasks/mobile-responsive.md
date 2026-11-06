@@ -16,14 +16,15 @@ Make Torneo Pro fully usable on mobile (320–430 px) across public, admin and a
 
 | ID | Specs | Route | Description | Commit |
 | --- | --- | --- | --- | --- |
-| T1 | S4,S5,S6 | inline | Shared primitives: chart card height, dialog max-height/scroll, data-table pagination wrap, table cell density | `feat: make shared UI primitives mobile friendly` |
-| T2 | S3,S4 | writer | Public shell, landing header, league home and auth pages | `feat: make public shell and auth pages responsive` |
-| T3 | S3 | writer | Admin shell and sidebar navigation | `feat: make admin shell responsive` |
-| T4 | S5 | writer | Tables: standings, tarjetas, goleadores, vallas, admin standings and admin list tables (players, teams, leagues, categories, courts, admins) | `feat: make tables responsive on mobile` |
-| T5 | S4,S6 | writer | Match cards, schedule views, match/result forms and dialogs | `feat: make match views and forms responsive` |
-| T6 | S4,S5 | writer | Charts and team/player detail pages | `feat: make charts and detail pages responsive` |
-| T7 | S2–S7 | parent | Browser sweep at 320/375/390/430 px + desktop regression at 1280 px | — |
-| T8 | all | parent | Close: report outcome and checks | — |
+| T1 | S4,S5,S6 | inline | Shared primitives: chart card height, dialog max-height/scroll, data-table pagination wrap, table cell density | `f7f6410` |
+| T2 | S3,S4 | writer | Public shell, landing header, league home and auth pages | `b96f553` + `a0a15e3` |
+| T3 | S3 | writer | Admin shell and sidebar navigation | `c3f80e4` |
+| T4 | S5 | writer | Tables: standings, tarjetas, goleadores, vallas, admin standings and admin list tables | `78af321` |
+| T5 | S4,S6 | writer | Match cards, schedule views, match/result/fixture forms | `c7e3206` (+ label fix `640c425`) |
+| T6 | S4,S5 | writer | Charts and team/player detail pages | `b98c5f8` |
+| T7 | S2–S7 | parent | Browser sweep at 320/375/390/430 px + desktop regression at 1280 px | verification only |
+| T7b | S4,S6 | parent | Sweep offenders: long select labels and chart filter header | `3442f68` |
+| T8 | all | parent | Close: production build, cleanup, report | `docs` commit |
 
 ## Log
 
@@ -32,3 +33,5 @@ Make Torneo Pro fully usable on mobile (320–430 px) across public, admin and a
 - **L3** — Verification tooling: no Playwright in the project, but global `playwright-cli` with Chromium is available for 390 px screenshots and overflow checks.
 - **L4** — Browser baseline at 320 px (public + admin, logged in as `admin@liga.com`): no document-level horizontal overflow, but admin match cards squeeze team names against 5 action buttons and admin data-tables (players) clip columns inside their own scroll area. T4 widened to cover all non-match admin list tables; T5 owns match cards and forms.
 - **L5** — T7 saturation sweep: 34 routes × 320/375/390/430 px = 136 loads, zero document-level horizontal overflow. Flagged elements were only decorative off-canvas circles inside `overflow-hidden` heroes and absolutely positioned wrappers. Follow-up: clipped-content pass over `overflow:hidden` containers at 390 px, plus visual screenshots of key screens.
+- **L6** — Clipped-content pass at 390 px found: long chart filter label hard-clipped ("Todas las cateq") and the fixture submit button clipped at 320 px. Fixed by stacking chart card headers below sm, expanding the trend filter, ellipsizing select values, and wrapping the fixture label. Remaining flags are intentional truncation (categories/players lists) or decorative blobs.
+- **L7** — Verification: `npx tsc --noEmit` clean; production `pnpm build` succeeds with the local database URL from `.env`. Without it, `next build` fails prerendering `/teams` because the committed `.env.production` has an empty `DATABASE_URL` (pre-existing environment config, unrelated to this change).
