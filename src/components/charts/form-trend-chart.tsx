@@ -75,7 +75,7 @@ export function FormTrendChart({ data: initialData, categories }: FormTrendChart
       onValueChange={(value) => handleCategoryChange(value as string)}
       disabled={loading}
     >
-      <SelectTrigger className="h-8 w-32 text-xs sm:w-44">
+      <SelectTrigger className="h-8 w-full text-xs sm:w-44">
         <SelectValue placeholder="Todas las categorías" />
       </SelectTrigger>
       <SelectContent>
