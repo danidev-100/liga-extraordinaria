@@ -128,8 +128,8 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-muted-foreground sm:text-sm">
           Página {table.getState().pagination.pageIndex + 1} de{" "}
           {table.getPageCount()}
         </p>

@@ -34,7 +34,7 @@ export function ChartCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">{children}</div>
+        <div className="h-[240px] w-full sm:h-[300px]">{children}</div>
       </CardContent>
     </Card>
   )
