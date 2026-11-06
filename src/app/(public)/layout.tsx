@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Menu,
   Trophy,
@@ -33,6 +33,31 @@ const navLinkDefs = [
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [drawerPathname, setDrawerPathname] = useState(pathname)
+
+  // Close the drawer whenever the route changes (link click, back/forward, programmatic nav)
+  if (drawerPathname !== pathname) {
+    setDrawerPathname(pathname)
+    setMobileOpen(false)
+  }
+
+  // Esc to close + lock page scroll while the drawer is open
+  useEffect(() => {
+    if (!mobileOpen) return
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setMobileOpen(false)
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    document.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+      document.body.style.overflow = previousOverflow
+    }
+  }, [mobileOpen])
 
   // Extract league slug from pathname: /liga/[slug]/...
   const leagueMatch = pathname.match(/^\/liga\/([^/]+)/)
@@ -49,8 +74,8 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   return (
     <div className="flex min-h-screen flex-col">
       {/* Public header — glassmorphism nav */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/80 dark:bg-black/50 dark:supports-[backdrop-filter]:bg-black/50">
-        <div className="container mx-auto flex items-center justify-between px-4 py-3">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-white/80 pt-[env(safe-area-inset-top)] backdrop-blur-md supports-[backdrop-filter]:bg-white/80 dark:bg-black/50 dark:supports-[backdrop-filter]:bg-black/50">
+        <div className="container mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
           <Link href="/" className="flex items-center gap-2.5 group min-w-0 shrink">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-transform group-hover:scale-105">
               <Trophy className="h-5 w-5" />
@@ -88,13 +113,16 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
               })}
             </nav>
 
-            {/* Mobile hamburger — visible below md */}
+            {/* Mobile hamburger — visible below md, ≥44×44 px tap target */}
             <button
+              type="button"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="mr-2 flex md:hidden"
+              className="mr-1 grid size-11 place-items-center rounded-lg text-foreground transition-colors hover:bg-accent md:hidden"
               aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={mobileOpen}
+              aria-controls="public-mobile-drawer"
             >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
             </button>
 
             <ThemeToggle />
@@ -111,9 +139,15 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             onClick={() => setMobileOpen(false)}
           />
           {/* Panel — slides from left like admin */}
-          <div className="fixed left-0 top-0 flex h-full w-64 flex-col bg-background shadow-xl">
+          <div
+            id="public-mobile-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Menú de navegación"
+            className="fixed left-0 top-0 flex h-dvh w-[85vw] max-w-72 flex-col bg-background pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] shadow-xl"
+          >
             {/* Branded header */}
-            <div className="flex h-16 items-center gap-3 bg-primary px-5">
+            <div className="flex h-16 shrink-0 items-center gap-3 bg-primary px-5">
               <div className="flex size-8 items-center justify-center rounded-lg bg-white/20">
                 <Trophy className="size-4 text-primary-foreground" />
               </div>
@@ -128,7 +162,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
+            <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain p-3">
               {navLinks.map((link) => {
                 const Icon = link.icon
                 const isHome = link.scopedPath === ""
@@ -165,7 +199,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
             </nav>
 
             {/* Theme toggle */}
-            <div className="border-t p-3">
+            <div className="shrink-0 border-t p-3">
               <div className="flex items-center justify-between rounded-lg px-3 py-2">
                 <span className="text-sm text-muted-foreground">Apariencia</span>
                 <ThemeToggle />
@@ -176,12 +210,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       )}
 
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8">{children}</div>
+        <div className="container mx-auto px-4 py-8 sm:px-6">{children}</div>
       </main>
 
       {/* Footer */}
       <footer className="border-t border-border/50 py-6">
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 sm:px-6">
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Torneo Pro. Todos los derechos reservados.

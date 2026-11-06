@@ -116,17 +116,17 @@ export default async function LeagueHomePage({ params }: Props) {
 
       {/* Hero */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <div className="flex items-center gap-3">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-3">
             {league.logoUrl && (
               <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full ring-1 ring-black/10">
                 <img src={league.logoUrl} alt={`${league.name} escudo`} className="h-full w-full object-cover" />
               </div>
             )}
-            <h1 className="font-heading text-3xl font-bold tracking-tight md:text-4xl">
+            <h1 className="font-heading text-2xl font-bold tracking-tight break-words sm:text-3xl md:text-4xl">
               {league.name}
             </h1>
-            <Badge variant={league.isActive ? "default" : "secondary"} className="h-6">
+            <Badge variant={league.isActive ? "default" : "secondary"} className="h-6 shrink-0">
               {league.isActive ? "Activa" : "Inactiva"}
             </Badge>
           </div>
@@ -139,45 +139,45 @@ export default async function LeagueHomePage({ params }: Props) {
       {/* Stats row */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Card className="border-l-4 border-l-primary bg-card shadow-xl transition-transform duration-200 hover:scale-[1.02]">
-          <CardContent className="flex items-center justify-between pt-5">
-            <div>
+          <CardContent className="flex flex-col items-start gap-2 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">Equipos</p>
               <p className="mt-0.5 text-2xl font-bold font-heading">{teamCount}</p>
             </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary sm:h-10 sm:w-10">
               <Users className="h-5 w-5" />
             </div>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-l-blue-500 bg-card shadow-xl transition-transform duration-200 hover:scale-[1.02]">
-          <CardContent className="flex items-center justify-between pt-5">
-            <div>
+          <CardContent className="flex flex-col items-start gap-2 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">Jugadores</p>
               <p className="mt-0.5 text-2xl font-bold font-heading">{playerCount}</p>
             </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 sm:h-10 sm:w-10 dark:bg-blue-950/40 dark:text-blue-400">
               <UserRound className="h-5 w-5" />
             </div>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-l-amber-500 bg-card shadow-xl transition-transform duration-200 hover:scale-[1.02]">
-          <CardContent className="flex items-center justify-between pt-5">
-            <div>
+          <CardContent className="flex flex-col items-start gap-2 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">Partidos</p>
               <p className="mt-0.5 text-2xl font-bold font-heading">{matchCount}</p>
             </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600 sm:h-10 sm:w-10 dark:bg-amber-950/40 dark:text-amber-400">
               <Calendar className="h-5 w-5" />
             </div>
           </CardContent>
         </Card>
         <Card className="border-l-4 border-l-emerald-500 bg-card shadow-xl transition-transform duration-200 hover:scale-[1.02]">
-          <CardContent className="flex items-center justify-between pt-5">
-            <div>
+          <CardContent className="flex flex-col items-start gap-2 pt-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
               <p className="text-xs font-medium text-muted-foreground">Finalizados</p>
               <p className="mt-0.5 text-2xl font-bold font-heading">{finishedCount}</p>
             </div>
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-emerald-600 sm:h-10 sm:w-10 dark:bg-emerald-950/40 dark:text-emerald-400">
               <CheckCircle2 className="h-5 w-5" />
             </div>
           </CardContent>
@@ -207,7 +207,7 @@ export default async function LeagueHomePage({ params }: Props) {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent results */}
         <Card className="bg-card shadow-xl transition-transform duration-200 hover:scale-[1.01]">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-base">Últimos resultados</CardTitle>
             <Link href={`/liga/${slug}/partidos`} className="text-xs text-primary hover:underline">
               Ver todos <ArrowRight className="ml-0.5 inline h-3 w-3" />
@@ -247,7 +247,7 @@ export default async function LeagueHomePage({ params }: Props) {
 
         {/* Upcoming matches */}
         <Card className="bg-card shadow-xl transition-transform duration-200 hover:scale-[1.01]">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-base">Próximos partidos</CardTitle>
             <Link href={`/liga/${slug}/partidos`} className="text-xs text-primary hover:underline">
               Ver todos <ArrowRight className="ml-0.5 inline h-3 w-3" />
@@ -287,14 +287,14 @@ export default async function LeagueHomePage({ params }: Props) {
       {/* Standings top 5 */}
       {standingsData.length > 0 && (
         <Card className="bg-card shadow-xl transition-transform duration-200 hover:scale-[1.01]">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-base">Tabla de posiciones</CardTitle>
             <Link href={`/liga/${slug}/posiciones`} className="text-xs text-primary hover:underline">
               Ver completa <ArrowRight className="ml-0.5 inline h-3 w-3" />
             </Link>
           </CardHeader>
           <CardContent>
-            <div className="overflow-hidden rounded-lg border">
+            <div className="overflow-x-auto rounded-lg border">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-muted/50 text-xs font-medium text-muted-foreground">
@@ -354,7 +354,7 @@ export default async function LeagueHomePage({ params }: Props) {
       {/* Least conceded */}
       {leastConcededData.length > 0 && (
         <Card className="bg-card shadow-xl transition-transform duration-200 hover:scale-[1.01]">
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
             <CardTitle className="flex items-center gap-2 text-base">
               <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               Valla menos vencida
@@ -362,7 +362,7 @@ export default async function LeagueHomePage({ params }: Props) {
             <span className="text-xs text-muted-foreground">Menos goles recibidos</span>
           </CardHeader>
           <CardContent>
-            <div className="overflow-hidden rounded-lg border">
+            <div className="overflow-x-auto rounded-lg border">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-muted/50 text-xs font-medium text-muted-foreground">

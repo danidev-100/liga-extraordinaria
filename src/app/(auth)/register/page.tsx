@@ -67,7 +67,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 p-4 dark:from-green-950 dark:via-zinc-950 dark:to-emerald-950">
+    <div className="relative flex min-h-dvh items-start justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 px-4 py-8 sm:items-center dark:from-green-950 dark:via-zinc-950 dark:to-emerald-950">
       {/* Background decorations */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-primary/10 blur-3xl dark:bg-primary/10" />
