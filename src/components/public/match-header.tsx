@@ -52,8 +52,8 @@ export function MatchHeader({
   return (
     <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
       {/* Status bar */}
-      <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-2.5">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/30 px-4 py-2.5">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge
             variant={statusInfo.variant}
             className={
@@ -69,7 +69,7 @@ export function MatchHeader({
             {category.name}
           </Badge>
         </div>
-        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {isPlaying && (
             <span className="inline-flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-xs font-medium text-accent-foreground">
               <span className="relative flex h-2 w-2">
@@ -100,13 +100,13 @@ export function MatchHeader({
       </div>
 
       {/* Scoreboard */}
-      <div className="flex items-center justify-between gap-4 px-6 py-8 sm:px-10">
+      <div className="flex items-center justify-between gap-2 px-3 py-6 sm:gap-4 sm:px-10 sm:py-8">
         {/* Local team */}
-        <div className="flex flex-1 flex-col items-center gap-3 text-center">
+        <div className="flex min-w-0 flex-1 flex-col items-center gap-3 text-center">
           <TeamLogo logoUrl={localTeam.logoUrl} color={localTeam.color} name={localTeam.name} size="xl" />
           <Link
             href={`/liga/${leagueSlug}/equipos/${localTeam.id}`}
-            className="font-heading text-lg font-semibold leading-tight transition-colors hover:text-primary sm:text-xl"
+            className="min-w-0 break-words font-heading text-lg font-semibold leading-tight transition-colors hover:text-primary sm:text-xl"
           >
             {localTeam.name}
           </Link>
@@ -114,16 +114,16 @@ export function MatchHeader({
         </div>
 
         {/* Score / VS */}
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex shrink-0 flex-col items-center gap-1">
           {hasScore ? (
-            <div className="flex items-center gap-3 sm:gap-5">
-              <span className="text-5xl font-bold tabular-nums tracking-tight sm:text-6xl">
+            <div className="flex items-center gap-2 sm:gap-5">
+              <span className="text-4xl font-bold tabular-nums tracking-tight sm:text-6xl">
                 {localScore}
               </span>
-              <span className="text-3xl font-light text-muted-foreground/30 sm:text-4xl">
+              <span className="text-2xl font-light text-muted-foreground/30 sm:text-4xl">
                 —
               </span>
-              <span className="text-5xl font-bold tabular-nums tracking-tight sm:text-6xl">
+              <span className="text-4xl font-bold tabular-nums tracking-tight sm:text-6xl">
                 {visitorScore}
               </span>
             </div>
@@ -142,11 +142,11 @@ export function MatchHeader({
         </div>
 
         {/* Visitor team */}
-        <div className="flex flex-1 flex-col items-center gap-3 text-center">
+        <div className="flex min-w-0 flex-1 flex-col items-center gap-3 text-center">
           <TeamLogo logoUrl={visitorTeam.logoUrl} color={visitorTeam.color} name={visitorTeam.name} size="xl" />
           <Link
             href={`/liga/${leagueSlug}/equipos/${visitorTeam.id}`}
-            className="font-heading text-lg font-semibold leading-tight transition-colors hover:text-primary sm:text-xl"
+            className="min-w-0 break-words font-heading text-lg font-semibold leading-tight transition-colors hover:text-primary sm:text-xl"
           >
             {visitorTeam.name}
           </Link>

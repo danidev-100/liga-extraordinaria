@@ -51,8 +51,8 @@ export function MatchCalendarGrid({ weeks, currentMonth }: MatchCalendarGridProp
         <h3 className="font-heading text-lg font-semibold capitalize">{currentMonth}</h3>
       </div>
 
-      {/* Day headers */}
-      <div className="grid grid-cols-7 gap-1">
+      {/* Day headers — the grid scrolls inside its own container below sm */}
+      <div className="grid grid-cols-[repeat(7,minmax(5rem,1fr))] gap-1 overflow-x-auto sm:grid-cols-7 sm:overflow-visible">
         {dayNames.map((name) => (
           <div
             key={name}
@@ -132,8 +132,11 @@ export function MatchCalendarGrid({ weeks, currentMonth }: MatchCalendarGridProp
                       </div>
 
                       {/* Category badge */}
-                      <div className="mt-0.5">
-                        <Badge variant="secondary" className="text-[9px] px-1 py-0 h-auto leading-none">
+                      <div className="mt-0.5 min-w-0">
+                        <Badge
+                          variant="secondary"
+                          className="block max-w-full truncate text-[9px] px-1 py-0 h-auto leading-none"
+                        >
                           {match.category.name}
                         </Badge>
                       </div>

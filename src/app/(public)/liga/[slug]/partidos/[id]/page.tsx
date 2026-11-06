@@ -128,17 +128,17 @@ export default async function LeagueMatchDetailPage({ params }: Props) {
           <div className="mt-4 space-y-2">
             <Link
               href={`/liga/${slug}/equipos/${match.localTeam.id}`}
-              className="flex items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted/50"
+              className="flex min-w-0 items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted/50"
             >
               <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
-              Ver ficha de {match.localTeam.name}
+              <span className="min-w-0 break-words">Ver ficha de {match.localTeam.name}</span>
             </Link>
             <Link
               href={`/liga/${slug}/equipos/${match.visitorTeam.id}`}
-              className="flex items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted/50"
+              className="flex min-w-0 items-center gap-2 rounded-lg border bg-card px-4 py-2.5 text-sm font-medium transition-colors hover:bg-muted/50"
             >
               <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
-              Ver ficha de {match.visitorTeam.name}
+              <span className="min-w-0 break-words">Ver ficha de {match.visitorTeam.name}</span>
             </Link>
           </div>
         </div>

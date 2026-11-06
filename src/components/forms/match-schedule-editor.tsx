@@ -129,7 +129,7 @@ export function MatchScheduleEditor({ rounds, categoryId, hiddenRounds = {} }: P
   return (
     <div className="space-y-6">
       {/* Toolbar */}
-      <div className="flex items-center justify-between gap-4 rounded-lg border bg-muted/30 p-3">
+      <div className="flex flex-col gap-2 rounded-lg border bg-muted/30 p-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <p className="text-sm text-muted-foreground">
           Modificá fecha, hora o ronda. Los cambios se validan contra disponibilidad de cancha.
         </p>
@@ -193,7 +193,7 @@ export function MatchScheduleEditor({ rounds, categoryId, hiddenRounds = {} }: P
                             <span className="mx-1.5 text-muted-foreground">vs</span>
                             <span>{match.visitorTeam.shortName}</span>
                           </p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                             <span>{match.court.venue.name} · {match.court.name}</span>
                             {dirty && (
                               <>

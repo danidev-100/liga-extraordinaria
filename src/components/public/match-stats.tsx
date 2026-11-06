@@ -69,7 +69,7 @@ export function MatchStats({
       </div>
       <div className="divide-y">
         {/* Goals row */}
-        <div className="grid grid-cols-3 items-center gap-4 px-5 py-3 text-sm">
+        <div className="grid grid-cols-3 items-center gap-2 px-3 py-3 text-sm sm:gap-4 sm:px-5">
           <span className="text-right font-medium">{localGoals + localOwnGoals}</span>
           <span className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
             Goles
@@ -79,7 +79,7 @@ export function MatchStats({
 
         {/* Own goals row */}
         {(localOwnGoals > 0 || visitorOwnGoals > 0) && (
-          <div className="grid grid-cols-3 items-center gap-4 px-5 py-3 text-sm">
+          <div className="grid grid-cols-3 items-center gap-2 px-3 py-3 text-sm sm:gap-4 sm:px-5">
             <span className="text-right text-muted-foreground">
               {localOwnGoals > 0 && (
                 <span className="text-destructive">{localOwnGoals} e/c</span>
@@ -97,9 +97,9 @@ export function MatchStats({
         )}
 
         {/* Yellow cards row */}
-        <div className="grid grid-cols-3 items-center gap-4 px-5 py-3 text-sm">
+        <div className="grid grid-cols-3 items-center gap-2 px-3 py-3 text-sm sm:gap-4 sm:px-5">
           <span className="text-right font-medium">{localYellow}</span>
-          <span className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+          <span className="text-center text-xs font-semibold uppercase leading-tight tracking-wide text-muted-foreground/70 sm:tracking-wider">
             <CardIcon type="YELLOW" className="align-middle" />{" "}
             Amarillas
           </span>
@@ -107,9 +107,9 @@ export function MatchStats({
         </div>
 
         {/* Red cards row */}
-        <div className="grid grid-cols-3 items-center gap-4 px-5 py-3 text-sm">
+        <div className="grid grid-cols-3 items-center gap-2 px-3 py-3 text-sm sm:gap-4 sm:px-5">
           <span className="text-right font-medium">{localRed}</span>
-          <span className="text-center text-xs font-semibold uppercase tracking-wider text-muted-foreground/70">
+          <span className="text-center text-xs font-semibold uppercase leading-tight tracking-wide text-muted-foreground/70 sm:tracking-wider">
             <CardIcon type="RED" className="align-middle" />{" "}
             Rojas
           </span>

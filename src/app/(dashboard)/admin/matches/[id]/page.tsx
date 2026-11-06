@@ -88,7 +88,7 @@ export default async function MatchDetailPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+        <h1 className="text-2xl font-bold tracking-tight flex flex-wrap items-center gap-2">
           <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
           <span>{match.localTeam.shortName}</span>
           <span className="text-muted-foreground/50">vs</span>
@@ -175,13 +175,13 @@ export default async function MatchDetailPage({
           <CardContent>
             <div className="divide-y">
               {match.goals.map((goal) => (
-                <div key={goal.id} className="flex items-center justify-between py-2">
-                  <div className="flex items-center gap-2">
+                <div key={goal.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
                     <TeamLogo logoUrl={goal.team.logoUrl} color={goal.team.color} name={goal.team.name} size="sm" />
                     <span className="text-xs font-semibold text-muted-foreground">
                       {goal.team.shortName}
                     </span>
-                    <span className="font-medium">
+                    <span className="min-w-0 break-words font-medium">
                       {goal.player.name} {goal.player.surname}
                     </span>
                     {goal.isOwnGoal && (
@@ -209,8 +209,8 @@ export default async function MatchDetailPage({
               {match.cards.map((card) => {
                 const isDoubleYellowRed = card.type === "RED" && card.isSecondYellow
                 return (
-                <div key={card.id} className="flex items-center justify-between py-2">
-                  <div className="flex items-center gap-2">
+                <div key={card.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                  <div className="flex min-w-0 flex-wrap items-center gap-2">
                     {isDoubleYellowRed ? (
                       <div className="flex items-center gap-0.5">
                         <div className="h-3 w-2 rounded-sm bg-yellow-400" />
@@ -227,7 +227,7 @@ export default async function MatchDetailPage({
                     <span className="text-xs font-semibold text-muted-foreground">
                       {card.team.shortName}
                     </span>
-                    <span className="font-medium">
+                    <span className="min-w-0 break-words font-medium">
                       {card.player.name} {card.player.surname}
                     </span>
                     {isDoubleYellowRed && (
