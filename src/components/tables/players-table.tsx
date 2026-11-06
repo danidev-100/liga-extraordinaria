@@ -69,10 +69,12 @@ function useColumns(): ColumnDef<PlayerRow>[] {
     {
       accessorKey: "dni",
       header: "DNI",
+      meta: { className: "hidden sm:table-cell" },
     },
     {
       id: "birthDate",
       header: "Fecha Nac.",
+      meta: { className: "hidden sm:table-cell" },
       accessorFn: (row) => formatDate(row.birthDate),
       cell: ({ row }) => (
         <span className="text-muted-foreground text-sm">
@@ -83,6 +85,7 @@ function useColumns(): ColumnDef<PlayerRow>[] {
     {
       accessorKey: "categoryName",
       header: "Categoría",
+      meta: { className: "hidden sm:table-cell" },
     },
     {
       accessorKey: "teamShortName",
@@ -97,6 +100,7 @@ function useColumns(): ColumnDef<PlayerRow>[] {
     {
       id: "jerseyNumber",
       header: "Camiseta",
+      meta: { className: "hidden sm:table-cell" },
       accessorFn: (row) => (row.jerseyNumber ? `#${row.jerseyNumber}` : ""),
       cell: ({ row }) =>
         row.original.jerseyNumber ? (
@@ -108,6 +112,7 @@ function useColumns(): ColumnDef<PlayerRow>[] {
     {
       accessorKey: "isActive",
       header: "Estado",
+      meta: { className: "hidden sm:table-cell" },
       cell: ({ row }) => (
         <Badge variant={row.original.isActive ? "default" : "secondary"}>
           {row.original.isActive ? "Activo" : "Inactivo"}
@@ -127,7 +132,7 @@ function useColumns(): ColumnDef<PlayerRow>[] {
     {
       accessorKey: "totalCards",
       header: "T",
-      meta: { align: "right" },
+      meta: { align: "right", className: "hidden sm:table-cell" },
       cell: ({ row }) => (
         <span className="text-muted-foreground">
           {row.original.totalCards}

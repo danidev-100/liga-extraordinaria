@@ -52,7 +52,7 @@ export default async function ScopedTeamsPage({ params, searchParams }: Props) {
             Gestioná los equipos de cada categoría
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Link href={`/admin/teams/new`}>
             <Button>
               <Plus className="mr-2 h-4 w-4" />
@@ -64,7 +64,7 @@ export default async function ScopedTeamsPage({ params, searchParams }: Props) {
 
       <Card className="shadow-xs">
         <CardHeader>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
             <CardTitle>
               {selectedCategory
                 ? `Equipos — ${selectedCategory.name}`
@@ -111,7 +111,7 @@ export default async function ScopedTeamsPage({ params, searchParams }: Props) {
               {teams.map((team) => (
                 <div
                   key={team.id}
-                  className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
+                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="md" />
@@ -131,7 +131,7 @@ export default async function ScopedTeamsPage({ params, searchParams }: Props) {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <Link href={`/admin/teams/${team.id}`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />

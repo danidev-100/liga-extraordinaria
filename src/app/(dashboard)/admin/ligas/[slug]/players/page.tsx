@@ -65,7 +65,7 @@ export default async function ScopedPlayersPage({ params, searchParams }: Props)
             Gestioná los jugadores de cada equipo
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <ImportPlayersCSV teams={teams.map(t => ({ id: t.id, name: t.name, shortName: t.shortName, category: t.category }))} leagueSlug={slug} />
           <Link href={`/admin/players/new`}>
             <Button>
@@ -78,7 +78,7 @@ export default async function ScopedPlayersPage({ params, searchParams }: Props)
 
       <Card className="shadow-xs">
         <CardHeader>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-4">
             <CardTitle>
               {selectedCategory
                 ? `Jugadores — ${selectedCategory.name}`

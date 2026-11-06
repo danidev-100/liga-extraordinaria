@@ -19,7 +19,7 @@ Make Torneo Pro fully usable on mobile (320–430 px) across public, admin and a
 | T1 | S4,S5,S6 | inline | Shared primitives: chart card height, dialog max-height/scroll, data-table pagination wrap, table cell density | `feat: make shared UI primitives mobile friendly` |
 | T2 | S3,S4 | writer | Public shell, landing header, league home and auth pages | `feat: make public shell and auth pages responsive` |
 | T3 | S3 | writer | Admin shell and sidebar navigation | `feat: make admin shell responsive` |
-| T4 | S5 | writer | Standings, tarjetas, goleadores, vallas and admin standings tables | `feat: make tables responsive on mobile` |
+| T4 | S5 | writer | Tables: standings, tarjetas, goleadores, vallas, admin standings and admin list tables (players, teams, leagues, categories, courts, admins) | `feat: make tables responsive on mobile` |
 | T5 | S4,S6 | writer | Match cards, schedule views, match/result forms and dialogs | `feat: make match views and forms responsive` |
 | T6 | S4,S5 | writer | Charts and team/player detail pages | `feat: make charts and detail pages responsive` |
 | T7 | S2–S7 | parent | Browser sweep at 320/375/390/430 px + desktop regression at 1280 px | — |
@@ -30,3 +30,4 @@ Make Torneo Pro fully usable on mobile (320–430 px) across public, admin and a
 - **L1** — "quiero que sea totalmente resposive para movil"
 - **L2** — Explorer audit found: Tailwind v4 CSS-first, no tailwind config; shared primitives (`ui/table`, `data-table`, `chart-card`, `ui/dialog`) have zero responsive prefixes; admin `main` uses `overflow-x-auto` masking child overflow; public drawer is fixed `w-64`; auth pages use `min-h-screen` + `items-center`.
 - **L3** — Verification tooling: no Playwright in the project, but global `playwright-cli` with Chromium is available for 390 px screenshots and overflow checks.
+- **L4** — Browser baseline at 320 px (public + admin, logged in as `admin@liga.com`): no document-level horizontal overflow, but admin match cards squeeze team names against 5 action buttons and admin data-tables (players) clip columns inside their own scroll area. T4 widened to cover all non-match admin list tables; T5 owns match cards and forms.

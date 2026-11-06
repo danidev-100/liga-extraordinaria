@@ -58,7 +58,7 @@ export default async function ScopedLeaguesPage({ params }: Props) {
           <CardTitle>Detalle del torneo</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2">
+          <div className="flex flex-wrap items-center justify-between gap-2 py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2">
             <div className="space-y-1 min-w-0">
               <div className="flex items-center gap-2 min-w-0">
                 <p className="font-medium truncate">{league.name}</p>
@@ -76,7 +76,7 @@ export default async function ScopedLeaguesPage({ params }: Props) {
                 {league.slug ? ` · slug: ${league.slug}` : ""}
               </p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <form
                 action={async () => {
                   "use server"

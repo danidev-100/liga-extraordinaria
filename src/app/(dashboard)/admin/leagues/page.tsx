@@ -49,7 +49,7 @@ export default async function LeaguesPage() {
               {leagues.map((league) => (
                 <div
                   key={league.id}
-                  className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
+                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
                 >
                   <div className="space-y-1 min-w-0">
                     <div className="flex items-center gap-2 min-w-0">
@@ -67,7 +67,7 @@ export default async function LeaguesPage() {
                       {new Date(league.endDate).toLocaleDateString("es-AR")}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <form
                       action={async () => {
                         "use server"
