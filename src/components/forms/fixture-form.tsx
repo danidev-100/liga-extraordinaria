@@ -192,7 +192,7 @@ export function FixtureForm({ categories }: FixtureFormProps) {
         <Button
           type="submit"
           disabled={isSubmitting || teamCount < 3}
-          className="w-full gap-2 sm:w-auto"
+          className="h-auto w-full gap-2 py-2 text-center whitespace-normal sm:w-auto sm:whitespace-nowrap"
         >
           {isSubmitting ? (
             <Loader2 className="h-4 w-4 animate-spin" />
