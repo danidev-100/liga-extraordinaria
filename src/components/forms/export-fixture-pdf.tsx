@@ -131,11 +131,11 @@ export function ExportFixturePDF({ categories }: Props) {
   const categoriesWithTeams = categories.filter((c) => c._count.teams >= 2)
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:gap-3">
       <div className="flex-1 space-y-1.5">
         <label className="text-sm font-medium">Categoría</label>
         <Select value={categoryId} onValueChange={(v) => setCategoryId(v ?? "")}>
-          <SelectTrigger>
+          <SelectTrigger className="w-full sm:w-fit">
             <SelectValue placeholder="Seleccionar categoría...">
               {(value: string | null) => {
                 if (!value) return "Seleccionar categoría..."
@@ -163,7 +163,7 @@ export function ExportFixturePDF({ categories }: Props) {
         onClick={handleExport}
         disabled={!categoryId || loading}
         variant="outline"
-        className="gap-2"
+        className="w-full gap-2 sm:w-auto"
       >
         {loading ? (
           <Loader2 className="h-4 w-4 animate-spin" />

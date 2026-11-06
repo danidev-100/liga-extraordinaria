@@ -174,7 +174,7 @@ export function ImportPlayersCSV({
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Equipo *</label>
             <Select value={selectedTeamId} onValueChange={(v) => setSelectedTeamId(v ?? "")}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full sm:w-fit">
                 <SelectValue placeholder="Seleccionar equipo..." />
               </SelectTrigger>
               <SelectContent>
@@ -190,10 +190,12 @@ export function ImportPlayersCSV({
           {/* File upload */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium">Archivo Excel o CSV *</label>
-            <div className="flex items-center gap-2">
-              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-6 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/50 flex-1 justify-center">
-                <FileSpreadsheet className="h-6 w-6" />
-                <span>{file ? file.name : "Hacé clic para seleccionar Excel o CSV"}</span>
+            <div className="flex min-w-0 items-center gap-2">
+              <label className="flex min-w-0 cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-6 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/50 flex-1 justify-center">
+                <FileSpreadsheet className="h-6 w-6 shrink-0" />
+                <span className="min-w-0 truncate">
+                  {file ? file.name : "Hacé clic para seleccionar Excel o CSV"}
+                </span>
                 <input
                   ref={fileRef}
                   type="file"

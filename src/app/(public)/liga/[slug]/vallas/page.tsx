@@ -77,17 +77,17 @@ async function VallasContent({ slug, categoryId }: { slug: string; categoryId?: 
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-          <div className="flex items-center gap-2 border-b px-6 py-4">
+          <div className="flex items-center gap-2 border-b px-4 py-4 sm:px-6">
             <Trophy className="h-5 w-5 text-primary" />
             <h2 className="font-heading text-xl font-semibold tracking-tight">
               {selectedCategory.name} — {selectedCategory.league.name}
             </h2>
           </div>
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="text-xs sm:text-sm">
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-12 text-center">#</TableHead>
+                  <TableHead className="w-8 text-center sm:w-12">#</TableHead>
                   <TableHead>Equipo</TableHead>
                   <TableHead className="w-32 text-center">Goles recibidos</TableHead>
                 </TableRow>
@@ -113,7 +113,7 @@ async function VallasContent({ slug, categoryId }: { slug: string; categoryId?: 
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="inline-flex items-center justify-center rounded-full bg-emerald-500/15 px-3 py-1 text-sm font-bold text-emerald-700 dark:text-emerald-400">{team.goals}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-emerald-500/15 px-2 py-1 text-xs font-bold text-emerald-700 sm:px-3 sm:text-sm dark:text-emerald-400">{team.goals}</span>
                     </TableCell>
                   </TableRow>
                 ))}

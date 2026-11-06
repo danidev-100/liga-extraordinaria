@@ -14,7 +14,7 @@ interface ChartErrorFallbackProps {
  */
 export function ChartErrorFallback({ title }: ChartErrorFallbackProps) {
   return (
-    <div className="flex h-[300px] flex-col items-center justify-center rounded-xl border border-dashed py-16 text-center">
+    <div className="flex h-[240px] flex-col items-center justify-center rounded-xl border border-dashed py-8 text-center sm:h-[300px] sm:py-16">
       <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
         <AlertTriangle className="h-7 w-7 text-destructive" />
       </div>

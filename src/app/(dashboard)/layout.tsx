@@ -47,7 +47,9 @@ export default async function DashboardLayout({
         isSuperAdmin={isSuperAdmin}
         allLeagues={allLeagues}
       />
-      <main className="min-w-0 flex-1 overflow-x-auto px-6 pb-6 pt-14 md:p-8">
+      {/* pt keeps the fixed mobile menu toggle (44px + safe-area inset) clear of the content,
+          and overflow-x-clip prevents child overflow from creating a second page scrollbar. */}
+      <main className="min-w-0 flex-1 overflow-x-clip px-4 pb-4 pt-[calc(3.5rem+env(safe-area-inset-top))] sm:px-6 sm:pb-6 md:p-8 md:pt-8">
         {children}
       </main>
     </div>

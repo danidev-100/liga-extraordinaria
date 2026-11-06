@@ -3,6 +3,7 @@
 import {
   type ColumnDef,
   type ColumnFiltersState,
+  type RowData,
   type SortingState,
   flexRender,
   getCoreRowModel,
@@ -23,6 +24,17 @@ import {
 } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Search } from "lucide-react"
+
+// Lets any column hide itself on small screens (or carry any other utility)
+// without duplicating table wrappers, e.g.
+// `meta: { className: "hidden sm:table-cell" }`.
+declare module "@tanstack/react-table" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface ColumnMeta<TData extends RowData, TValue> {
+    className?: string
+    align?: "left" | "center" | "right"
+  }
+}
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -66,7 +78,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       {searchKey && (
-        <div className="relative max-w-sm">
+        <div className="relative w-full max-w-sm">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder={searchPlaceholder}
@@ -85,7 +97,10 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead
+                    key={header.id}
+                    className={header.column.columnDef.meta?.className}
+                  >
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -105,7 +120,10 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.columnDef.meta?.className}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()
@@ -128,8 +146,8 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
 
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-muted-foreground sm:text-sm">
           Página {table.getState().pagination.pageIndex + 1} de{" "}
           {table.getPageCount()}
         </p>

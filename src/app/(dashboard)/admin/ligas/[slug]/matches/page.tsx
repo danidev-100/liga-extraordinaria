@@ -330,11 +330,11 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                       key={match.id}
                       className={`rounded-lg border border-border bg-card ${status.borderClass} border-l-4 p-5 transition-shadow hover:shadow-sm`}
                     >
-                      <div className="flex items-center justify-between gap-4">
+                      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                         {/* Left: match info */}
                         <div className="min-w-0 space-y-2">
                           {/* Status + round */}
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <Badge
                               variant={status.variant}
                               className={
@@ -352,12 +352,12 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                           </div>
 
                           {/* Teams */}
-                          <div className="font-heading text-lg font-bold leading-tight flex items-center gap-2">
+                          <div className="font-heading text-lg font-bold leading-tight flex min-w-0 flex-wrap items-center gap-2">
                             <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
-                            <span>{match.localTeam.shortName}</span>
+                            <span className="min-w-0 truncate">{match.localTeam.shortName}</span>
                             <span className="text-muted-foreground">vs</span>
                             <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
-                            <span>{match.visitorTeam.shortName}</span>
+                            <span className="min-w-0 truncate">{match.visitorTeam.shortName}</span>
                           </div>
 
                           {/* Score for finished matches */}
@@ -370,7 +370,7 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
                             )}
 
                           {/* Details */}
-                          <p className="text-sm text-muted-foreground">
+                          <p className="text-sm text-muted-foreground break-words">
                             {new Date(match.date).toLocaleDateString("es-AR")} —{" "}
                             {match.time}
                             <span className="mx-1.5">·</span>
@@ -382,28 +382,45 @@ export default async function ScopedMatchesPage({ params, searchParams }: Props)
 
                         {/* Right: actions */}
                         <div className="flex flex-wrap items-center gap-2">
-                          <Link href={`/admin/matches/${match.id}`}>
+                          <Link href={`/admin/matches/${match.id}`} className="grow sm:grow-0">
                             <Button
                               variant={
                                 match.status === "SCHEDULED" ? "default" : "outline"
                               }
                               size="sm"
+                              className="w-full sm:w-auto"
                             >
                               <Edit className="mr-1.5 h-4 w-4" />
                               {match.status === "SCHEDULED" ? "Cargar" : match.status === "POSTPONED" || match.status === "FINISHED" ? "Editar" : "Ver"}
                             </Button>
                           </Link>
                           {match.status === "SCHEDULED" && (
-                            <form action={postponeMatch.bind(null, match.id, slug)}>
-                              <Button type="submit" variant="outline" size="sm">
+                            <form
+                              action={postponeMatch.bind(null, match.id, slug)}
+                              className="grow sm:grow-0"
+                            >
+                              <Button
+                                type="submit"
+                                variant="outline"
+                                size="sm"
+                                className="w-full sm:w-auto"
+                              >
                                 <CalendarClock className="mr-1.5 h-4 w-4" />
                                 Postergar
                               </Button>
                             </form>
                           )}
                           {match.status === "POSTPONED" && (
-                            <form action={rescheduleMatch.bind(null, match.id, slug)}>
-                              <Button type="submit" variant="outline" size="sm">
+                            <form
+                              action={rescheduleMatch.bind(null, match.id, slug)}
+                              className="grow sm:grow-0"
+                            >
+                              <Button
+                                type="submit"
+                                variant="outline"
+                                size="sm"
+                                className="w-full sm:w-auto"
+                              >
                                 <CalendarPlus className="mr-1.5 h-4 w-4" />
                                 Reprogramar
                               </Button>

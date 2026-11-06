@@ -86,11 +86,11 @@ export default async function LeagueTeamsPage({ params }: Props) {
                   <CardHeader className="pb-2">
                     <div className="flex items-center gap-3">
                       <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="md" />
-                      <div>
-                        <CardTitle className="text-base font-semibold group-hover:text-primary transition-colors">
+                      <div className="min-w-0 flex-1">
+                        <CardTitle className="truncate text-base font-semibold group-hover:text-primary transition-colors">
                           {team.name}
                         </CardTitle>
-                        <p className="text-xs text-muted-foreground">{team.shortName}</p>
+                        <p className="truncate text-xs text-muted-foreground">{team.shortName}</p>
                       </div>
                     </div>
                   </CardHeader>

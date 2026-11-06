@@ -37,7 +37,7 @@ export default async function Home() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
+      <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 pt-[env(safe-area-inset-top)] backdrop-blur-md supports-[backdrop-filter]:bg-background/80">
         <div className="container mx-auto flex items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-transform group-hover:scale-105">
@@ -93,7 +93,7 @@ export default async function Home() {
                 </div>
 
                 {/* Main title */}
-                <h1 className="font-heading text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+                <h1 className="font-heading text-4xl font-bold tracking-tight break-words sm:text-5xl md:text-6xl lg:text-7xl">
                   Administrá tu torneo con{" "}
                   <span className="bg-gradient-to-r from-green-600 via-emerald-500 to-green-500 bg-clip-text text-transparent dark:from-green-400 dark:via-emerald-400 dark:to-green-300">
                     potencia
@@ -163,7 +163,7 @@ export default async function Home() {
         <section className="py-20">
           <div className="container mx-auto px-4">
             <div className="mx-auto mb-12 max-w-2xl text-center">
-              <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="font-heading text-3xl font-bold tracking-tight break-words sm:text-4xl">
                 Todo lo que necesitás
               </h2>
               <p className="mt-4 text-muted-foreground">
@@ -217,7 +217,7 @@ export default async function Home() {
           <section id="ligas" className="border-t bg-muted/30 py-20 scroll-mt-24">
             <div className="container mx-auto px-4">
               <div className="mx-auto mb-12 max-w-2xl text-center">
-                <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+                <h2 className="font-heading text-3xl font-bold tracking-tight break-words sm:text-4xl">
                   Torneos activos
                 </h2>
                 <p className="mt-4 text-muted-foreground">
@@ -264,7 +264,7 @@ export default async function Home() {
               <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg shadow-green-500/20">
                 <Plus className="h-8 w-8 text-white" />
               </div>
-              <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+              <h2 className="font-heading text-3xl font-bold tracking-tight break-words sm:text-4xl">
                 ¿Tenés tu propio torneo?
               </h2>
               <p className="mx-auto mt-4 max-w-lg text-muted-foreground">

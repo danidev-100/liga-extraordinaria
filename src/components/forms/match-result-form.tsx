@@ -199,7 +199,7 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
 
         {/* Goals */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-base">Goles</CardTitle>
             <Button
               type="button"
@@ -228,8 +228,8 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
                     ? match.visitorTeam.players
                     : []
               return (
-              <div key={field.id} className="flex items-start gap-2 rounded-lg border p-3">
-                <div className="grid flex-1 gap-3 sm:grid-cols-4">
+              <div key={field.id} className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-start">
+                <div className="grid flex-1 gap-3 [&>*]:min-w-0 sm:grid-cols-4">
                   <FormField
                     control={form.control}
                     name={`goals.${index}.teamId`}
@@ -352,7 +352,7 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="mt-6"
+                  className="h-11 w-11 shrink-0 self-end sm:mt-6 sm:h-7 sm:w-7"
                   onClick={() => removeGoal(index)}
                 >
                   <X className="h-4 w-4 text-muted-foreground" />
@@ -365,7 +365,7 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
 
         {/* Cards */}
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
             <CardTitle className="text-base">Tarjetas</CardTitle>
             <Button
               type="button"
@@ -394,8 +394,8 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
                     ? match.visitorTeam.players
                     : []
               return (
-              <div key={field.id} className="flex items-start gap-2 rounded-lg border p-3">
-                <div className="grid flex-1 gap-3 sm:grid-cols-4">
+              <div key={field.id} className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-start">
+                <div className="grid flex-1 gap-3 [&>*]:min-w-0 sm:grid-cols-4">
                   <FormField
                     control={form.control}
                     name={`cards.${index}.teamId`}
@@ -522,7 +522,7 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
                   type="button"
                   variant="ghost"
                   size="sm"
-                  className="mt-6"
+                  className="h-11 w-11 shrink-0 self-end sm:mt-6 sm:h-7 sm:w-7"
                   onClick={() => removeCard(index)}
                 >
                   <X className="h-4 w-4 text-muted-foreground" />
@@ -539,7 +539,7 @@ export function MatchResultForm({ match, editing = false }: MatchResultFormProps
               <AlertTriangle className="h-4 w-4" />
               {editing ? "¿Guardar cambios al resultado?" : "¿Confirmar resultado?"}
             </div>
-            <div className="flex items-center justify-center gap-4 text-lg font-bold">
+            <div className="flex flex-wrap items-center justify-center gap-4 text-lg font-bold">
               <span>{match.localTeam.shortName}</span>
               <span className="text-primary">{localScoreValue} - {visitorScoreValue}</span>
               <span>{match.visitorTeam.shortName}</span>

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { cn } from "@/lib/utils"
 import {
   LayoutDashboard,
@@ -59,6 +59,43 @@ export function Sidebar({
 }) {
   const pathname = usePathname()
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [drawerPathname, setDrawerPathname] = useState(pathname)
+
+  // Close the drawer whenever the route changes (link click, back/forward, programmatic nav)
+  if (drawerPathname !== pathname) {
+    setDrawerPathname(pathname)
+    setMobileOpen(false)
+  }
+
+  // Esc closes the drawer, and page scroll is locked while it is open
+  useEffect(() => {
+    if (!mobileOpen) return
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setMobileOpen(false)
+    }
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = "hidden"
+    document.addEventListener("keydown", handleKeyDown)
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown)
+      document.body.style.overflow = previousOverflow
+    }
+  }, [mobileOpen])
+
+  // Above md the sidebar is static, so drop the drawer state (and release the scroll lock)
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)")
+
+    function handleBreakpointChange() {
+      if (desktop.matches) setMobileOpen(false)
+    }
+
+    desktop.addEventListener("change", handleBreakpointChange)
+    return () => desktop.removeEventListener("change", handleBreakpointChange)
+  }, [])
 
   const userInitial = email?.charAt(0)?.toUpperCase() ?? "U"
 
@@ -71,39 +108,43 @@ export function Sidebar({
 
   return (
     <>
-      {/* Mobile menu button */}
+      {/* Mobile menu button — 44×44 px target, kept inside the safe area */}
       <Button
         variant="ghost"
         size="icon"
-        className="fixed left-4 top-3 z-50 md:hidden"
+        className="fixed left-3 top-[calc(0.75rem+env(safe-area-inset-top))] z-50 size-11 md:hidden"
         onClick={() => setMobileOpen(!mobileOpen)}
         aria-label={mobileOpen ? "Cerrar menú" : "Abrir menú"}
+        aria-expanded={mobileOpen}
+        aria-controls="admin-mobile-drawer"
       >
-        {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        {mobileOpen ? <X className="size-5" /> : <Menu className="size-5" />}
       </Button>
 
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          aria-hidden="true"
           onClick={() => setMobileOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
+        id="admin-mobile-drawer"
         className={cn(
-          "fixed inset-y-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r bg-sidebar transition-transform duration-200 md:static md:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 flex w-[85vw] max-w-64 shrink-0 flex-col overflow-y-auto overscroll-contain border-r bg-sidebar pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)] transition-transform duration-200 md:static md:w-64 md:translate-x-0 md:overflow-visible md:py-0",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        {/* Sporty green header */}
-        <div className="flex h-16 items-center gap-3 bg-sidebar-primary px-5">
+        {/* Sporty green header — pl clears the fixed mobile toggle */}
+        <div className="flex h-16 items-center gap-3 bg-sidebar-primary pl-16 pr-5 md:pl-5">
           <Link href="/" className="flex size-8 items-center justify-center rounded-lg bg-white/20 transition-opacity hover:opacity-80">
             <Trophy className="size-4 text-sidebar-primary-foreground" />
           </Link>
           {isSuperAdmin && allLeagues ? (
-            <div>
+            <div className="min-w-0 flex-1">
               <LeagueSwitcher
                 leagues={allLeagues}
                 currentSlug={effectiveSlug}
@@ -126,7 +167,7 @@ export function Sidebar({
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
+        <nav className="min-h-0 flex-1 space-y-0.5 overflow-y-auto overscroll-contain p-3">
           {navItems.map((item) => {
             const isActive =
               item.href === (leagueSlug ? `/admin/ligas/${leagueSlug}` : "/admin")

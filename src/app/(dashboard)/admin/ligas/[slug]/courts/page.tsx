@@ -57,7 +57,7 @@ export default async function ScopedVenuesPage({ params }: Props) {
               {venues.map((venue) => (
                 <div
                   key={venue.id}
-                  className="flex items-center justify-between py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
+                  className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 py-3 transition-colors hover:bg-muted/50 rounded-lg px-2 -mx-2"
                 >
                   <div className="space-y-1 min-w-0">
                     <p className="font-medium truncate">{venue.name}</p>
@@ -66,7 +66,7 @@ export default async function ScopedVenuesPage({ params }: Props) {
                       {venue.address ? ` · ${venue.address}` : ""} · {venue._count.courts} cancha{venue._count.courts !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex shrink-0 items-center gap-2">
                     <Link href={`/admin/courts/${venue.id}`}>
                       <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4" />

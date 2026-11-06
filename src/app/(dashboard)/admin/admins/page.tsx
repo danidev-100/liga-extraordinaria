@@ -58,7 +58,7 @@ export default async function AdminsPage() {
                 return (
                   <div
                     key={admin.id}
-                    className="flex items-center justify-between px-6 py-4 transition-colors hover:bg-muted/50"
+                    className="flex flex-wrap items-center justify-between gap-2 px-4 py-4 transition-colors hover:bg-muted/50 sm:px-6"
                   >
                     <div className="flex items-start gap-4 min-w-0">
                       <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${

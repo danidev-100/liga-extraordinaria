@@ -96,8 +96,8 @@ function GoalItem({
 
       {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col justify-center pt-0.5">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="min-w-0 break-words text-sm font-medium">
             {goal.player.name} {goal.player.surname}
           </span>
           {goal.isOwnGoal && (
@@ -106,7 +106,7 @@ function GoalItem({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <TeamLogo logoUrl={goal.team.logoUrl} color={goal.team.color} name={goal.team.name} size="md" />
           <span className="font-medium" style={{ color: teamColor }}>
             {goal.team.shortName}
@@ -138,8 +138,8 @@ function CardItem({
 
       {/* Content */}
       <div className="flex min-w-0 flex-1 flex-col justify-center pt-0.5">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="min-w-0 break-words text-sm font-medium">
             {card.player.name} {card.player.surname}
           </span>
           {isDoubleYellowRed && (
@@ -158,7 +158,7 @@ function CardItem({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
           <TeamLogo logoUrl={card.team.logoUrl} color={card.team.color} name={card.team.name} size="md" />
           <span className="font-medium" style={{ color: teamColor }}>
             {card.team.shortName}

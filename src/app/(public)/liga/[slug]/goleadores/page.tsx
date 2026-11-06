@@ -129,20 +129,20 @@ async function GoleadoresContent({ slug, categoryId }: { slug: string; categoryI
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-          <div className="flex items-center gap-2 border-b px-6 py-4">
+          <div className="flex items-center gap-2 border-b px-4 py-4 sm:px-6">
             <Trophy className="h-5 w-5 text-primary" />
             <h2 className="font-heading text-xl font-semibold tracking-tight">
               {selectedCategory.name} — {selectedCategory.league.name}
             </h2>
           </div>
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="text-xs sm:text-sm">
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-12 text-center">#</TableHead>
+                  <TableHead className="w-8 text-center sm:w-12">#</TableHead>
                   <TableHead>Jugador</TableHead>
-                  <TableHead>Equipo</TableHead>
-                  <TableHead className="w-24 text-center">Goles</TableHead>
+                  <TableHead className="hidden sm:table-cell">Equipo</TableHead>
+                  <TableHead className="w-12 text-center sm:w-24">Goles</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -152,18 +152,18 @@ async function GoleadoresContent({ slug, categoryId }: { slug: string; categoryI
                       <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ring-1", positionBadge(scorer.position))}>{scorer.position}</span>
                     </TableCell>
                     <TableCell className="font-medium">
-                      <Link href={`/liga/${slug}/jugadores/${scorer.playerId}`} className="transition-colors hover:text-primary hover:underline">
+                      <Link href={`/liga/${slug}/jugadores/${scorer.playerId}`} className="block max-w-[11rem] truncate transition-colors hover:text-primary hover:underline sm:max-w-none">
                         {scorer.playerName} {scorer.playerSurname}
                       </Link>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <div className="flex items-center gap-2">
                         <TeamLogo logoUrl={scorer.teamLogoUrl} color={scorer.teamColor} name={scorer.teamName} size="md" />
                         <span className="text-sm text-muted-foreground">{scorer.teamShortName}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="inline-flex items-center justify-center rounded-full bg-primary/15 px-3 py-1 text-sm font-bold text-primary dark:bg-primary/25">{scorer.totalGoals}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-primary/15 px-2 py-1 text-xs font-bold text-primary sm:px-3 sm:text-sm dark:bg-primary/25">{scorer.totalGoals}</span>
                     </TableCell>
                   </TableRow>
                 ))}

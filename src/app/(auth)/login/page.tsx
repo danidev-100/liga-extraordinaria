@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 function LoginFallback() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 dark:from-green-950 dark:via-zinc-950 dark:to-emerald-950">
+    <div className="flex min-h-dvh items-center justify-center bg-gradient-to-br from-green-50 via-white to-emerald-50 p-4 dark:from-green-950 dark:via-zinc-950 dark:to-emerald-950">
       <div className="w-full max-w-sm space-y-4">
         <Skeleton className="mx-auto h-16 w-16 rounded-xl" />
         <Skeleton className="mx-auto h-6 w-56" />

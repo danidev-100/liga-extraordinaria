@@ -174,19 +174,19 @@ export default function ScopedStandingsPage({ params }: Props) {
             </p>
           ) : (
             <div className="overflow-x-auto">
-              <Table>
+              <Table className="text-xs sm:text-sm">
               <TableHeader>
                 <TableRow className="bg-muted/50">
                   <TableHead className="w-10">#</TableHead>
                   <TableHead>Equipo</TableHead>
                   <TableHead className="text-center">Pts</TableHead>
-                  <TableHead className="text-center">PJ</TableHead>
-                  <TableHead className="text-center">PG</TableHead>
-                  <TableHead className="text-center">PE</TableHead>
-                  <TableHead className="text-center">PP</TableHead>
-                  <TableHead className="text-center">GF</TableHead>
-                  <TableHead className="text-center">GC</TableHead>
-                  <TableHead className="text-center">DG</TableHead>
+                  <TableHead className="hidden text-center sm:table-cell">PJ</TableHead>
+                  <TableHead className="hidden text-center sm:table-cell">PG</TableHead>
+                  <TableHead className="hidden text-center sm:table-cell">PE</TableHead>
+                  <TableHead className="hidden text-center sm:table-cell">PP</TableHead>
+                  <TableHead className="hidden text-center sm:table-cell">GF</TableHead>
+                  <TableHead className="hidden text-center sm:table-cell">GC</TableHead>
+                  <TableHead className="hidden text-center sm:table-cell">DG</TableHead>
                   <TableHead className="hidden sm:table-cell text-center">TA</TableHead>
                   <TableHead className="hidden sm:table-cell text-center">TR</TableHead>
                 </TableRow>
@@ -213,13 +213,13 @@ export default function ScopedStandingsPage({ params }: Props) {
                       </span>
                     </TableCell>
                     <TableCell className="text-center font-bold text-primary">{row.pts}</TableCell>
-                    <TableCell className="text-center text-muted-foreground">{row.pj}</TableCell>
-                    <TableCell className="text-center">{row.pg}</TableCell>
-                    <TableCell className="text-center">{row.pe}</TableCell>
-                    <TableCell className="text-center">{row.pp}</TableCell>
-                    <TableCell className="text-center">{row.gf}</TableCell>
-                    <TableCell className="text-center">{row.gc}</TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="hidden text-center text-muted-foreground sm:table-cell">{row.pj}</TableCell>
+                    <TableCell className="hidden text-center sm:table-cell">{row.pg}</TableCell>
+                    <TableCell className="hidden text-center sm:table-cell">{row.pe}</TableCell>
+                    <TableCell className="hidden text-center sm:table-cell">{row.pp}</TableCell>
+                    <TableCell className="hidden text-center sm:table-cell">{row.gf}</TableCell>
+                    <TableCell className="hidden text-center sm:table-cell">{row.gc}</TableCell>
+                    <TableCell className="hidden text-center sm:table-cell">
                       <span
                         className={
                           row.dg > 0

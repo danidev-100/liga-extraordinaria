@@ -190,7 +190,7 @@ export function MatchScheduleView({
             Temporada {season} &middot; Programación y resultados
           </p>
         </div>
-        <div className="flex flex-col items-end gap-2">
+        <div className="flex flex-col items-start gap-2 sm:items-end">
           <MatchScheduleFilter
             categories={categories}
             currentCategoryId={categoryId}
@@ -316,7 +316,7 @@ export function MatchScheduleView({
                       >
                         {isPlaying && <span className="absolute inset-x-0 top-0 h-1 bg-accent" />}
 
-                        <div className="flex items-center justify-between border-b bg-muted/30 px-4 py-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2 border-b bg-muted/30 px-4 py-2">
                           <Badge
                             variant={status.variant}
                             className={
@@ -328,7 +328,7 @@ export function MatchScheduleView({
                             {isPlaying && <Sparkles className="h-3 w-3 animate-pulse" />}
                             {status.label}
                           </Badge>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                             {isToday && !isPlaying && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">Hoy</span>
                             )}
@@ -353,9 +353,9 @@ export function MatchScheduleView({
 
                         <div className="p-4">
                           <div className="flex items-center justify-between gap-3">
-                            <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
+                            <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5 text-center">
                               <TeamLogo logoUrl={match.localTeam.logoUrl} color={match.localTeam.color} name={match.localTeam.name} size="md" />
-                              <span className="text-sm font-semibold leading-tight">{match.localTeam.shortName}</span>
+                              <span className="max-w-full text-sm font-semibold leading-tight break-words">{match.localTeam.shortName}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               {isFinished && match.localScore !== null && match.visitorScore !== null ? (
@@ -368,13 +368,13 @@ export function MatchScheduleView({
                                 <span className="text-lg font-medium text-muted-foreground/40">vs</span>
                               )}
                             </div>
-                            <div className="flex flex-1 flex-col items-center gap-1.5 text-center">
+                            <div className="flex min-w-0 flex-1 flex-col items-center gap-1.5 text-center">
                               <TeamLogo logoUrl={match.visitorTeam.logoUrl} color={match.visitorTeam.color} name={match.visitorTeam.name} size="md" />
-                              <span className="text-sm font-semibold leading-tight">{match.visitorTeam.shortName}</span>
+                              <span className="max-w-full text-sm font-semibold leading-tight break-words">{match.visitorTeam.shortName}</span>
                             </div>
                           </div>
 
-                          <div className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
                             {(() => {
                               const mapsHref = match.court.venue.googleMapsLink || (match.court.venue.address
                                 ? `https://www.google.com/maps/search/${encodeURIComponent([match.court.venue.address, match.court.venue.city, "Argentina"].filter(Boolean).join(", "))}`
@@ -397,11 +397,11 @@ export function MatchScheduleView({
                                   {matchGoals.map((goal) => {
                                     const isLocal = goal.teamId === match.localTeam.id
                                     return (
-                                      <div key={goal.id} className="flex items-center gap-1.5 text-xs">
+                                      <div key={goal.id} className="flex flex-wrap items-center gap-1.5 text-xs">
                                         <GoalBall />
                                         <TeamLogo logoUrl={goal.team.logoUrl} color={goal.team.color} name={goal.team.name} size="sm" />
                                         <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">{goal.team.shortName}</span>
-                                        <span className="font-medium">{goal.player.name} {goal.player.surname}</span>
+                                        <span className="min-w-0 break-words font-medium">{goal.player.name} {goal.player.surname}</span>
                                         {goal.isOwnGoal && <span className="rounded bg-destructive/10 px-1 py-0.5 text-[10px] text-destructive">e/c</span>}
                                         <span className="text-muted-foreground">{goal.minute}&apos;</span>
                                       </div>
@@ -416,11 +416,11 @@ export function MatchScheduleView({
                                     const isLocal = card.teamId === match.localTeam.id
                                     const isDoubleYellowRed = card.type === "RED" && card.isSecondYellow
                                     return (
-                                      <div key={card.id} className="flex items-center gap-1.5 text-xs">
+                                      <div key={card.id} className="flex flex-wrap items-center gap-1.5 text-xs">
                                         <CardIcon type={card.type as "YELLOW" | "RED"} isSecondYellow={isDoubleYellowRed} />
                                         <TeamLogo logoUrl={card.team.logoUrl} color={card.team.color} name={card.team.name} size="sm" />
                                         <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">{card.team.shortName}</span>
-                                        <span className="font-medium">{card.player.name} {card.player.surname}</span>
+                                        <span className="min-w-0 break-words font-medium">{card.player.name} {card.player.surname}</span>
                                         {isDoubleYellowRed && <span className="rounded bg-amber-100 px-1 py-0.5 text-[9px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">2A</span>}
                                         <span className="text-muted-foreground">{card.minute}&apos;</span>
                                       </div>
@@ -447,7 +447,7 @@ export function MatchScheduleView({
                         Libre
                       </Badge>
                       <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="md" />
-                      <span className="text-sm font-semibold leading-tight">{team.shortName}</span>
+                      <span className="max-w-full text-sm font-semibold leading-tight break-words">{team.shortName}</span>
                       <span className="text-xs text-muted-foreground">
                         Sin partido esta fecha · {categoryNameById.get(team.categoryId)}
                       </span>

@@ -25,7 +25,7 @@ export function ChartCard({
   return (
     <Card className={cn("shadow-xs", className)}>
       <CardHeader>
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
           <div className="min-w-0 flex-1">
             <CardTitle className="text-base">{title}</CardTitle>
             {description && <CardDescription>{description}</CardDescription>}
@@ -34,7 +34,7 @@ export function ChartCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">{children}</div>
+        <div className="h-[240px] w-full sm:h-[300px]">{children}</div>
       </CardContent>
     </Card>
   )

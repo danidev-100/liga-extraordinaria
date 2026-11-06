@@ -143,22 +143,22 @@ async function TarjetasContent({ slug, categoryId }: { slug: string; categoryId?
         </div>
       ) : (
         <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
-          <div className="flex items-center gap-2 border-b px-6 py-4">
+          <div className="flex items-center gap-2 border-b px-4 py-4 sm:px-6">
             <ShieldAlert className="h-5 w-5 text-red-500" />
             <h2 className="font-heading text-xl font-semibold tracking-tight">
               {selectedCategory.name} — {selectedCategory.league.name}
             </h2>
           </div>
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="text-xs sm:text-sm">
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-12 text-center">#</TableHead>
+                  <TableHead className="w-6 text-center sm:w-12">#</TableHead>
                   <TableHead>Jugador</TableHead>
-                  <TableHead>Equipo</TableHead>
-                  <TableHead className="w-28 text-center"><span className="inline-flex items-center gap-1.5 justify-center"><span className="inline-block h-3 w-2 rounded-sm bg-yellow-400 ring-1 ring-yellow-400/50" />Amarillas</span></TableHead>
-                  <TableHead className="w-24 text-center"><span className="inline-flex items-center gap-1.5 justify-center"><span className="inline-block h-3 w-2 rounded-sm bg-red-500 ring-1 ring-red-500/50" />Rojas</span></TableHead>
-                  <TableHead className="w-24 text-center">Total</TableHead>
+                  <TableHead className="hidden sm:table-cell">Equipo</TableHead>
+                  <TableHead className="w-10 text-center sm:w-28"><span className="inline-flex items-center gap-1.5 justify-center"><span className="inline-block h-3 w-2 rounded-sm bg-yellow-400 ring-1 ring-yellow-400/50" /><span className="hidden sm:inline">Amarillas</span></span></TableHead>
+                  <TableHead className="w-9 text-center sm:w-24"><span className="inline-flex items-center gap-1.5 justify-center"><span className="inline-block h-3 w-2 rounded-sm bg-red-500 ring-1 ring-red-500/50" /><span className="hidden sm:inline">Rojas</span></span></TableHead>
+                  <TableHead className="w-12 text-center sm:w-24">Total</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -168,30 +168,30 @@ async function TarjetasContent({ slug, categoryId }: { slug: string; categoryId?
                       <span className={cn("inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ring-1", positionBadge(player.position))}>{player.position}</span>
                     </TableCell>
                     <TableCell className="font-medium">
-                      <Link href={`/liga/${slug}/jugadores/${player.playerId}`} className="transition-colors hover:text-primary hover:underline">
+                      <Link href={`/liga/${slug}/jugadores/${player.playerId}`} className="block max-w-[6.5rem] truncate transition-colors hover:text-primary hover:underline sm:max-w-none">
                         {player.playerName} {player.playerSurname}
                       </Link>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <div className="flex items-center gap-2">
                         <TeamLogo logoUrl={player.teamLogoUrl} color={player.teamColor} name={player.teamName} size="md" />
                         <span className="text-sm text-muted-foreground">{player.teamShortName}</span>
                       </div>
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-100 px-3 py-1 text-sm font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400">
-                        <span className="inline-block h-2 w-1.5 rounded-sm bg-yellow-400 ring-1 ring-yellow-400/50" />
+                      <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-1.5 py-1 text-xs font-medium text-yellow-700 sm:gap-1.5 sm:px-3 sm:text-sm dark:bg-yellow-900/30 dark:text-yellow-400">
+                        <span className="hidden h-2 w-1.5 rounded-sm bg-yellow-400 ring-1 ring-yellow-400/50 sm:inline-block" />
                         {player.yellowCards}
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700 dark:bg-red-900/30 dark:text-red-400">
-                        <span className="inline-block h-2 w-1.5 rounded-sm bg-red-500 ring-1 ring-red-500/50" />
+                      <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-1.5 py-1 text-xs font-medium text-red-700 sm:gap-1.5 sm:px-3 sm:text-sm dark:bg-red-900/30 dark:text-red-400">
+                        <span className="hidden h-2 w-1.5 rounded-sm bg-red-500 ring-1 ring-red-500/50 sm:inline-block" />
                         {player.redCards}
                       </span>
                     </TableCell>
                     <TableCell className="text-center">
-                      <span className="inline-flex items-center justify-center rounded-full bg-orange-100 px-3 py-1 text-sm font-bold text-orange-700 dark:bg-orange-900/30 dark:text-orange-400">{player.totalCards}</span>
+                      <span className="inline-flex items-center justify-center rounded-full bg-orange-100 px-1.5 py-1 text-xs font-bold text-orange-700 sm:px-3 sm:text-sm dark:bg-orange-900/30 dark:text-orange-400">{player.totalCards}</span>
                     </TableCell>
                   </TableRow>
                 ))}

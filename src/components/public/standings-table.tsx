@@ -50,7 +50,7 @@ export function StandingsTable({ standings, categoryName, leagueSlug }: Standing
   return (
     <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
       {/* Category header */}
-      <div className="flex items-center gap-2 border-b px-6 py-4">
+      <div className="flex items-center gap-2 border-b px-4 py-4 sm:px-6">
         <Trophy className="h-5 w-5 text-primary" />
         <h2 className="font-heading text-xl font-semibold tracking-tight">
           {categoryName}
@@ -58,19 +58,19 @@ export function StandingsTable({ standings, categoryName, leagueSlug }: Standing
       </div>
 
       <div className="overflow-x-auto">
-        <Table>
+        <Table className="text-xs sm:text-sm">
           <TableHeader>
             <TableRow className="bg-muted/50">
-              <TableHead className="w-12 text-center">#</TableHead>
+              <TableHead className="w-8 text-center sm:w-12">#</TableHead>
               <TableHead>Equipo</TableHead>
-              <TableHead className="w-12 text-center">Pts</TableHead>
-              <TableHead className="w-10 text-center">PJ</TableHead>
-              <TableHead className="w-10 text-center">PG</TableHead>
-              <TableHead className="w-10 text-center">PE</TableHead>
-              <TableHead className="w-10 text-center">PP</TableHead>
-              <TableHead className="w-10 text-center">GF</TableHead>
-              <TableHead className="w-10 text-center">GC</TableHead>
-              <TableHead className="w-14 text-center">DG</TableHead>
+              <TableHead className="w-10 text-center sm:w-12">Pts</TableHead>
+              <TableHead className="hidden w-10 text-center sm:table-cell">PJ</TableHead>
+              <TableHead className="hidden w-10 text-center sm:table-cell">PG</TableHead>
+              <TableHead className="hidden w-10 text-center sm:table-cell">PE</TableHead>
+              <TableHead className="hidden w-10 text-center sm:table-cell">PP</TableHead>
+              <TableHead className="hidden w-10 text-center sm:table-cell">GF</TableHead>
+              <TableHead className="hidden w-10 text-center sm:table-cell">GC</TableHead>
+              <TableHead className="hidden w-14 text-center sm:table-cell">DG</TableHead>
               <TableHead className="hidden sm:table-cell w-10 text-center">TA</TableHead>
               <TableHead className="hidden sm:table-cell w-10 text-center">TR</TableHead>
             </TableRow>
@@ -101,11 +101,11 @@ export function StandingsTable({ standings, categoryName, leagueSlug }: Standing
                     </span>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
+                    <div className="flex min-w-0 items-center gap-2">
                       <TeamLogo logoUrl={row.team.logoUrl} color={row.team.color} name={row.team.name} size="md" />
                       <Link
                         href={`/liga/${leagueSlug}/equipos/${row.team.id}`}
-                        className="font-medium transition-colors hover:text-primary hover:underline"
+                        className="max-w-[11rem] truncate font-medium transition-colors hover:text-primary hover:underline sm:max-w-none"
                       >
                         {row.team.shortName}
                       </Link>
@@ -117,21 +117,21 @@ export function StandingsTable({ standings, categoryName, leagueSlug }: Standing
                   <TableCell className="text-center font-bold text-primary">
                     {row.pts}
                   </TableCell>
-                  <TableCell className="text-center text-muted-foreground">
+                  <TableCell className="hidden text-center text-muted-foreground sm:table-cell">
                     {row.pj}
                   </TableCell>
-                  <TableCell className="text-center text-green-600 dark:text-green-400">
+                  <TableCell className="hidden text-center text-green-600 sm:table-cell dark:text-green-400">
                     {row.pg}
                   </TableCell>
-                  <TableCell className="text-center text-amber-600 dark:text-amber-400">
+                  <TableCell className="hidden text-center text-amber-600 sm:table-cell dark:text-amber-400">
                     {row.pe}
                   </TableCell>
-                  <TableCell className="text-center text-red-500 dark:text-red-400">
+                  <TableCell className="hidden text-center text-red-500 sm:table-cell dark:text-red-400">
                     {row.pp}
                   </TableCell>
-                  <TableCell className="text-center">{row.gf}</TableCell>
-                  <TableCell className="text-center">{row.gc}</TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="hidden text-center sm:table-cell">{row.gf}</TableCell>
+                  <TableCell className="hidden text-center sm:table-cell">{row.gc}</TableCell>
+                  <TableCell className="hidden text-center sm:table-cell">
                     <span
                       className={cn(
                         "font-medium tabular-nums",

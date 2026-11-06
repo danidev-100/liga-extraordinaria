@@ -116,26 +116,26 @@ function formatDate(date: Date): string {
       </Link>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-primary/10">
+        <div className="flex min-w-0 items-center gap-4">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary/10">
             <User className="h-7 w-7 text-primary" />
           </div>
-          <div>
-            <h1 className="font-heading text-2xl font-bold tracking-tight md:text-3xl">
+          <div className="min-w-0">
+            <h1 className="font-heading text-2xl font-bold tracking-tight break-words md:text-3xl">
               {player.name} {player.surname}
             </h1>
-            <div className="mt-1 flex items-center gap-2 text-muted-foreground">
+            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground">
               {player.team && (
                 <Link
                   href={`/liga/${slug}/equipos/${player.team.id}`}
-                  className="flex items-center gap-1.5 transition-colors hover:text-primary hover:underline"
+                  className="flex min-w-0 items-center gap-1.5 transition-colors hover:text-primary hover:underline"
                 >
                   <TeamLogo logoUrl={player.team.logoUrl} color={player.team.color} name={player.team.name} size="md" />
-                  <span>{player.team.name}</span>
+                  <span className="truncate">{player.team.name}</span>
                 </Link>
               )}
               {player.jerseyNumber != null && (
-                <span className="flex items-center gap-1 text-sm">
+                <span className="flex shrink-0 items-center gap-1 text-sm">
                   <Shirt className="h-3.5 w-3.5" />
                   #{player.jerseyNumber}
                 </span>
@@ -145,7 +145,7 @@ function formatDate(date: Date): string {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         <Card size="sm">
           <CardContent className="flex flex-col items-center px-3 py-4 text-center">
             <Fingerprint className="mb-1.5 h-4 w-4 text-muted-foreground" />
@@ -176,7 +176,7 @@ function formatDate(date: Date): string {
         </Card>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         <Card size="sm" className="border-primary/20 bg-primary/5">
           <CardContent className="flex flex-col items-center px-3 py-4 text-center">
             <Goal className="mb-1.5 h-4 w-4 text-primary" />
@@ -208,7 +208,7 @@ function formatDate(date: Date): string {
       </div>
 
       <section>
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <Goal className="h-5 w-5 text-green-500" />
           <h2 className="font-heading text-xl font-semibold tracking-tight">Goles</h2>
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">{player.goals.length}</span>
@@ -223,8 +223,8 @@ function formatDate(date: Date): string {
                   <TableHead className="hidden sm:table-cell">Fecha</TableHead>
                   <TableHead>Rival</TableHead>
                   <TableHead className="hidden md:table-cell">Marcador</TableHead>
-                  <TableHead className="w-16 text-center">Min.</TableHead>
-                  <TableHead className="w-20 text-center">Tipo</TableHead>
+                  <TableHead className="w-12 text-center sm:w-16">Min.</TableHead>
+                  <TableHead className="w-16 text-center sm:w-20">Tipo</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -264,7 +264,7 @@ function formatDate(date: Date): string {
       </section>
 
       <section>
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <ShieldAlert className="h-5 w-5 text-red-500" />
           <h2 className="font-heading text-xl font-semibold tracking-tight">Tarjetas</h2>
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">{player.cards.length}</span>
@@ -279,7 +279,7 @@ function formatDate(date: Date): string {
                   <TableHead className="hidden sm:table-cell">Fecha</TableHead>
                   <TableHead>Rival</TableHead>
                   <TableHead className="hidden md:table-cell">Marcador</TableHead>
-                  <TableHead className="w-16 text-center">Min.</TableHead>
+                  <TableHead className="w-12 text-center sm:w-16">Min.</TableHead>
                   <TableHead className="w-24 text-center">Tipo</TableHead>
                 </TableRow>
               </TableHeader>
