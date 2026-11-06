@@ -12,7 +12,7 @@ interface ChartSkeletonProps {
  */
 export function ChartSkeleton({ hasHeader = true, className }: ChartSkeletonProps) {
   return (
-    <div className={cn("rounded-xl border bg-card p-6 shadow-xs h-[300px]", className)}>
+    <div className={cn("h-[240px] rounded-xl border bg-card p-6 shadow-xs sm:h-[300px]", className)}>
       {hasHeader && (
         <div className="mb-6 space-y-2">
           <Skeleton className="h-5 w-32" />

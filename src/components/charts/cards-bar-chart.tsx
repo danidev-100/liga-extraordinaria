@@ -12,6 +12,7 @@ import {
 } from "recharts"
 import { ShieldAlert } from "lucide-react"
 import { ChartCard } from "@/components/charts/chart-card"
+import { useNarrowChart } from "@/components/charts/use-narrow-chart"
 import { EmptyState } from "@/components/ui/empty-state"
 import type { CardsBreakdown } from "@/lib/analytics"
 
@@ -36,6 +37,8 @@ function CardsTooltip({ active, payload, label }: any) {
 }
 
 export function CardsBarChart({ data }: CardsBarChartProps) {
+  const narrow = useNarrowChart()
+
   if (data.length === 0) {
     return (
       <ChartCard title="Tarjetas por Equipo">
@@ -47,19 +50,27 @@ export function CardsBarChart({ data }: CardsBarChartProps) {
   return (
     <ChartCard title="Tarjetas por Equipo">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data} barSize={32} margin={{ left: 0, right: 0, top: 8, bottom: 0 }}>
+        <BarChart
+          data={data}
+          barSize={narrow ? 14 : 32}
+          margin={{ left: 0, right: 0, top: 8, bottom: 0 }}
+        >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis
             dataKey="teamShortName"
-            tick={{ fontSize: 12 }}
-            interval={0}
+            tick={{ fontSize: narrow ? 10 : 12 }}
+            interval={narrow ? "preserveStartEnd" : 0}
             angle={-25}
             textAnchor="end"
             height={60}
           />
-          <YAxis allowDecimals={false} />
+          <YAxis
+            allowDecimals={false}
+            width={narrow ? 32 : undefined}
+            tick={narrow ? { fontSize: 10 } : undefined}
+          />
           <Tooltip content={<CardsTooltip />} />
-          <Legend />
+          <Legend wrapperStyle={narrow ? { fontSize: 10 } : undefined} />
           <Bar
             dataKey="yellows"
             fill="#eab308"

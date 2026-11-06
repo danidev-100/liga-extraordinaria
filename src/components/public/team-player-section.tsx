@@ -167,7 +167,7 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
             Gestioná la plantilla del equipo
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
             {exporting ? (
               <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -195,9 +195,9 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
                 {/* File upload */}
                 <div className="space-y-1.5">
                   <label className="text-sm font-medium">Archivo *</label>
-                  <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-6 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/50 flex-1 justify-center">
-                    <FileSpreadsheet className="h-6 w-6" />
-                    <span>{file ? file.name : "Hacé clic para seleccionar CSV o Excel"}</span>
+                  <label className="flex min-w-0 cursor-pointer items-center gap-2 rounded-lg border border-dashed px-3 py-6 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/50 flex-1 justify-center sm:px-4">
+                    <FileSpreadsheet className="h-6 w-6 shrink-0" />
+                    <span className="truncate">{file ? file.name : "Hacé clic para seleccionar CSV o Excel"}</span>
                     <input
                       ref={fileRef}
                       type="file"
@@ -216,19 +216,19 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
                       <table className="w-full">
                         <thead>
                           <tr className="bg-muted">
-                            <th className="px-3 py-2 text-left font-medium">Nombre</th>
-                            <th className="px-3 py-2 text-left font-medium">Apellido</th>
-                            <th className="px-3 py-2 text-left font-medium">DNI</th>
-                            <th className="px-3 py-2 text-left font-medium">Camiseta</th>
+                            <th className="px-2 py-2 text-left font-medium sm:px-3">Nombre</th>
+                            <th className="px-2 py-2 text-left font-medium sm:px-3">Apellido</th>
+                            <th className="px-2 py-2 text-left font-medium sm:px-3">DNI</th>
+                            <th className="px-2 py-2 text-left font-medium sm:px-3">Camiseta</th>
                           </tr>
                         </thead>
                         <tbody>
                           {preview.map((row, i) => (
                             <tr key={i} className="border-t">
-                              <td className="px-3 py-2">{row.nombre || row.Nombre || ""}</td>
-                              <td className="px-3 py-2">{row.apellido || row.Apellido || ""}</td>
-                              <td className="px-3 py-2">{row.dni || row.DNI || ""}</td>
-                              <td className="px-3 py-2">{row.camiseta || row.numero || row.Camiseta || ""}</td>
+                              <td className="px-2 py-2 sm:px-3">{row.nombre || row.Nombre || ""}</td>
+                              <td className="px-2 py-2 sm:px-3">{row.apellido || row.Apellido || ""}</td>
+                              <td className="px-2 py-2 sm:px-3">{row.dni || row.DNI || ""}</td>
+                              <td className="px-2 py-2 sm:px-3">{row.camiseta || row.numero || row.Camiseta || ""}</td>
                             </tr>
                           ))}
                         </tbody>
@@ -328,26 +328,30 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-lg border">
+        <div className="overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-muted/50 text-xs font-medium text-muted-foreground">
-                <th className="px-3 py-2.5 text-left">Nombre</th>
-                <th className="px-3 py-2.5 text-left">Apellido</th>
-                <th className="px-3 py-2.5 text-left">DNI</th>
-                <th className="px-3 py-2.5 text-left">Nacimiento</th>
-                <th className="px-3 py-2.5 text-center">Camiseta</th>
-                <th className="px-3 py-2.5 text-center">Estado</th>
+                <th className="px-2 py-2.5 text-left sm:px-3">Nombre</th>
+                <th className="px-2 py-2.5 text-left sm:px-3">Apellido</th>
+                <th className="hidden px-2 py-2.5 text-left sm:table-cell sm:px-3">DNI</th>
+                <th className="hidden px-2 py-2.5 text-left md:table-cell md:px-3">Nacimiento</th>
+                <th className="px-2 py-2.5 text-center sm:px-3">Camiseta</th>
+                <th className="px-2 py-2.5 text-center sm:px-3">Estado</th>
               </tr>
             </thead>
             <tbody>
               {players.map((p) => (
                 <tr key={p.id} className="border-t transition-colors hover:bg-muted/30">
-                  <td className="px-3 py-2.5 font-medium">{p.name}</td>
-                  <td className="px-3 py-2.5">{p.surname}</td>
-                  <td className="px-3 py-2.5 font-mono text-xs">{p.dni}</td>
-                  <td className="px-3 py-2.5 text-muted-foreground">{formatDate(p.birthDate)}</td>
-                  <td className="px-3 py-2.5 text-center">
+                  <td className="px-2 py-2.5 font-medium sm:px-3">
+                    <span className="block max-w-[7rem] truncate sm:max-w-none">{p.name}</span>
+                  </td>
+                  <td className="px-2 py-2.5 sm:px-3">
+                    <span className="block max-w-[7rem] truncate sm:max-w-none">{p.surname}</span>
+                  </td>
+                  <td className="hidden px-2 py-2.5 font-mono text-xs sm:table-cell sm:px-3">{p.dni}</td>
+                  <td className="hidden px-2 py-2.5 text-muted-foreground md:table-cell md:px-3">{formatDate(p.birthDate)}</td>
+                  <td className="px-2 py-2.5 text-center sm:px-3">
                     {p.jerseyNumber ? (
                       <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                         {p.jerseyNumber}
@@ -356,7 +360,7 @@ export function TeamPlayerSection({ teamId, teamName, players }: Props) {
                       <span className="text-muted-foreground">—</span>
                     )}
                   </td>
-                  <td className="px-3 py-2.5 text-center">
+                  <td className="px-2 py-2.5 text-center sm:px-3">
                     <Badge variant={p.isActive ? "default" : "secondary"} className="text-xs">
                       {p.isActive ? "Activo" : "Inactivo"}
                     </Badge>

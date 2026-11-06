@@ -13,6 +13,7 @@ import {
 } from "recharts"
 import { TrendingDown } from "lucide-react"
 import { ChartCard } from "@/components/charts/chart-card"
+import { useNarrowChart } from "@/components/charts/use-narrow-chart"
 import { EmptyState } from "@/components/ui/empty-state"
 import {
   Select,
@@ -50,6 +51,7 @@ function FormTooltip({ active, payload, label }: any) {
 }
 
 export function FormTrendChart({ data: initialData, categories }: FormTrendChartProps) {
+  const narrow = useNarrowChart()
   const [data, setData] = useState<FormTrendRow[]>(initialData)
   const [loading, setLoading] = useState(false)
 
@@ -73,7 +75,7 @@ export function FormTrendChart({ data: initialData, categories }: FormTrendChart
       onValueChange={(value) => handleCategoryChange(value as string)}
       disabled={loading}
     >
-      <SelectTrigger className="h-8 w-44 text-xs">
+      <SelectTrigger className="h-8 w-32 text-xs sm:w-44">
         <SelectValue placeholder="Todas las categorías" />
       </SelectTrigger>
       <SelectContent>
@@ -113,15 +115,21 @@ export function FormTrendChart({ data: initialData, categories }: FormTrendChart
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis
               dataKey="round"
+              tick={narrow ? { fontSize: 10 } : undefined}
+              interval={narrow ? "preserveStartEnd" : undefined}
               label={{
                 value: "Fecha",
                 position: "insideBottomRight",
                 offset: -5,
               }}
             />
-            <YAxis allowDecimals={false} />
+            <YAxis
+              allowDecimals={false}
+              width={narrow ? 32 : undefined}
+              tick={narrow ? { fontSize: 10 } : undefined}
+            />
             <Tooltip content={<FormTooltip />} />
-            <Legend />
+            <Legend wrapperStyle={narrow ? { fontSize: 10 } : undefined} />
             <Line
               type="monotone"
               dataKey="wins"

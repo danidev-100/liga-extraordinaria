@@ -144,19 +144,19 @@ export default async function LeagueTeamDetailPage({ params }: Props) {
       </Link>
 
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-4">
+        <div className="flex min-w-0 items-center gap-4">
           <TeamLogo logoUrl={team.logoUrl} color={team.color} name={team.name} size="lg" />
-          <div>
-            <h1 className="font-heading text-2xl font-bold tracking-tight md:text-3xl">{team.name}</h1>
-            <p className="mt-1 text-muted-foreground">
+          <div className="min-w-0">
+            <h1 className="font-heading text-2xl font-bold tracking-tight break-words md:text-3xl">{team.name}</h1>
+            <p className="mt-1 text-muted-foreground break-words">
               {team.category.name} &mdash; {team.category.league.name}
             </p>
           </div>
         </div>
-        <Badge variant="secondary" className="text-sm px-3 py-1">{team.shortName}</Badge>
+        <Badge variant="secondary" className="shrink-0 self-start text-sm px-3 py-1 sm:self-auto">{team.shortName}</Badge>
       </div>
 
-      <div className="grid grid-cols-5 gap-3 sm:grid-cols-10">
+      <div className="grid grid-cols-3 gap-2 sm:grid-cols-10 sm:gap-3">
         {statItems.map((item) => (
           <Card key={item.label} size="sm" className="text-center">
             <CardContent className="px-2 py-3">
@@ -175,7 +175,7 @@ export default async function LeagueTeamDetailPage({ params }: Props) {
       </div>
 
       <section>
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
           <h2 className="font-heading text-xl font-semibold tracking-tight">Plantel</h2>
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">{team.players.length}</span>
@@ -187,11 +187,11 @@ export default async function LeagueTeamDetailPage({ params }: Props) {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-16 text-center"><Hash className="mx-auto h-4 w-4" /></TableHead>
+                  <TableHead className="w-10 text-center sm:w-16"><Hash className="mx-auto h-4 w-4" /></TableHead>
                   <TableHead>Nombre</TableHead>
                   <TableHead className="hidden sm:table-cell">Apellido</TableHead>
-                  <TableHead className="w-14 text-center">G</TableHead>
-                  <TableHead className="w-14 text-center">T</TableHead>
+                  <TableHead className="w-10 text-center sm:w-14">G</TableHead>
+                  <TableHead className="w-10 text-center sm:w-14">T</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -215,7 +215,7 @@ export default async function LeagueTeamDetailPage({ params }: Props) {
       </section>
 
       <section>
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <Swords className="h-5 w-5 text-primary" />
           <h2 className="font-heading text-xl font-semibold tracking-tight">Partidos</h2>
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">{matches.length}</span>
@@ -227,9 +227,9 @@ export default async function LeagueTeamDetailPage({ params }: Props) {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="w-20 text-center">Resultado</TableHead>
+                  <TableHead className="w-16 text-center sm:w-20">Resultado</TableHead>
                   <TableHead>Rival</TableHead>
-                  <TableHead className="w-24 text-center">Marcador</TableHead>
+                  <TableHead className="w-20 text-center sm:w-24">Marcador</TableHead>
                   <TableHead className="hidden sm:table-cell">Fecha</TableHead>
                   <TableHead className="hidden md:table-cell w-16 text-center">Jorn.</TableHead>
                 </TableRow>
@@ -274,7 +274,7 @@ export default async function LeagueTeamDetailPage({ params }: Props) {
       </section>
 
       <section>
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <Goal className="h-5 w-5 text-primary" />
           <h2 className="font-heading text-xl font-semibold tracking-tight">Goleadores</h2>
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">{topScorersRaw.length}</span>
@@ -317,7 +317,7 @@ export default async function LeagueTeamDetailPage({ params }: Props) {
       </section>
 
       <section>
-        <div className="mb-4 flex items-center gap-2">
+        <div className="mb-4 flex flex-wrap items-center gap-2">
           <AlertTriangle className="h-5 w-5 text-primary" />
           <h2 className="font-heading text-xl font-semibold tracking-tight">Tarjetas</h2>
           <span className="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground">{cardsByPlayer.length}</span>
@@ -365,7 +365,7 @@ export default async function LeagueTeamDetailPage({ params }: Props) {
 
       {categoryTeams.length > 0 && (
         <section>
-          <div className="mb-4 flex items-center gap-2">
+          <div className="mb-4 flex flex-wrap items-center gap-2">
             <Swords className="h-5 w-5 text-primary" />
             <h2 className="font-heading text-xl font-semibold tracking-tight">Enfrentamientos directos</h2>
           </div>

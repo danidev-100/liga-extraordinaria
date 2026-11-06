@@ -10,6 +10,7 @@ import {
 } from "recharts"
 import { Crosshair } from "lucide-react"
 import { ChartCard } from "@/components/charts/chart-card"
+import { useNarrowChart } from "@/components/charts/use-narrow-chart"
 import { EmptyState } from "@/components/ui/empty-state"
 import type { GoalsDistribution } from "@/lib/analytics"
 
@@ -31,6 +32,8 @@ function GoalsTooltip({ active, payload }: any) {
 }
 
 export function GoalsPieChart({ data }: GoalsPieChartProps) {
+  const narrow = useNarrowChart()
+
   if (data.length === 0) {
     return (
       <ChartCard title="Goles por Equipo">
@@ -49,14 +52,14 @@ export function GoalsPieChart({ data }: GoalsPieChartProps) {
             nameKey="teamShortName"
             cx="50%"
             cy="50%"
-            outerRadius={100}
+            outerRadius={narrow ? "70%" : 100}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.teamColor ?? "#6366f1"} />
             ))}
           </Pie>
           <Tooltip content={<GoalsTooltip />} />
-          <Legend />
+          <Legend wrapperStyle={narrow ? { fontSize: 10 } : undefined} />
         </PieChart>
       </ResponsiveContainer>
     </ChartCard>

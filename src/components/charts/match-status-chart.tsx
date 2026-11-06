@@ -10,6 +10,7 @@ import {
 } from "recharts"
 import { Calendar } from "lucide-react"
 import { ChartCard } from "@/components/charts/chart-card"
+import { useNarrowChart } from "@/components/charts/use-narrow-chart"
 import { EmptyState } from "@/components/ui/empty-state"
 import type { MatchStatusRow } from "@/lib/analytics"
 
@@ -46,6 +47,8 @@ function StatusTooltip({ active, payload }: any) {
 }
 
 export function MatchStatusChart({ data }: MatchStatusChartProps) {
+  const narrow = useNarrowChart()
+
   if (data.length === 0) {
     return (
       <ChartCard title="Estado de Partidos">
@@ -66,8 +69,8 @@ export function MatchStatusChart({ data }: MatchStatusChartProps) {
             nameKey="status"
             cx="50%"
             cy="50%"
-            innerRadius={60}
-            outerRadius={100}
+            innerRadius={narrow ? "45%" : 60}
+            outerRadius={narrow ? "70%" : 100}
             paddingAngle={2}
           >
             {data.map((entry, index) => (

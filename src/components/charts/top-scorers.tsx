@@ -31,48 +31,55 @@ export function TopScorers({ data }: TopScorersProps) {
 
   return (
     <ChartCard title="Máximos Goleadores">
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-8 text-center">#</TableHead>
-            <TableHead>Jugador</TableHead>
-            <TableHead>Equipo</TableHead>
-            <TableHead className="w-10 text-right">G</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map((scorer, i) => (
-            <TableRow key={`${scorer.playerName}-${scorer.teamShortName}`}>
-              <TableCell className="text-center">
-                {i === 0 ? (
-                  <Trophy className={cn("mx-auto h-4 w-4", MEDAL_STYLES[i])} />
-                ) : (
-                  <span
-                    className={cn(
-                      "text-sm font-bold",
-                      MEDAL_STYLES[i] ?? "text-muted-foreground",
-                    )}
-                  >
-                    {i + 1}
-                  </span>
-                )}
-              </TableCell>
-              <TableCell className="font-medium">
-                {scorer.playerName}
-                {i === 0 && (
-                  <span className="ml-1 text-xs text-amber-400">★</span>
-                )}
-              </TableCell>
-              <TableCell className="text-muted-foreground">
-                {scorer.teamShortName}
-              </TableCell>
-              <TableCell className="text-right font-bold tabular-nums">
-                {scorer.goals}
-              </TableCell>
+      <div className="h-full overflow-y-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-8 text-center">#</TableHead>
+              <TableHead>Jugador</TableHead>
+              <TableHead className="hidden sm:table-cell">Equipo</TableHead>
+              <TableHead className="w-10 text-right">G</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {data.map((scorer, i) => (
+              <TableRow key={`${scorer.playerName}-${scorer.teamShortName}`}>
+                <TableCell className="text-center">
+                  {i === 0 ? (
+                    <Trophy className={cn("mx-auto h-4 w-4", MEDAL_STYLES[i])} />
+                  ) : (
+                    <span
+                      className={cn(
+                        "text-sm font-bold",
+                        MEDAL_STYLES[i] ?? "text-muted-foreground",
+                      )}
+                    >
+                      {i + 1}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell className="font-medium">
+                  <span className="block max-w-[9rem] truncate sm:max-w-none">
+                    {scorer.playerName}
+                    {i === 0 && (
+                      <span className="ml-1 text-xs text-amber-400">★</span>
+                    )}
+                  </span>
+                  <span className="block text-[10px] font-normal text-muted-foreground sm:hidden">
+                    {scorer.teamShortName}
+                  </span>
+                </TableCell>
+                <TableCell className="hidden text-muted-foreground sm:table-cell">
+                  {scorer.teamShortName}
+                </TableCell>
+                <TableCell className="text-right font-bold tabular-nums">
+                  {scorer.goals}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </ChartCard>
   )
 }

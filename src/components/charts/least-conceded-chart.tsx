@@ -1,3 +1,5 @@
+"use client"
+
 import {
   BarChart,
   Bar,
@@ -9,6 +11,7 @@ import {
 } from "recharts"
 import { Shield } from "lucide-react"
 import { ChartCard } from "@/components/charts/chart-card"
+import { useNarrowChart } from "@/components/charts/use-narrow-chart"
 import { EmptyState } from "@/components/ui/empty-state"
 import type { GoalsDistribution } from "@/lib/analytics"
 
@@ -32,6 +35,8 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export function LeastConcededChart({ data }: LeastConcededChartProps) {
+  const narrow = useNarrowChart()
+
   if (data.length === 0) {
     return (
       <ChartCard title="Valla Menos Vencida">
@@ -48,22 +53,30 @@ export function LeastConcededChart({ data }: LeastConcededChartProps) {
         <BarChart
           data={chartData}
           layout="vertical"
-          margin={{ left: 0, right: 0, top: 8, bottom: 0 }}
+          margin={{ left: 0, right: narrow ? 16 : 0, top: 8, bottom: 0 }}
         >
           <CartesianGrid strokeDasharray="3 3" horizontal={false} />
-          <XAxis type="number" allowDecimals={false} />
+          <XAxis
+            type="number"
+            allowDecimals={false}
+            tick={narrow ? { fontSize: 10 } : undefined}
+          />
           <YAxis
             type="category"
             dataKey="teamShortName"
-            width={70}
-            tick={{ fontSize: 11 }}
+            width={narrow ? 46 : 70}
+            tick={{ fontSize: narrow ? 10 : 11 }}
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar
             dataKey="goals"
             fill="#16a34a"
             radius={[0, 4, 4, 0]}
-            label={{ position: "right", fontSize: 12, fontWeight: 600 }}
+            label={{
+              position: "right",
+              fontSize: narrow ? 10 : 12,
+              fontWeight: 600,
+            }}
           />
         </BarChart>
       </ResponsiveContainer>
