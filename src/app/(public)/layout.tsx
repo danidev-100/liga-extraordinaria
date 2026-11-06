@@ -75,7 +75,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
     <div className="flex min-h-screen flex-col">
       {/* Public header — glassmorphism nav */}
       <header className="sticky top-0 z-50 border-b border-border/50 bg-white/80 pt-[env(safe-area-inset-top)] backdrop-blur-md supports-[backdrop-filter]:bg-white/80 dark:bg-black/50 dark:supports-[backdrop-filter]:bg-black/50">
-        <div className="container mx-auto flex items-center justify-between px-4 py-3 sm:px-6">
+        <div className="container mx-auto flex items-center justify-between px-4 py-3">
           <Link href="/" className="flex items-center gap-2.5 group min-w-0 shrink">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-transform group-hover:scale-105">
               <Trophy className="h-5 w-5" />
@@ -210,12 +210,12 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       )}
 
       <main className="flex-1">
-        <div className="container mx-auto px-4 py-8 sm:px-6">{children}</div>
+        <div className="container mx-auto px-4 py-8">{children}</div>
       </main>
 
       {/* Footer */}
       <footer className="border-t border-border/50 py-6">
-        <div className="container mx-auto px-4 sm:px-6">
+        <div className="container mx-auto px-4">
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} Torneo Pro. Todos los derechos reservados.
